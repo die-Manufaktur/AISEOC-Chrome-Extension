@@ -1,0 +1,37 @@
+# WordPress Generated Files
+uploads/*
+!uploads/.gitkeep
+upgrade/*
+!upgrade/.gitkeep
+cache/*
+*.log
+
+# Development Dependencies
+node_modules/
+vendor/
+.pnpm-store/
+
+# Build Artifacts
+dist/
+build/
+*.min.js
+*.min.css
+*.map
+
+# IDE & System Files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment & Config
+.env
+.env.local
+wp-config.php
+.htaccess
+
+# Temporary Files
+*.tmp
+.cache/
