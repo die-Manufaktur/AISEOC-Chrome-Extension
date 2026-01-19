@@ -12,6 +12,28 @@ The template is designed for:
 - WordPress security, performance, and accessibility auditing
 - Integration with Claude Code for WordPress development workflows
 
+## ⚠️ CRITICAL: File Location Requirements
+
+**This project uses ROOT-LEVEL WordPress folders, NOT `wp-content/` subfolders:**
+
+```
+project-root/
+├── themes/          ← Theme files go HERE (NOT wp-content/themes/)
+├── plugins/         ← Plugin files go HERE (NOT wp-content/plugins/)
+├── mu-plugins/      ← Must-use plugins go HERE (NOT wp-content/mu-plugins/)
+└── .claude/         ← Claude Code configuration
+```
+
+**Why root-level?**
+- Cleaner development structure
+- Easier version control (no nested wp-content)
+- Testing copies files to WordPress `wp-content/` for deployment
+- Development and testing environments separated
+
+**NEVER create files in `wp-content/themes/` or `wp-content/plugins/` during development.**
+
+When deploying to WordPress, files are copied from root folders to `wp-content/` by deployment scripts.
+
 ## WordPress Development Scripts
 
 This template includes WordPress-specific automation scripts:
@@ -112,39 +134,51 @@ wp server --host=localhost --port=8080
 
 When developing, follow these conventions:
 
-### Theme Structure
+### Theme Structure (Development - Root Level)
 ```
-wp-content/themes/theme-name/
-├── style.css           # Theme information and main styles
-├── functions.php       # Theme functions and hooks
-├── index.php          # Main template file
-├── header.php         # Header template
-├── footer.php         # Footer template
-├── sidebar.php        # Sidebar template
-├── single.php         # Single post template
-├── page.php           # Page template
-├── archive.php        # Archive template
-├── 404.php            # 404 error template
+themes/theme-name/              ← ROOT-LEVEL (not wp-content/themes/)
+├── style.css                   # Theme information and main styles
+├── functions.php               # Theme functions and hooks
+├── index.php                   # Main template file (classic themes)
+├── theme.json                  # FSE theme configuration (REQUIRED for FSE)
+├── templates/                  # FSE block templates
+│   ├── index.html             # Main template
+│   ├── front-page.html        # Homepage template
+│   ├── single.html            # Single post template
+│   ├── page.html              # Page template
+│   └── 404.html               # 404 error template
+├── parts/                      # FSE template parts
+│   ├── header.html            # Header template part
+│   ├── footer.html            # Footer template part
+│   └── sidebar.html           # Sidebar template part
+├── patterns/                   # Block patterns
 ├── assets/
-│   ├── css/          # Additional stylesheets
-│   ├── js/           # JavaScript files
-│   └── images/       # Theme images
-└── template-parts/    # Reusable template parts
+│   ├── css/                   # Additional stylesheets
+│   ├── js/                    # JavaScript files
+│   └── images/                # Theme images
+└── inc/                        # PHP includes
+
+# Classic theme alternatives (if not using FSE):
+# ├── header.php, footer.php, sidebar.php
+# ├── single.php, page.php, archive.php
+# └── template-parts/
 ```
 
-### Plugin Structure
+### Plugin Structure (Development - Root Level)
 ```
-wp-content/plugins/plugin-name/
-├── plugin-name.php    # Main plugin file with header
-├── includes/          # PHP includes
-├── admin/            # Admin-specific functionality
-├── public/           # Public-facing functionality
+plugins/plugin-name/            ← ROOT-LEVEL (not wp-content/plugins/)
+├── plugin-name.php            # Main plugin file with header
+├── includes/                  # PHP includes
+├── admin/                     # Admin-specific functionality
+├── public/                    # Public-facing functionality
 ├── assets/
 │   ├── css/
 │   ├── js/
 │   └── images/
-└── languages/        # Translation files
+└── languages/                 # Translation files
 ```
+
+**Deployment Note:** During testing/deployment, files from `themes/` are copied to `wp-content/themes/` and files from `plugins/` are copied to `wp-content/plugins/`. See `.claude/skills/figma-to-fse-autonomous-workflow/TESTING-GUIDE.md` for deployment procedures.
 
 ## WordPress Development Standards
 
@@ -384,18 +418,20 @@ git checkout -b feature/hero-block-pattern
 
 **2. Code Quality Workflow**
 ```bash
-# Check coding standards
+# Check coding standards (use root-level paths)
 ./scripts/wordpress/check-coding-standards.sh themes/my-theme
 
-# Security scan
+# Security scan (use root-level paths)
 ./scripts/wordpress/security-scan.sh themes/my-theme
 
-# Performance check
+# Performance check (use root-level paths)
 ./scripts/wordpress/check-performance.sh themes/my-theme
 
 # Fix issues and commit
 /commit
 ```
+
+**Note:** Always use root-level paths (`themes/`, `plugins/`) for development scripts.
 
 **3. Using Custom Agents**
 Agents are invoked automatically based on task context, or explicitly:

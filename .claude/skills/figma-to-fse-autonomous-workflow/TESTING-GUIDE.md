@@ -170,9 +170,11 @@ Summary:
 
 Next steps:
 1. Install WordPress locally (if not already)
-2. Copy theme to wp-content/themes/
+2. Copy theme from themes/ to wp-content/themes/ (deployment step)
 3. Activate theme in WordPress admin
 4. View front page
+
+Note: Development creates files in root-level themes/, then you copy to WordPress for testing.
 
 See detailed report: .claude/reports/figma-fse-comparison.md"
 ```
@@ -285,13 +287,17 @@ echo '{"tool_input":{"file_path":"themes/[theme-name]/templates/front-page.html"
 
 If you have WordPress installed locally:
 
+**Important:** This test demonstrates **DEPLOYMENT** - copying from development location (`themes/`) to WordPress installation (`wp-content/themes/`). Development always happens in root-level `themes/` folder.
+
 ### Install Theme
 
 ```bash
-# Copy theme to WordPress
+# Copy theme to WordPress (deployment step)
+# Source: themes/[theme-name] (development location)
+# Target: /path/to/wordpress/wp-content/themes/ (WordPress installation)
 cp -r themes/[theme-name] /path/to/wordpress/wp-content/themes/
 
-# Or create symlink
+# Or create symlink (for live development)
 ln -s $(pwd)/themes/[theme-name] /path/to/wordpress/wp-content/themes/[theme-name]
 ```
 
@@ -350,6 +356,96 @@ ln -s $(pwd)/themes/[theme-name] /path/to/wordpress/wp-content/themes/[theme-nam
 - [ ] Complex component simplified successfully
 - [ ] Note added to report
 - [ ] Conversion completed
+
+---
+
+## Test 7: No Design System in Figma (Fallback Defaults)
+
+**Purpose:** Verify workflow completes even when Figma file has NO design system, using professional fallback defaults.
+
+### Setup
+
+Create or use a Figma file with:
+- **ONLY templates** (homepage, about, services, etc.)
+- **NO "Design System" page** or similar
+- **NO design variables/tokens defined**
+
+### Test Procedure
+
+1. Provide Figma file URL to Claude:
+   ```
+   User: "Convert this Figma file to FSE theme: [URL with templates only]"
+   ```
+
+2. Observe Phase 1.1 behavior
+
+**Expected Phase 1.1 behavior:**
+```
+Claude: "Step 1.1: Creating theme.json foundation..."
+Claude: "ℹ️  No design system found, using professional fallback tokens"
+Claude: "✓ theme.json created at themes/[theme-name]/theme.json"
+```
+
+3. Verify theme.json was created with fallback defaults
+
+### Expected Results
+
+**Immediate theme.json creation:**
+- [ ] theme.json created BEFORE template discovery
+- [ ] No "where is your design system?" question
+- [ ] No workflow blockage
+
+**Fallback tokens used:**
+- [ ] 13 colors in theme.json (primary, accent, neutrals)
+- [ ] 9 font sizes (14px-72px scale)
+- [ ] 10 spacing tokens (4px base unit)
+- [ ] Layout settings (768px content, 1280px wide)
+
+**Workflow proceeds normally:**
+- [ ] Claude discovers templates
+- [ ] Claude generates FSE templates using fallback theme.json
+- [ ] Templates are pixel-perfect (using fallback colors/sizes)
+- [ ] No hardcoded values in templates
+- [ ] Workflow completes without errors
+
+### Verification Commands
+
+```bash
+# Check theme.json exists
+ls -la themes/[theme-name]/theme.json
+
+# Verify fallback colors (should be 13)
+jq '.settings.color.palette | length' themes/[theme-name]/theme.json
+# Expected output: 13
+
+# Verify fallback font sizes (should be 9)
+jq '.settings.typography.fontSizes | length' themes/[theme-name]/theme.json
+# Expected output: 9
+
+# Verify fallback spacing (should be 10)
+jq '.settings.spacing.spacingSizes | length' themes/[theme-name]/theme.json
+# Expected output: 10
+
+# Check NO hardcoded values in templates
+grep -r "color:#" themes/[theme-name]/templates/
+# Expected: No matches (should use var:preset|color| instead)
+```
+
+### Success Criteria
+
+✅ Test passes if:
+- theme.json created with 13+ colors, 9+ font sizes, 10+ spacing
+- Workflow never blocked or prompted for design system location
+- Templates generated successfully using fallback tokens
+- Zero hardcoded values in template files
+- Professional-looking theme with accessible color contrast
+
+❌ Test fails if:
+- Workflow blocks waiting for design system
+- Claude asks "where is your design system?"
+- theme.json has missing/incomplete token sets
+- Templates contain hardcoded colors/sizes
+- Workflow errors or stops
 
 ---
 

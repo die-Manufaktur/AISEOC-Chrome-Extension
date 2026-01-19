@@ -31,18 +31,43 @@ Develop themes/plugins here and sync to your WordPress installation's `wp-conten
 
 ## Directory Structure
 
+### ⚠️ Development Structure (Root-Level Folders)
+
+**During development, this project uses ROOT-LEVEL WordPress folders:**
+
 ```
-wp-content/
-├── themes/              # WordPress themes
-├── plugins/             # Custom plugins
-├── mu-plugins/          # Must-use plugins
-├── uploads/             # Media files (gitignored)
-├── languages/           # Translation files
-├── upgrade/             # WordPress upgrade files (gitignored)
+project-root/
+├── themes/              ← Themes go HERE during development
+├── plugins/             ← Plugins go HERE during development
+├── mu-plugins/          ← Must-use plugins go HERE during development
 ├── scripts/             # Development automation scripts
 │   └── wordpress/       # WordPress-specific tools
-└── docs/                # Documentation and planning
+│   └── figma-fse/       # Figma-to-FSE conversion scripts
+├── docs/                # Documentation and planning
+└── .claude/             # Claude Code configuration
 ```
+
+**Why root-level?**
+- Cleaner development structure (no nested wp-content)
+- Easier version control
+- Separation between development and deployment environments
+
+### Deployment Structure (WordPress wp-content)
+
+**When deploying to WordPress, files are copied to standard wp-content structure:**
+
+```
+wordpress-install/
+└── wp-content/
+    ├── themes/          ← Development themes/ copied here for testing
+    ├── plugins/         ← Development plugins/ copied here for testing
+    ├── mu-plugins/      ← Development mu-plugins/ copied here for testing
+    ├── uploads/         # Media files (gitignored)
+    ├── languages/       # Translation files
+    └── upgrade/         # WordPress upgrade files (gitignored)
+```
+
+**NEVER create files in `wp-content/` during development.** Use root-level `themes/`, `plugins/`, `mu-plugins/` folders.
 
 ## WordPress Development Tools
 

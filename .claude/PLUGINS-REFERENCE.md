@@ -239,7 +239,7 @@ git checkout -b hotfix/security-escaping
 **1. Create New Block Pattern**
 ```bash
 # Create pattern file
-# wp-content/themes/my-theme/patterns/hero-section.php
+# themes/my-theme/patterns/hero-section.php
 
 # Test in editor, then commit
 /commit
@@ -249,7 +249,7 @@ git checkout -b hotfix/security-escaping
 **2. Update theme.json**
 ```bash
 # Modify theme.json settings
-# wp-content/themes/my-theme/theme.json
+# themes/my-theme/theme.json
 
 # Commit with context
 /commit
@@ -259,7 +259,7 @@ git checkout -b hotfix/security-escaping
 **3. Add Template Part**
 ```bash
 # Create new template part
-# wp-content/themes/my-theme/parts/footer-minimal.html
+# themes/my-theme/parts/footer-minimal.html
 
 # Commit and document
 /commit
@@ -271,7 +271,7 @@ git checkout -b hotfix/security-escaping
 **1. Create Custom Block Plugin**
 ```bash
 # Scaffold plugin structure
-# wp-content/plugins/my-custom-blocks/
+# plugins/my-custom-blocks/
 
 # Initial commit
 /commit
@@ -328,7 +328,7 @@ Check `.claude/settings.local.json` for configured permissions.
 ## 🚀 Next Steps
 
 ### Verify PHP LSP is Working
-1. Open a PHP file: `wp-content/themes/your-theme/functions.php`
+1. Open a PHP file: `themes/your-theme/functions.php`
 2. Start typing `wp_` and check for autocomplete suggestions
 3. Hover over a function to see documentation
 4. Use Ctrl+Click to jump to definitions

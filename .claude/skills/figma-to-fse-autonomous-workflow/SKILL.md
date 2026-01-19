@@ -46,105 +46,205 @@ Before starting, verify:
 
 **Critical:** If Figma MCP not accessible, STOP and inform user before proceeding.
 
+## ⚠️ CRITICAL: File Location Requirements
+
+**This project uses ROOT-LEVEL folders for theme development:**
+
+```
+project-root/
+└── themes/[theme-name]/     ← ALL theme files go HERE (NOT wp-content/themes/)
+```
+
+**PRE-FLIGHT VALIDATION (Run BEFORE any file writes):**
+
+Before creating or modifying ANY theme files, verify:
+1. [ ] `themes/` directory exists at project root
+2. [ ] NO files being created in `wp-content/themes/` (NEVER use this path)
+3. [ ] Theme name slug is valid (lowercase, hyphens only, no spaces)
+
+**Auto-validation script:** `scripts/figma-fse/validate-theme-location.sh` will block incorrect paths.
+
+**Why root-level?**
+- Clean development structure (no nested wp-content)
+- Easier version control
+- Testing copies files to WordPress `wp-content/` separately
+
+**Deployment Note:** During testing, files are copied from `themes/` to WordPress `wp-content/themes/`. See TESTING-GUIDE.md for deployment procedures.
+
+## Fallback Design Tokens (Default Design System)
+
+**CRITICAL:** When Figma design system is unavailable, incomplete, or cannot be extracted, use these professional fallback defaults. This ensures the workflow NEVER blocks on missing design systems.
+
+### Fallback Color Palette (13 tokens)
+
+All colors are WCAG AA compliant with appropriate contrast ratios:
+
+```javascript
+const FALLBACK_COLORS = {
+  // Primary palette (Professional blue-gray)
+  "primary": "#34495e",           // Main brand color
+  "primary-dark": "#293a4b",      // Darker variant
+  "primary-darker": "#141d25",    // Darkest variant
+  "primary-light": "#707f8e",     // Lighter variant
+  "primary-lightest": "#eaecee",  // Lightest variant
+
+  // Accent palette (Teal)
+  "accent": "#16a085",            // Accent color
+  "accent-dark": "#11806a",       // Darker accent
+  "accent-darker": "#084035",     // Darkest accent
+  "accent-lightest": "#e7f5f2",   // Lightest accent
+
+  // Neutrals
+  "white": "#ffffff",             // Pure white
+  "black": "#0c0c0c",             // Near black (softer than pure black)
+  "background": "#fdfdfd",        // Off-white background
+  "gray": "#5e6060"               // Mid-tone gray
+};
+```
+
+### Fallback Typography (2 families, 9 sizes)
+
+**Font families:**
+- Primary: `"Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"`
+- Heading: `"Questrial", "Georgia", "serif"`
+
+**Font sizes** (9-point scale):
+
+```javascript
+const FALLBACK_FONT_SIZES = [
+  { slug: "small", size: "14px", name: "Small" },          // Body small
+  { slug: "base", size: "16px", name: "Base" },            // Body text
+  { slug: "medium", size: "18px", name: "Medium" },        // Large body
+  { slug: "large", size: "20px", name: "Large" },          // Subheading
+  { slug: "x-large", size: "24px", name: "Extra Large" },  // H4
+  { slug: "2x-large", size: "32px", name: "2X Large" },    // H3
+  { slug: "3x-large", size: "40px", name: "3X Large" },    // H2
+  { slug: "4x-large", size: "56px", name: "4X Large" },    // H1
+  { slug: "5x-large", size: "72px", name: "5X Large" }     // Hero heading
+];
+```
+
+### Fallback Spacing (10 tokens)
+
+**Based on 4px base unit:**
+
+```javascript
+const FALLBACK_SPACING = [
+  { slug: "20", size: "4px", name: "1" },      // xs: 4px
+  { slug: "30", size: "8px", name: "2" },      // sm: 8px
+  { slug: "40", size: "16px", name: "3" },     // base: 16px
+  { slug: "50", size: "24px", name: "4" },     // md: 24px
+  { slug: "60", size: "32px", name: "5" },     // lg: 32px
+  { slug: "70", size: "40px", name: "6" },     // xl: 40px
+  { slug: "80", size: "48px", name: "7" },     // 2xl: 48px
+  { slug: "90", size: "64px", name: "8" },     // 3xl: 64px
+  { slug: "100", size: "80px", name: "9" },    // 4xl: 80px
+  { slug: "110", size: "112px", name: "10" }   // 5xl: 112px
+];
+```
+
+### Fallback Layout Settings
+
+```javascript
+const FALLBACK_LAYOUT = {
+  contentSize: "768px",    // Standard content width
+  wideSize: "1280px"       // Wide content width
+};
+```
+
+### When to Use Fallback Tokens
+
+**Use fallback tokens when:**
+1. Figma file has NO design system page/frame
+2. Auto-detection fails to find design system
+3. `get_variable_defs` returns empty or incomplete results
+4. User cannot provide design system location
+5. Design system extraction errors occur
+
+**Merge strategy (when partial design system exists):**
+- Figma tokens take precedence
+- Fallback tokens fill gaps
+- Never leave theme.json with missing values
+
+**Example merge:**
+```javascript
+// Figma has 5 colors, fallback has 13
+// Result: 5 Figma colors + 8 additional fallback colors = 13 total
+```
+
 ## The Workflow
 
 ### Phase 1: Discovery & Planning (1-2 minutes, Interactive)
 
-**Step 1.1: Locate Design System**
+**Step 1.1: Create theme.json Foundation FIRST**
 
-CRITICAL FIRST STEP - Do NOT skip this or proceed to templates without it.
+⚠️ **CRITICAL:** Create theme.json IMMEDIATELY, before any template discovery. This step NEVER blocks the workflow.
 
-Ask user explicitly:
-```
-"Where is your design system in the Figma file?
+**Auto-detection workflow:**
 
-Common locations:
-- Separate "Design System" page
-- "Styles" or "Tokens" page
-- Component library
-- Shared Figma library (provide link)
+```javascript
+async function createThemeJsonFoundation(figmaFileKey, themeName) {
+  console.log("Step 1.1: Creating theme.json foundation...");
 
-If unsure, I can search for common design system patterns."
-```
+  // 1. Attempt auto-detection of design system (non-blocking)
+  const designSystem = await autoDetectDesignSystem(figmaFileKey);
 
-**Step 1.2: Extract COMPLETE Design System Wholesale**
+  let tokens;
 
-Once design system location identified, use Figma MCP `get_variable_defs` to extract:
-
-✅ **ALL colors** (not selective):
-- Primary, secondary, tertiary color palettes
-- Neutral/gray scales
-- Semantic colors (success, error, warning, info)
-- Background colors
-- Text colors
-
-✅ **ALL typography styles**:
-- Font families (primary, secondary, monospace)
-- Font sizes (complete scale: xs, sm, base, lg, xl, 2xl, 3xl, etc.)
-- Font weights (thin, normal, medium, semibold, bold, black)
-- Line heights (tight, normal, relaxed, loose)
-- Letter spacing
-
-✅ **ALL spacing tokens** (complete scale):
-- Base unit (usually 4px or 8px)
-- Full scale (4px, 8px, 12px, 16px, 24px, 32px, 40px, 48px, 64px, 96px)
-- Padding presets
-- Margin presets
-
-✅ **ALL layout settings**:
-- Breakpoints (mobile, tablet, desktop)
-- Container widths (max-width values)
-- Column counts
-- Gap sizes
-
-**Step 1.3: Translate Design System → theme.json Foundation**
-
-Map Figma variables DIRECTLY to theme.json structure:
-
-```json
-{
-  "$schema": "https://schemas.wp.org/trunk/theme.json",
-  "version": 2,
-  "settings": {
-    "color": {
-      "palette": [
-        {"slug": "primary", "color": "#<figma-variable-value>", "name": "Primary"},
-        // Map ALL color variables here
-      ]
-    },
-    "typography": {
-      "fontFamilies": [
-        {"slug": "primary", "fontFamily": "<figma-font-family>", "name": "Primary"}
-      ],
-      "fontSizes": [
-        {"slug": "small", "size": "<figma-size>", "name": "Small"}
-        // Map ALL size variables here
-      ]
-    },
-    "spacing": {
-      "spacingSizes": [
-        {"slug": "20", "size": "4px", "name": "1"},
-        // Map ALL spacing tokens here
-      ]
-    },
-    "layout": {
-      "contentSize": "<figma-container-width>",
-      "wideSize": "<figma-wide-width>"
+  if (designSystem) {
+    // Design system found - extract tokens
+    console.log(`✓ Found design system: ${designSystem.name}`);
+    try {
+      tokens = await extractFigmaTokens(designSystem.nodeId);
+      console.log(`✓ Extracted ${tokens.colors.length} colors, ${tokens.fontSizes.length} font sizes`);
+    } catch (error) {
+      console.log(`⚠️  Extraction failed, using fallback tokens`);
+      tokens = FALLBACK_DESIGN_TOKENS;
     }
+  } else {
+    // No design system - use fallback defaults
+    console.log("ℹ️  No design system found, using professional fallback tokens");
+    tokens = FALLBACK_DESIGN_TOKENS;
   }
+
+  // 2. Merge Figma tokens with fallbacks (Figma takes precedence)
+  const mergedTokens = mergeFigmaWithDefaults(tokens, FALLBACK_DESIGN_TOKENS);
+
+  // 3. Generate theme.json immediately
+  const themeJson = generateThemeJson(mergedTokens, themeName);
+
+  // 4. Write to file (root-level themes/ folder)
+  await writeFile(`themes/${themeName}/theme.json`, themeJson);
+  console.log(`✓ theme.json created at themes/${themeName}/theme.json`);
+
+  return { themeJson, tokens: mergedTokens };
 }
 ```
 
-**NO hardcoded values.** Every color, size, spacing value MUST come from Figma variables.
+**Auto-detection logic (searches common names):**
+- Page names: "Design System", "Styles", "Tokens", "Library", "Components"
+- Frame names: "design-system", "tokens", "variables"
+- If found: Extract with `get_variable_defs`
+- If not found: Use fallback tokens (no user prompt needed)
 
-**Step 1.4: Survey Templates to Convert**
+**Merge strategy:**
+- Figma colors override fallback colors (by slug)
+- Figma font sizes override fallback sizes (by slug)
+- Fill gaps with fallback tokens
+- Ensure minimum viable theme.json (13+ colors, 9+ sizes, 10+ spacing)
+
+**Result:** theme.json exists with complete design system BEFORE template work begins.
+
+**NEVER ask user "where is your design system?" - auto-detection or fallbacks handle this.**
+
+**Step 1.2: Survey Templates to Convert**
 
 Use Figma MCP `get_image` or `get_code` to:
 1. Count total templates in Figma file (6-15 expected)
 2. Identify template types (homepage, about, services, contact, etc.)
 3. Capture screenshots of each template for reference
 
-**Step 1.5: Create Component Mapping Plan**
+**Step 1.3: Create Component Mapping Plan**
 
 Map Figma components → WordPress blocks using this reference:
 
@@ -161,26 +261,28 @@ Map Figma components → WordPress blocks using this reference:
 | Accordions | Details block | Collapsible content |
 | Spacers | Spacer block | Vertical spacing (use theme.json tokens) |
 
-**Step 1.6: Generate Implementation Plan**
+**Step 1.4: Generate Implementation Plan**
 
 Use `superpowers:writing-plans` to create detailed plan:
 
 ```
 Plan structure:
-1. Create theme.json from extracted Figma design system
-2. Create theme directory structure
+1. ✅ theme.json already created (Phase 1.1)
+2. Create theme directory structure (style.css, templates/, parts/)
 3. For each template (1-N):
    - Extract component structure from Figma
    - Generate FSE template HTML using WordPress blocks
-   - Apply theme.json tokens exclusively
+   - Apply theme.json tokens exclusively (NO hardcoded values)
    - Add responsive layouts
    - Add accessibility attributes
-4. Create supporting block patterns
+4. Create supporting block patterns (optional)
 5. Run automated verification
 6. Generate comparison report
 ```
 
-**Step 1.7: Present Plan to User**
+**Note:** theme.json is already complete from Step 1.1, so plan focuses on templates and structure.
+
+**Step 1.5: Present Plan to User**
 
 Show:
 - Complete design token mapping (colors, typography, spacing)
@@ -202,13 +304,13 @@ User: "Yes, proceed"
 → Mode: Autonomous (no checkpoint prompts)
 ```
 
-**Step 2.2: Create theme.json Foundation**
+**Step 2.2: Verify theme.json Foundation**
 
-From Phase 1 extraction, create complete theme.json:
-- Write to `themes/<theme-name>/theme.json`
-- Include ALL extracted tokens
+✅ theme.json already created in Phase 1.1 - verify it exists:
+- Check file exists: `themes/<theme-name>/theme.json`
+- Verify completeness (13+ colors, 9+ font sizes, 10+ spacing tokens)
 - Validate JSON syntax
-- No placeholder values
+- Confirm NO placeholder values
 
 **Step 2.3: Create Theme Structure**
 
@@ -225,39 +327,80 @@ themes/<theme-name>/
 └── patterns/          # Generated patterns
 ```
 
-**Step 2.4: Convert Templates (Autonomous Loop)**
+**Step 2.4: Convert Templates (Autonomous Loop for 6-15 Templates)**
 
-For EACH template identified in Phase 1:
+**Phase 2 Multi-Template Processing:**
 
-1. **Extract Structure**:
-   - Try: `get_code` for component structure
-   - If fails (annotations present): Fallback to `get_image` + visual analysis
-   - Log error but CONTINUE
+Initialize template queue with priority ordering:
+```
+Priority 1: Template parts (header, footer) - Required by other templates
+Priority 2: index.html - Required fallback
+Priority 3: Main templates (front-page, page, single, archive, etc.)
+Priority 4: Special templates (404, search, etc.)
+```
 
-2. **Generate FSE Template**:
+**For EACH template in queue (template X of N):**
+
+1. **Pre-Processing**:
+   - Log: "Processing template {X} of {N}: {template-name}"
+   - Track: templates_completed[], templates_remaining[]
+   - Check context: If approaching 80% context limit → trigger checkpoint (see Context Management)
+
+2. **Extract Structure with Error Recovery**:
+   ```
+   Try:
+     structure = get_code(template_node_id)
+     Log: "✓ Structure extracted via get_code"
+   Catch annotation error:
+     Log: "⚠ get_code failed (annotations detected), falling back to image analysis"
+     image = get_image(template_node_id)
+     structure = analyze_image_for_blocks(image)
+     Log: "✓ Structure extracted via visual analysis"
+   Catch connection error:
+     Log: "❌ Figma MCP connection failed"
+     Try remote MCP fallback
+     If both fail: STOP (blocker)
+   Continue: (don't stop for non-blocker errors)
+   ```
+
+3. **Generate FSE Template**:
    - Use WordPress block markup (HTML comments)
    - Apply theme.json tokens EXCLUSIVELY (no hardcoded #hexcodes)
    - Structure: `<!-- wp:block-name {"attributes"} -->content<!-- /wp:block-name -->`
    - Use block mapping from Phase 1
+   - Reference existing parts: `<!-- wp:template-part {"slug":"header"} /-->`
 
-3. **Implement Responsiveness**:
+4. **Implement Responsiveness**:
    - Use theme.json breakpoints
    - Apply appropriate block alignment (wide, full)
    - Test mental model: mobile → tablet → desktop
+   - Stack columns for mobile views
 
-4. **Add Accessibility**:
+5. **Add Accessibility**:
    - ARIA labels where needed
-   - Semantic HTML structure
-   - Alt text for images (extract from Figma if present)
+   - Semantic HTML structure (header, main, footer, nav, article, aside)
+   - Alt text for images (extract from Figma or use placeholder)
    - Keyboard navigation support
+   - Heading hierarchy (h1 → h2 → h3, no skipping levels)
 
-5. **Validate**:
+6. **Validate & Hook Execution**:
    - Run `.claude/hooks/figma-fse-post-template.sh` (if exists)
-   - Check for hardcoded values (should be ZERO)
-   - Verify block syntax
-   - Continue even if minor issues found
+   - Check for hardcoded hex colors (should be ZERO)
+   - Check for hardcoded pixel sizes (should be ZERO)
+   - Verify block syntax (balanced open/close tags)
+   - If validation failures: Log to errors.log, continue anyway
 
-6. **Continue to Next Template** (NO prompt to user)
+7. **Update Progress**:
+   - Add template to templates_completed[]
+   - Remove from templates_remaining[]
+   - Log: "✓ Template {X} of {N} complete: {template-name}"
+   - NO "should I continue?" prompt to user
+
+8. **Checkpoint Check**:
+   - If (templates_completed.length % 3 == 0): Trigger episodic memory checkpoint
+   - Continue to next template without waiting
+
+9. **Continue to Next Template** (NO prompt to user)
 
 **Step 2.5: Create Block Patterns**
 
@@ -442,27 +585,159 @@ Then:
 - WordPress theme directory structure missing
 - User manually interrupts
 
-## Context Management
+## Context Management (Phase 2: Multi-Template Support)
 
-**Problem:** 6-15 templates can exhaust context window
+**Problem:** 6-15 templates can exhaust context window (200K tokens)
 
-**Solution:** Episodic memory checkpointing
+**Solution:** Episodic memory checkpointing every 3 templates
+
+### Checkpoint Trigger Conditions
+
+Trigger checkpoint when:
+1. **Template count divisible by 3** (templates_completed % 3 == 0)
+2. **Context approaching 80% limit** (~160K tokens used)
+3. **Before switching to complex templates** (e.g., before archive.php with loops)
+
+### Checkpoint Procedure
+
+**Step 1: Prepare Checkpoint Data**
+
+Create checkpoint object with all critical state:
+```json
+{
+  "checkpoint_id": "figma-fse-{theme-name}-{timestamp}",
+  "theme_name": "{theme-name}",
+  "total_templates": 12,
+  "templates_completed": [
+    {"name": "header.html", "status": "complete", "blocks": 8, "issues": []},
+    {"name": "footer.html", "status": "complete", "blocks": 5, "issues": []},
+    {"name": "index.html", "status": "complete", "blocks": 12, "issues": []}
+  ],
+  "templates_remaining": [
+    {"name": "front-page.html", "priority": 3, "figma_node_id": "123:456"},
+    {"name": "page.html", "priority": 3, "figma_node_id": "123:457"},
+    {"name": "single.html", "priority": 3, "figma_node_id": "123:458"},
+    // ... remaining templates
+  ],
+  "design_system": {
+    "colors": ["primary", "secondary", "white", "black", "..."],
+    "font_sizes": ["small", "base", "medium", "large", "xl"],
+    "spacing": ["20", "30", "40", "50", "60", "70", "80", "90"],
+    "theme_json_path": "themes/{theme-name}/theme.json"
+  },
+  "component_patterns": {
+    "hero_sections": "Cover block with columns",
+    "card_grids": "Columns with Group blocks",
+    "testimonials": "Quote block in Group"
+  },
+  "errors_encountered": [
+    {"template": "index.html", "error": "get_code failed", "resolution": "used get_image fallback"}
+  ],
+  "figma_file": {
+    "url": "{figma-url}",
+    "design_system_location": "Design System page"
+  }
+}
+```
+
+**Step 2: Save to Episodic Memory**
+
+```bash
+# Use episodic-memory plugin to save checkpoint
+/episodic-memory:save "Figma-to-FSE checkpoint: {theme-name}, completed {X} of {N} templates"
+
+# Include full checkpoint data in the save
+```
+
+**Step 3: Log Checkpoint**
+
+```bash
+echo "📌 CHECKPOINT: Template {X} of {N} complete" >> .claude/logs/figma-fse-checkpoints.log
+echo "State saved to episodic memory: checkpoint_id={checkpoint_id}" >> .claude/logs/figma-fse-checkpoints.log
+```
+
+**Step 4: Continue Immediately**
+
+- Do NOT wait for user confirmation
+- Do NOT pause execution
+- Checkpoint is non-blocking
+- Move immediately to next template
+
+### Resumption Procedure (If Session Interrupted)
+
+**If conversion interrupted and user returns:**
+
+**Step 1: Detect Incomplete Conversion**
 
 ```
-After every 3 templates:
-1. Save state to episodic memory:
-   - Templates completed (list)
-   - Templates remaining (list)
-   - Design token mappings
-   - Component patterns discovered
-   - Known issues encountered
+User: "Continue converting my Figma templates"
 
-2. If context approaches limit:
-   - Trigger: /episodic-memory:save
-   - Start fresh session
-   - Load state: /episodic-memory:search
-   - Resume from checkpoint
+Claude: Uses episodic-memory:search to find recent checkpoint
+Search query: "Figma-to-FSE checkpoint {theme-name}"
 ```
+
+**Step 2: Load Checkpoint State**
+
+```bash
+# Retrieve checkpoint from episodic memory
+checkpoint = /episodic-memory:search "Figma-to-FSE checkpoint {theme-name}"
+
+# Extract state
+templates_completed = checkpoint.templates_completed
+templates_remaining = checkpoint.templates_remaining
+design_system = checkpoint.design_system
+```
+
+**Step 3: Resume from Checkpoint**
+
+```
+Claude: "I found a checkpoint from [timestamp]:
+         - Completed: {X} templates (header, footer, index, ...)
+         - Remaining: {Y} templates (front-page, page, single, ...)
+
+         Resuming autonomous conversion from template {X+1}..."
+
+[Continue with Step 2.4 loop from checkpoint.templates_remaining[0]]
+```
+
+**Step 4: NO Re-Discovery**
+
+- Do NOT re-extract design system (use checkpoint.design_system)
+- Do NOT re-survey templates (use checkpoint.templates_remaining)
+- Do NOT ask for plan approval again
+- Jump directly to Step 2.4 autonomous loop
+
+### Context Window Management
+
+**Monitor context usage:**
+```
+After each template:
+  estimated_tokens = (templates_completed * avg_tokens_per_template)
+  if estimated_tokens > 160000:  # 80% of 200K limit
+    Trigger checkpoint
+    Consider: Summarize previous templates to save context
+```
+
+**Context-saving strategies:**
+1. Checkpoint every 3 templates (before hitting limit)
+2. Summarize completed templates (keep only: name, status, issues)
+3. Clear verbose Figma MCP responses from context
+4. Keep only essential design token mappings in working memory
+
+### Error Recovery with Checkpoints
+
+**If error occurs during template processing:**
+1. Log error to checkpoint.errors_encountered[]
+2. Save checkpoint immediately (preserve state before potential failure)
+3. Attempt error recovery (get_code → get_image fallback)
+4. Continue with next template
+5. Final report will include all errors from checkpoint
+
+**Benefits:**
+- No lost work if session crashes
+- Can pause and resume multi-hour conversions
+- Errors logged and tracked across checkpoints
+- User can interrupt without losing progress
 
 ## Quality Gates
 
@@ -771,6 +1046,7 @@ Claude: [Invokes superpowers:executing-plans]
 
 ---
 
-**Status:** Phase 1 implementation complete
-**Version:** 1.0.0
+**Status:** Phase 2 implementation complete (multi-template support, episodic memory, error recovery)
+**Version:** 2.0.0
 **Last Updated:** 2026-01-19
+**Supports:** 1-15 templates with autonomous checkpointing every 3 templates

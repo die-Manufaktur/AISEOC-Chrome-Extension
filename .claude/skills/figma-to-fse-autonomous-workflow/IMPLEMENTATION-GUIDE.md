@@ -8,7 +8,56 @@
 
 ## Part 1: Design Token Extraction (Figma → theme.json)
 
-### Step 1: Locate Figma Design System
+### ⚠️ NEW WORKFLOW: theme.json-First Approach
+
+**CRITICAL CHANGE:** Create theme.json FIRST with auto-detection and fallback tokens. This ensures the workflow NEVER blocks on missing design systems.
+
+**Workflow order (new):**
+1. **Create theme.json IMMEDIATELY** (auto-detect OR use fallbacks)
+2. Survey templates
+3. Generate templates using theme.json tokens
+
+**Old workflow (deprecated):** Ask user for design system location → Extract → Create theme.json → Templates
+
+**Fallback Design Tokens:** See SKILL.md "Fallback Design Tokens" section for complete defaults (13 colors, 9 font sizes, 10 spacing tokens)
+
+**Key functions to implement:**
+
+```javascript
+// 1. Auto-detect design system (non-blocking)
+async function autoDetectDesignSystem(figmaFileKey) {
+  const commonNames = ["Design System", "Styles", "Tokens", "Library", "Components"];
+  // Search pages/frames by name
+  // Return {nodeId, name} if found, null if not found
+}
+
+// 2. Merge Figma tokens with fallbacks
+function mergeFigmaWithDefaults(figmaTokens, fallbackTokens) {
+  // Figma tokens take precedence by slug
+  // Fill gaps with fallback tokens
+  // Ensure minimum viable theme.json
+}
+
+// 3. Create theme.json foundation
+async function createThemeJsonFoundation(figmaFileKey, themeName) {
+  const designSystem = await autoDetectDesignSystem(figmaFileKey);
+  let tokens = designSystem
+    ? await extractFigmaTokens(designSystem.nodeId)
+    : FALLBACK_DESIGN_TOKENS;
+
+  const mergedTokens = mergeFigmaWithDefaults(tokens, FALLBACK_DESIGN_TOKENS);
+  const themeJson = generateThemeJson(mergedTokens, themeName);
+  await writeFile(`themes/${themeName}/theme.json`, themeJson);
+
+  return {themeJson, tokens: mergedTokens};
+}
+```
+
+**Result:** theme.json created BEFORE template discovery, workflow never blocks.
+
+---
+
+### Step 1: Locate Figma Design System (OPTIONAL - Auto-detection handles this)
 
 **Objective:** Find where design tokens are defined in the Figma file
 

@@ -37,15 +37,28 @@ When NOT to use:
 
 ## Required File Structure
 
+### ⚠️ CRITICAL: File Location
+
+**This project uses ROOT-LEVEL folders during development:**
+
+```
+project-root/
+└── themes/theme-name/      ← Create themes HERE (NOT wp-content/themes/)
+```
+
+**NEVER create files in `wp-content/themes/` during development.** All theme development happens in the root-level `themes/` directory. Testing environments copy files to WordPress `wp-content/` for deployment.
+
+### Minimal FSE Theme Structure
+
 **Minimal FSE theme requires:**
 
 ```
-theme-name/
-├── style.css           # Theme header (REQUIRED)
-├── theme.json          # Design system (REQUIRED)
+themes/theme-name/          ← ROOT-LEVEL (not wp-content/themes/)
+├── style.css               # Theme header (REQUIRED)
+├── theme.json              # Design system (REQUIRED)
 ├── templates/
-│   └── index.html      # Fallback template (REQUIRED)
-└── parts/              # Optional but recommended
+│   └── index.html          # Fallback template (REQUIRED)
+└── parts/                  # Optional but recommended
     ├── header.html
     └── footer.html
 ```
@@ -53,27 +66,31 @@ theme-name/
 **Complete FSE theme structure:**
 
 ```
-theme-name/
+themes/theme-name/              ← ROOT-LEVEL (not wp-content/themes/)
 ├── style.css
 ├── theme.json
-├── functions.php       # Optional: custom functionality
+├── functions.php               # Optional: custom functionality
 ├── templates/
-│   ├── index.html      # Required fallback
+│   ├── index.html              # Required fallback
 │   ├── front-page.html
-│   ├── home.html       # Blog index
-│   ├── single.html     # Single post
-│   ├── page.html       # Single page
-│   ├── archive.html    # Archive pages
+│   ├── home.html               # Blog index
+│   ├── single.html             # Single post
+│   ├── page.html               # Single page
+│   ├── archive.html            # Archive pages
 │   ├── search.html
 │   └── 404.html
 ├── parts/
 │   ├── header.html
 │   ├── footer.html
 │   └── sidebar.html
-└── patterns/           # Custom block patterns
-    ├── hero.php
-    ├── call-to-action.php
-    └── testimonial.php
+├── patterns/                   # Custom block patterns
+│   ├── hero.php
+│   ├── call-to-action.php
+│   └── testimonial.php
+└── assets/                     # Theme assets
+    ├── css/
+    ├── js/
+    └── images/
 ```
 
 ## Quick Reference
