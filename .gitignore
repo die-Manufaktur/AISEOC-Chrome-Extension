@@ -2,6 +2,7 @@
 # Ignore user-specific settings but preserve shared documentation
 .claude/*
 !.claude/agents/
+!.claude/skills/
 !.claude/*.md
 
 # WordPress Core Files
