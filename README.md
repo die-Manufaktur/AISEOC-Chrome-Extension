@@ -73,12 +73,48 @@ See `CLAUDE.md` for comprehensive WP-CLI command reference for:
 
 ## Claude Code Integration
 
-This template includes WordPress-specific guidance in `CLAUDE.md` to help Claude Code:
-- Follow WordPress coding standards
-- Use WordPress APIs and functions correctly
-- Implement proper security practices (escaping, sanitization, nonces)
-- Work with WordPress hooks and filters
-- Structure themes and plugins correctly
+This template is optimized for WordPress development with Claude Code, featuring:
+
+### **Architecture Overview**
+- **Lean Plugin Setup**: 5 WordPress-focused plugins + 1 local task manager
+- **Custom Agents**: 24 specialized agents (8 WordPress-relevant, 16 general-purpose)
+- **Documentation Hub**: Comprehensive guides in `.claude/` directory
+
+### **Installed Plugins**
+```
+✅ claude-mem          # Persistent memory across sessions
+✅ commit-commands     # Structured git workflows (/commit, /commit-push-pr)
+✅ github              # GitHub integration (gh CLI)
+✅ php-lsp             # PHP code intelligence (autocomplete, go-to-definition)
+✅ superpowers         # Advanced development workflows and skills
+✅ ai-taskmaster       # Task management (local plugin)
+```
+
+### **WordPress-Relevant Custom Agents**
+```
+✅ frontend-developer       # JS/CSS implementation for FSE themes
+✅ test-writer-fixer        # PHP unit testing
+✅ ui-designer              # Block pattern design
+✅ ux-researcher            # Theme usability testing
+✅ performance-benchmarker  # Performance optimization
+✅ api-tester              # REST API testing
+✅ analytics-reporter      # Performance metrics
+✅ workflow-optimizer      # Development process improvement
+```
+
+### **Claude Code Documentation**
+- **`CLAUDE.md`** - WordPress development guidance for Claude Code
+- **`.claude/PLUGINS-REFERENCE.md`** - Plugin usage and commands
+- **`.claude/AGENT-NAMING-GUIDE.md`** - Agent disambiguation (code-reviewer variants)
+- **`.claude/CUSTOM-AGENTS-GUIDE.md`** - Custom agent catalog and WordPress relevance
+
+### **What Claude Code Provides**
+- WordPress coding standards compliance
+- Proper use of WordPress APIs and functions
+- Security best practices (escaping, sanitization, nonces)
+- Structured git commits and PR workflows
+- PHP code intelligence and autocomplete
+- Specialized agents for WordPress development tasks
 
 ## Development Best Practices
 

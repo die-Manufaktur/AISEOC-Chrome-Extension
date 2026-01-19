@@ -1,5 +1,49 @@
-# Claude Code Local Settings (not shared across users)
-.claude/
+# Claude Code Settings
+# Ignore user-specific settings but preserve shared documentation
+.claude/*
+!.claude/agents/
+!.claude/*.md
+
+# WordPress Core Files
+# If using this as wp-content, WordPress core files should be in parent directory
+# These patterns catch core files if accidentally placed here
+/index.php
+/license.txt
+/readme.html
+/wp-activate.php
+/wp-blog-header.php
+/wp-comments-post.php
+/wp-config-sample.php
+/wp-config.php
+/wp-cron.php
+/wp-links-opml.php
+/wp-load.php
+/wp-login.php
+/wp-mail.php
+/wp-settings.php
+/wp-signup.php
+/wp-trackback.php
+/xmlrpc.php
+/wp-admin/
+/wp-includes/
+
+# WordPress Uploads & Cache
+uploads/
+upgrade/
+cache/
+backup-db/
+backups/
+*.sql
+*.sql.gz
+
+# WordPress Advanced Cache
+advanced-cache.php
+wp-cache-config.php
+object-cache.php
+
+# WordPress Multisite
+blogs.dir/
+/sites/
 
 # Template Development - Test Files
 test-theme/
@@ -7,16 +51,109 @@ test-plugin/
 *.test.php
 scratch/
 notes/
+sandbox/
+experiments/
 
-# IDE & System Files
+# IDE & Editor Files
 .DS_Store
 .vscode/
 .idea/
+.phpintel/
 *.swp
 *.swo
 *~
+.sublime-project
+.sublime-workspace
+.project
+.settings/
+*.code-workspace
+
+# Dependency Directories
+node_modules/
+vendor/
+bower_components/
+
+# Build & Compiled Files
+*.min.js
+*.min.css
+/dist/
+/build/
+.sass-cache/
+*.map
+
+# Package Manager Files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+composer.lock
+
+# Environment & Config Files
+.env
+.env.local
+.env.*.local
+wp-config-local.php
+local-config.php
 
 # Temporary Files
 *.tmp
 *.bak
+*.log
 .cache/
+.temp/
+*.pid
+*.seed
+*.pid.lock
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Security & Sensitive Data
+*.pem
+*.key
+*.cert
+.htaccess.bak
+.htpasswd
+
+# WordPress Debug Logs
+debug.log
+error_log
+wp-errors.log
+php_errors.log
+
+# PHPUnit & Testing
+/tests/phpunit/
+phpunit.xml
+.phpunit.result.cache
+coverage/
+.coverage
+htmlcov/
+
+# Code Quality Tools
+.phpcs.xml.cache
+.php_cs.cache
+.php-cs-fixer.cache
+
+# Documentation Build Files
+/docs/_build/
+/docs/.sass-cache/
+
+# Taskmaster Files (if using ai-taskmaster)
+.taskmaster/tasks/*.json.bak
+.taskmaster/logs/
+
+# Comments
+# This .gitignore is designed for WordPress wp-content development
+# It excludes Claude Code user settings but preserves shared documentation
+# Adjust patterns based on your specific workflow needs
