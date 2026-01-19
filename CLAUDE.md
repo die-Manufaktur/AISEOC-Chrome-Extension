@@ -236,7 +236,9 @@ define( 'SCRIPT_DEBUG', true );
 This project uses a lean, WordPress-optimized plugin configuration:
 
 **User Plugins (5):**
-1. **claude-mem** - Persistent memory across sessions for long-term context
+1. **episodic-memory** - Semantic search and persistent memory across sessions
+   - `/search-conversations` - Search previous conversations
+   - `/remember` - Save important context
 2. **commit-commands** - Structured git workflows
    - `/commit` - Create structured commits
    - `/commit-push-pr` - Commit + push + create PR
@@ -285,6 +287,76 @@ Use this guide to select the right one:
 **Quick rule:** Use the most specific agent for your context (PR → pr-review-toolkit, plan verification → superpowers, general → feature-dev)
 
 **Full guide:** See `.claude/AGENT-NAMING-GUIDE.md`
+
+---
+
+### Custom WordPress Skills (8 Total)
+
+This template includes custom WordPress development skills that provide systematic workflows and best practices:
+
+**Core WordPress Workflows (Priority 1):**
+
+1. **fse-block-theme-development**
+   - Systematic workflow for FSE block theme creation
+   - theme.json-first approach with template hierarchy
+   - Triggers: "create block theme", "theme.json", "FSE", "block theme"
+   - Location: `.claude/skills/fse-block-theme-development/`
+
+2. **block-pattern-creation**
+   - Creating and registering reusable block patterns
+   - Pattern categories, keywords, and best practices
+   - Triggers: "create pattern", "register pattern", "block pattern"
+   - Location: `.claude/skills/block-pattern-creation/`
+
+3. **wordpress-security-hardening**
+   - Security best practices: sanitize input, escape output, nonces
+   - XSS, SQL injection, and CSRF prevention
+   - Triggers: "security review", "sanitize", "escape", "nonce"
+   - Location: `.claude/skills/wordpress-security-hardening/`
+
+4. **wp-cli-workflows**
+   - WP-CLI automation for scaffolding, database ops, WordPress management
+   - Safe workflows with backups and dry-runs
+   - Triggers: "scaffold theme", "wp command", "database export"
+   - Location: `.claude/skills/wp-cli-workflows/`
+
+**Advanced Workflows (Priority 2):**
+
+5. **wordpress-testing-workflows**
+   - PHPUnit testing for WordPress themes/plugins
+   - Test fixtures, factories, and WordPress test suite integration
+   - Triggers: "write tests", "PHPUnit", "test coverage"
+   - Location: `.claude/skills/wordpress-testing-workflows/`
+
+6. **wordpress-deployment-automation**
+   - CI/CD pipelines with GitHub Actions
+   - Deployment workflows with WP-CLI and rsync
+   - Triggers: "deploy to production", "CI/CD", "GitHub Actions"
+   - Location: `.claude/skills/wordpress-deployment-automation/`
+
+7. **wordpress-internationalization**
+   - i18n/l10n implementation with translation functions
+   - POT file generation and GlotPress workflows
+   - Triggers: "translate", "i18n", "localization", "POT file"
+   - Location: `.claude/skills/wordpress-internationalization/`
+
+8. **wordpress-hook-integration**
+   - Creating Claude Code agent hooks for WordPress workflows
+   - PreToolUse/PostToolUse patterns for automation
+   - Triggers: "agent hook", "create hook", "automate"
+   - Location: `.claude/skills/wordpress-hook-integration/`
+
+**Skills Documentation:** See `.claude/skills/README.md` for complete skill catalog and usage guide.
+
+**Key Features:**
+- All skills created using TDD methodology (RED-GREEN-REFACTOR)
+- Comprehensive quick reference tables
+- Common mistakes and rationalization detection
+- Integration with existing agents and plugins
+- No-exceptions lists for critical practices
+
+**When Skills Are Triggered:**
+Skills are automatically invoked when Claude Code detects relevant keywords in your requests. Each skill provides systematic workflows, prevents common mistakes, and enforces WordPress best practices.
 
 ---
 
@@ -381,6 +453,7 @@ Claude: [Uses test-writer-fixer agent]
 - `.claude/PLUGINS-REFERENCE.md` - Plugin commands and usage
 - `.claude/AGENT-NAMING-GUIDE.md` - Agent disambiguation
 - `.claude/CUSTOM-AGENTS-GUIDE.md` - Agent catalog
+- `.claude/skills/README.md` - WordPress skills catalog and usage
 
 ---
 
