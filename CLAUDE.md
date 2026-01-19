@@ -4,11 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a WordPress development template directory. The project can be used to develop:
-- WordPress themes
-- WordPress plugins
-- Full WordPress installations
-- WordPress multisite networks
+This is a **Claude Code-integrated WordPress development template** providing a clean `wp-content` directory structure with WordPress-specific development tools and scripts.
+
+The template is designed for:
+- WordPress FSE (Full Site Editing) block theme development
+- Custom WordPress plugin development
+- WordPress security, performance, and accessibility auditing
+- Integration with Claude Code for WordPress development workflows
+
+## WordPress Development Scripts
+
+This template includes WordPress-specific automation scripts:
+
+### Security and Quality Tools
+```bash
+# Set up PHP CodeSniffer with WordPress standards
+./scripts/wordpress/setup-phpcs.sh
+
+# Check WordPress coding standards
+./scripts/wordpress/check-coding-standards.sh
+
+# Run security scan
+./scripts/wordpress/security-scan.sh
+
+# Check performance
+./scripts/wordpress/check-performance.sh
+```
 
 ## Development Commands
 

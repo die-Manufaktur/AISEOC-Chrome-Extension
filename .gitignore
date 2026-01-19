@@ -1,22 +1,12 @@
-# WordPress Generated Files
-uploads/*
-!uploads/.gitkeep
-upgrade/*
-!upgrade/.gitkeep
-cache/*
-*.log
+# Claude Code Local Settings (not shared across users)
+.claude/
 
-# Development Dependencies
-node_modules/
-vendor/
-.pnpm-store/
-
-# Build Artifacts
-dist/
-build/
-*.min.js
-*.min.css
-*.map
+# Template Development - Test Files
+test-theme/
+test-plugin/
+*.test.php
+scratch/
+notes/
 
 # IDE & System Files
 .DS_Store
@@ -26,12 +16,7 @@ build/
 *.swo
 *~
 
-# Environment & Config
-.env
-.env.local
-wp-config.php
-.htaccess
-
 # Temporary Files
 *.tmp
+*.bak
 .cache/
