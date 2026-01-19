@@ -82,7 +82,7 @@ This template is optimized for WordPress development with Claude Code, featuring
 
 ### **Installed Plugins**
 ```
-✅ claude-mem          # Persistent memory across sessions
+✅ episodic-memory     # Semantic search and persistent memory
 ✅ commit-commands     # Structured git workflows (/commit, /commit-push-pr)
 ✅ github              # GitHub integration (gh CLI)
 ✅ php-lsp             # PHP code intelligence (autocomplete, go-to-definition)
@@ -102,8 +102,30 @@ This template is optimized for WordPress development with Claude Code, featuring
 ✅ workflow-optimizer      # Development process improvement
 ```
 
+### **WordPress Development Skills (NEW! ✨)**
+```
+✅ fse-block-theme-development      # FSE block theme creation workflows
+✅ block-pattern-creation           # Reusable block pattern registration
+✅ wordpress-security-hardening     # Security best practices (sanitize, escape, nonces)
+✅ wp-cli-workflows                 # WP-CLI automation with safe workflows
+✅ wordpress-testing-workflows      # PHPUnit testing for WordPress
+✅ wordpress-deployment-automation  # CI/CD pipelines with GitHub Actions
+✅ wordpress-internationalization   # i18n/l10n implementation
+✅ wordpress-hook-integration       # Claude Code agent hooks for WordPress
+```
+
+**What Skills Provide:**
+- Systematic workflows for WordPress development tasks
+- Prevention of common WordPress mistakes
+- Quick reference tables and code examples
+- Security-first approaches with rationalization detection
+- Integration with existing agents and automation scripts
+
+**Skills Documentation:** `.claude/skills/README.md`
+
 ### **Claude Code Documentation**
 - **`CLAUDE.md`** - WordPress development guidance for Claude Code
+- **`.claude/skills/README.md`** - WordPress skills catalog and usage guide
 - **`.claude/PLUGINS-REFERENCE.md`** - Plugin usage and commands
 - **`.claude/AGENT-NAMING-GUIDE.md`** - Agent disambiguation (code-reviewer variants)
 - **`.claude/CUSTOM-AGENTS-GUIDE.md`** - Custom agent catalog and WordPress relevance
