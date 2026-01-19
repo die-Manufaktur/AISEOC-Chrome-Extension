@@ -231,24 +231,25 @@ define( 'SCRIPT_DEBUG', true );
 
 ## Claude Code Architecture & Configuration
 
-### Installed Plugins (6 Total)
+### Installed Plugins (5 Total)
 
 This project uses a lean, WordPress-optimized plugin configuration:
 
-**User Plugins (5):**
+**User Plugins (4):**
 1. **episodic-memory** - Semantic search and persistent memory across sessions
    - `/search-conversations` - Search previous conversations
    - `/remember` - Save important context
-2. **commit-commands** - Structured git workflows
+2. **commit-commands** - Structured git workflows (uses `gh` CLI)
    - `/commit` - Create structured commits
    - `/commit-push-pr` - Commit + push + create PR
    - `/clean_gone` - Clean up merged branches
-3. **github** - GitHub CLI integration for PRs, issues, and repository management
-4. **php-lsp** - PHP language server providing autocomplete, go-to-definition, and error detection
-5. **superpowers** - Advanced development workflows and best practices skills
+3. **php-lsp** - PHP language server providing autocomplete, go-to-definition, and error detection
+4. **superpowers** - Advanced development workflows and best practices skills
 
 **Local Plugins (1):**
 - **ai-taskmaster** - Task management and project planning
+
+**Note:** GitHub integration works through the `gh` CLI (installed separately), not a plugin. See [GitHub CLI workflows](#github-cli-workflows) below.
 
 **Documentation:** See `.claude/PLUGINS-REFERENCE.md` for detailed plugin usage
 
@@ -437,10 +438,11 @@ Claude: [Uses test-writer-fixer agent]
 ### Architecture Notes
 
 **Plugin Philosophy:**
-- Lean configuration (6 plugins total)
+- Lean configuration (5 plugins total)
 - WordPress-specific focus (php-lsp, not 9+ language servers)
 - No redundant or duplicate plugins
 - All plugins serve WordPress development
+- GitHub integration via `gh` CLI (not a plugin)
 
 **Agent Philosophy:**
 - 24 custom agents available (8 WordPress-focused)
@@ -474,12 +476,13 @@ wp db export backup.sql       # Backup database
 /clean_gone                   # Clean merged branches
 ```
 
-**GitHub (via github plugin):**
+**GitHub CLI Workflows:**
 ```bash
 gh pr create                  # Create pull request
 gh pr list                    # List pull requests
 gh issue create               # Create issue
 gh repo view                  # View repository info
+gh auth status                # Check authentication
 ```
 
 **Code Quality:**
@@ -498,5 +501,5 @@ gh repo view                  # View repository info
 
 ---
 
-**Last Updated:** 2026-01-18
-**Architecture Status:** ✅ Lean, WordPress-optimized configuration
+**Last Updated:** 2026-01-19
+**Architecture Status:** ✅ Lean, WordPress-optimized configuration (5 plugins + gh CLI)
