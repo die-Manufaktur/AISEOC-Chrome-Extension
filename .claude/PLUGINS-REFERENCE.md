@@ -7,7 +7,7 @@
 ## Currently Installed Plugins
 
 **User Plugins (5):**
-- `claude-mem` - Memory and context management
+- `episodic-memory` - Conversation search and persistent memory
 - `commit-commands` - Git workflow automation
 - `github` - GitHub integration
 - `php-lsp` - PHP language server
@@ -406,20 +406,30 @@ gh issue create                 # Create issue
 
 ---
 
-## 🎯 WordPress Development with claude-mem
+## 🔍 episodic-memory Plugin
 
-The `claude-mem` plugin provides persistent memory across sessions:
+The `episodic-memory` plugin provides semantic search and persistent memory across sessions.
 
 **Benefits for WordPress Development:**
-- Remembers project preferences and patterns
-- Tracks theme architecture decisions
-- Maintains context across development sessions
-- Stores commonly used WordPress snippets and patterns
+- Search previous conversations semantically
+- Archives conversations automatically
+- Maintains context across sessions
+- Find solutions to past problems quickly
+- Persistent memory survives Claude Code's 30-day deletion
 
 **Usage:**
-- Automatic - Claude Code uses memory contextually
-- Review memories with memory management commands
-- Useful for long-term theme/plugin projects
+```bash
+# Search previous conversations
+/search-conversations [your query]
+
+# Remember important context
+/remember [something important]
+```
+
+**Technical Notes:**
+- Uses SQLite database with vector search
+- Archives stored in `~/.config/superpowers/conversations-archive`
+- Fixed for Windows paths with spaces (2026-01-18)
 
 ---
 
@@ -455,22 +465,114 @@ If you see agents named "code-reviewer" from different plugins, refer to `.claud
 
 ## 🧹 Architecture Assessment (2026-01-18)
 
-**Finding:** This project already has a lean, WordPress-optimized plugin configuration.
+**Finding:** This project has a lean, WordPress-optimized plugin configuration.
 
 **Current State:**
-- ✅ Only 5 user plugins installed (all WordPress-relevant)
+- ✅ 5 user plugins installed (all WordPress-relevant)
 - ✅ No bloat from unused language servers
 - ✅ No duplicate or redundant plugins
 - ✅ Focused on PHP, Git, and GitHub workflows
+- ✅ episodic-memory replaces claude-mem (Windows path issue fixed)
 
-**No cleanup needed** - the plugin architecture is already optimal for WordPress FSE development.
+**Changes Made:**
+- ❌ Removed `claude-mem` (broken on Windows, path with spaces issue)
+- ✅ Added `episodic-memory` (working alternative with semantic search)
+- 🔧 Fixed Windows path handling in episodic-memory hook (session-start-wrapper.cmd)
 
 **Documentation Added:**
-- `.claude/AGENT-NAMING-GUIDE.md` - Clarifies agent naming conflicts (useful for superpowers agents)
-- This file updated to reflect actual installed plugins
+- `.claude/AGENT-NAMING-GUIDE.md` - Clarifies agent naming conflicts
+- `.claude/CUSTOM-AGENTS-GUIDE.md` - Custom agent catalog
+- This file updated to reflect current plugins
+
+---
+
+## 🎯 WordPress Development Skills (NEW)
+
+**Installed:** 2026-01-18
+**Total Skills:** 8 comprehensive WordPress workflows
+
+This template includes custom WordPress development skills that complement the plugins and agents.
+
+### What Skills Provide
+
+**Skills are NOT plugins** - they are documentation-based workflows that trigger automatically when relevant keywords are detected in conversation.
+
+**Benefits:**
+- Systematic workflows for WordPress development tasks
+- Prevention of common WordPress mistakes
+- Quick reference tables and code examples
+- Security-first approaches with rationalization detection
+- Integration with existing agents and automation scripts
+
+### Installed Skills
+
+1. **fse-block-theme-development**
+   - FSE block theme creation with theme.json-first approach
+   - Triggers: "create block theme", "theme.json", "FSE"
+
+2. **block-pattern-creation**
+   - Reusable block pattern registration and best practices
+   - Triggers: "create pattern", "register pattern", "block pattern"
+
+3. **wordpress-security-hardening**
+   - Security best practices: sanitize input, escape output, nonces
+   - Triggers: "security review", "sanitize", "escape", "nonce"
+
+4. **wp-cli-workflows**
+   - WP-CLI automation with safe workflows and backups
+   - Triggers: "scaffold theme", "wp command", "database export"
+
+5. **wordpress-testing-workflows**
+   - PHPUnit testing for WordPress with test fixtures
+   - Triggers: "write tests", "PHPUnit", "test coverage"
+
+6. **wordpress-deployment-automation**
+   - CI/CD pipelines with GitHub Actions
+   - Triggers: "deploy to production", "CI/CD", "GitHub Actions"
+
+7. **wordpress-internationalization**
+   - i18n/l10n implementation with POT file generation
+   - Triggers: "translate", "i18n", "localization", "POT file"
+
+8. **wordpress-hook-integration**
+   - Claude Code agent hooks for WordPress automation
+   - Triggers: "agent hook", "create hook", "automate"
+
+### Skills vs Plugins
+
+| Type | Purpose | Invocation | Example |
+|------|---------|------------|---------|
+| **Plugins** | Tool integrations and commands | Manual commands | `/commit`, `/search-conversations` |
+| **Skills** | Workflows and best practices | Automatic keyword detection | "create block theme" triggers skill |
+| **Agents** | Specialized task execution | Task tool | `frontend-developer` builds features |
+
+### How They Work Together
+
+```
+User: "I need to create a secure contact form"
+    ↓
+wordpress-security-hardening skill provides:
+    - Form processing security checklist
+    - Nonce verification patterns
+    - Input sanitization examples
+    - Output escaping guidance
+    ↓
+frontend-developer agent implements:
+    - Form HTML structure
+    - AJAX handling
+    - Error messaging
+    ↓
+wordpress-testing-workflows skill guides:
+    - PHPUnit test creation
+    - Security test patterns
+    - Edge case coverage
+```
+
+**Skills Documentation:** `.claude/skills/README.md`
 
 ---
 
 **Last Updated:** 2026-01-18
 **Template Version:** 1.0.0
-**Architecture Status:** ✅ Optimized (no cleanup required)
+**Architecture Status:** ✅ Optimized and Windows-compatible
+**WordPress Skills:** ✅ 8 comprehensive workflows installed

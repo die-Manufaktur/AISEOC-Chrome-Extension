@@ -197,6 +197,52 @@ User: "Use the frontend-developer agent to help me build this block pattern"
 
 ---
 
+## How Agents Work with WordPress Skills
+
+**NEW:** This template includes 8 custom WordPress development skills that complement the agents.
+
+### Skills vs Agents
+
+| Type | Purpose | When Triggered | Example |
+|------|---------|----------------|---------|
+| **Skills** | Systematic workflows and best practices | Keyword detection in conversation | "create block theme" triggers `fse-block-theme-development` |
+| **Agents** | Specialized task execution | Task tool invocation | frontend-developer builds block patterns |
+
+### Agent-Skill Integration
+
+**frontend-developer agent** + WordPress Skills:
+- Works with `fse-block-theme-development` for theme structure
+- Works with `block-pattern-creation` for pattern registration
+- Works with `wordpress-security-hardening` for secure code
+- Works with `wp-cli-workflows` for theme scaffolding
+
+**test-writer-fixer agent** + WordPress Skills:
+- Works with `wordpress-testing-workflows` for PHPUnit setup
+- Works with `wp-cli-workflows` for test scaffolding
+- Works with `wordpress-security-hardening` for security tests
+
+**All agents** benefit from:
+- `wordpress-security-hardening` - Security best practices
+- `wp-cli-workflows` - WordPress automation
+- `wordpress-hook-integration` - Agent-specific hooks
+
+### Complete WordPress Development Stack
+
+```
+WordPress Skills (8)
+    ↓ Provide workflows and best practices
+Agents (24)
+    ↓ Execute specialized tasks
+Plugins (6)
+    ↓ Provide tooling and memory
+Automation Scripts (4)
+    ↓ Run security/performance checks
+```
+
+**Skills Documentation:** See `.claude/skills/README.md` for complete catalog
+
+---
+
 ## Current Architecture Status
 
 **Plugins:** ✅ Already optimized (5 user + 1 local)
