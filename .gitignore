@@ -3,7 +3,23 @@
 .claude/*
 !.claude/agents/
 !.claude/skills/
+!.claude/validation/
 !.claude/*.md
+
+# WordPress Development Structure
+# This project uses ROOT-LEVEL folders for development:
+#   - themes/       (tracked - development themes)
+#   - plugins/      (tracked - development plugins)
+#   - mu-plugins/   (tracked - development must-use plugins)
+#
+# Deployment copies in wp-content/ subdirectories are gitignored below
+
+# WordPress Deployment Folders (DO NOT TRACK)
+# Files are copied from root-level folders to wp-content/ for testing
+# These are deployment artifacts and should NOT be committed
+wp-content/themes/
+wp-content/plugins/
+wp-content/mu-plugins/
 
 # WordPress Core Files
 # If using this as wp-content, WordPress core files should be in parent directory
@@ -155,6 +171,8 @@ htmlcov/
 .taskmaster/logs/
 
 # Comments
-# This .gitignore is designed for WordPress wp-content development
-# It excludes Claude Code user settings but preserves shared documentation
+# This .gitignore is designed for WordPress theme/plugin development
+# Development happens in root-level themes/, plugins/, mu-plugins/ folders (tracked)
+# Deployment copies in wp-content/ subdirectories are ignored (not tracked)
+# It excludes Claude Code user settings but preserves shared documentation and validation scripts
 # Adjust patterns based on your specific workflow needs
