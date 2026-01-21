@@ -327,9 +327,9 @@ themes/<theme-name>/
 └── patterns/          # Generated patterns
 ```
 
-**Step 2.4: Convert Templates (Autonomous Loop for 6-15 Templates)**
+**Step 2.4: Convert Templates (Autonomous Loop for 6-15 Templates) + Phase 3 Attribute Validation**
 
-**Phase 2 Multi-Template Processing:**
+**Phase 2 + 3 Multi-Template Processing:**
 
 Initialize template queue with priority ordering:
 ```
@@ -363,44 +363,98 @@ Priority 4: Special templates (404, search, etc.)
    Continue: (don't stop for non-blocker errors)
    ```
 
-3. **Generate FSE Template**:
+3. **Extract Figma Component Attributes (Phase 3)**:
+   ```
+   For each component in template:
+     a. Extract design properties from Figma:
+        - Layout: padding, margin, gap, width, height
+        - Typography: font-size, font-weight, line-height, letter-spacing
+        - Visual: border-radius, border-width, opacity, box-shadow
+        - Colors: fill, stroke, background (exact hex values)
+
+     b. Match to theme.json tokens:
+        - Exact match (padding: 24px → spacing-50: 24px): Use token slug
+        - Close match (padding: 26px → spacing-50: 24px): Use closest token, log 2px discrepancy
+        - No match:
+          - If used 3+ times: Add new token to theme.json
+          - If used 1-2 times: Use inline style
+
+     c. Track comparison data:
+        - Component name
+        - Property name
+        - Figma value
+        - Template value (token or inline)
+        - Match type (exact/close/new token/inline)
+        - Recommendation (if mismatch)
+   ```
+
+4. **Generate FSE Template**:
    - Use WordPress block markup (HTML comments)
-   - Apply theme.json tokens EXCLUSIVELY (no hardcoded #hexcodes)
+   - Apply matched theme.json tokens from attribute extraction
+   - Use inline styles only when no suitable token exists
    - Structure: `<!-- wp:block-name {"attributes"} -->content<!-- /wp:block-name -->`
    - Use block mapping from Phase 1
    - Reference existing parts: `<!-- wp:template-part {"slug":"header"} /-->`
+   - Log all attribute matches/mismatches
 
-4. **Implement Responsiveness**:
+5. **Implement Responsiveness**:
    - Use theme.json breakpoints
    - Apply appropriate block alignment (wide, full)
    - Test mental model: mobile → tablet → desktop
    - Stack columns for mobile views
 
-5. **Add Accessibility**:
+6. **Add Accessibility**:
    - ARIA labels where needed
    - Semantic HTML structure (header, main, footer, nav, article, aside)
    - Alt text for images (extract from Figma or use placeholder)
    - Keyboard navigation support
    - Heading hierarchy (h1 → h2 → h3, no skipping levels)
 
-6. **Validate & Hook Execution**:
+7. **Save Attribute Comparison Data (Phase 3)**:
+   ```
+   Create `.claude/figma-data/` directory if not exists
+
+   Save per-template data to `.claude/figma-data/{template-name}-attributes.json`:
+   {
+     "template_name": "front-page.html",
+     "total_attributes_checked": 45,
+     "matched_attributes": 42,
+     "mismatches": [
+       {
+         "component": "Hero Button",
+         "property": "padding",
+         "figma_value": "24px",
+         "template_value": "16px (spacing-40)",
+         "recommendation": "Use spacing-50: 24px or add spacing-45: 24px"
+       }
+     ],
+     "exact_matches": 40,
+     "close_matches_used": 2,
+     "new_tokens_added": 0
+   }
+
+   Aggregate into `.claude/figma-data/attribute-comparison.json` (all templates)
+   This data will be read by generate-comparison-report.sh
+   ```
+
+8. **Validate & Hook Execution**:
    - Run `.claude/hooks/figma-fse-post-template.sh` (if exists)
    - Check for hardcoded hex colors (should be ZERO)
    - Check for hardcoded pixel sizes (should be ZERO)
    - Verify block syntax (balanced open/close tags)
    - If validation failures: Log to errors.log, continue anyway
 
-7. **Update Progress**:
+9. **Update Progress**:
    - Add template to templates_completed[]
    - Remove from templates_remaining[]
    - Log: "✓ Template {X} of {N} complete: {template-name}"
    - NO "should I continue?" prompt to user
 
-8. **Checkpoint Check**:
-   - If (templates_completed.length % 3 == 0): Trigger episodic memory checkpoint
-   - Continue to next template without waiting
+10. **Checkpoint Check**:
+    - If (templates_completed.length % 3 == 0): Trigger episodic memory checkpoint
+    - Continue to next template without waiting
 
-9. **Continue to Next Template** (NO prompt to user)
+11. **Continue to Next Template** (NO prompt to user)
 
 **Step 2.5: Create Block Patterns**
 
@@ -1046,7 +1100,7 @@ Claude: [Invokes superpowers:executing-plans]
 
 ---
 
-**Status:** Phase 2 implementation complete (multi-template support, episodic memory, error recovery)
-**Version:** 2.0.0
-**Last Updated:** 2026-01-19
-**Supports:** 1-15 templates with autonomous checkpointing every 3 templates
+**Status:** Phase 3 implementation complete (attribute-level validation, token matching, comparison reporting)
+**Version:** 3.0.0
+**Last Updated:** 2026-01-21
+**Supports:** 1-15 templates with autonomous checkpointing every 3 templates + attribute validation
