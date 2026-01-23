@@ -3,8 +3,14 @@
 .claude/*
 !.claude/agents/
 !.claude/skills/
+!.claude/commands/
+!.claude/hooks/
 !.claude/validation/
 !.claude/*.md
+
+# Claude Code temporary/user-specific files (explicitly ignored)
+.claude/logs/
+.claude/settings.local.json
 
 # WordPress Development Structure
 # This project uses ROOT-LEVEL folders for development:

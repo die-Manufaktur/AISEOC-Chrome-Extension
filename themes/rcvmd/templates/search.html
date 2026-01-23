@@ -1,0 +1,84 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}}},"layout":{"type":"default"}} -->
+<main class="wp-block-group" style="padding-top:0;padding-right:0;padding-bottom:0;padding-left:0">
+
+	<!-- Search Header -->
+	<!-- wp:group {"backgroundColor":"light-gray","style":{"spacing":{"padding":{"top":"var:preset|spacing|100","bottom":"var:preset|spacing|100","left":"var:preset|spacing|90","right":"var:preset|spacing|90"}}},"layout":{"type":"constrained","wideSize":"1280px"}} -->
+	<div class="wp-block-group has-light-gray-background-color has-background" style="padding-top:var(--wp--preset--spacing--100);padding-right:var(--wp--preset--spacing--90);padding-bottom:var(--wp--preset--spacing--100);padding-left:var(--wp--preset--spacing--90)">
+		<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|60"}},"layout":{"type":"flex","orientation":"vertical","justifyContent":"center"}} -->
+		<div class="wp-block-group">
+			<!-- wp:query-title {"type":"search","textAlign":"center","textColor":"black","fontSize":"4-x-large"} /-->
+
+			<!-- wp:search {"label":"Search","showLabel":false,"placeholder":"Refine your search...","buttonText":"Search","buttonPosition":"button-inside","buttonUseIcon":true,"style":{"border":{"radius":"12px"}}} /-->
+		</div>
+		<!-- /wp:group -->
+	</div>
+	<!-- /wp:group -->
+
+	<!-- Search Results -->
+	<!-- wp:group {"backgroundColor":"white","style":{"spacing":{"padding":{"top":"var:preset|spacing|110","bottom":"var:preset|spacing|110","left":"var:preset|spacing|90","right":"var:preset|spacing|90"}}},"layout":{"type":"constrained","wideSize":"1280px"}} -->
+	<div class="wp-block-group has-white-background-color has-background" style="padding-top:var(--wp--preset--spacing--110);padding-right:var(--wp--preset--spacing--90);padding-bottom:var(--wp--preset--spacing--110);padding-left:var(--wp--preset--spacing--90)">
+		<!-- wp:query {"queryId":0,"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"style":{"spacing":{"blockGap":"var:preset|spacing|80"}}} -->
+				<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|50"}},"layout":{"type":"flex","orientation":"vertical"}} -->
+				<div class="wp-block-group">
+					<!-- wp:post-title {"isLink":true,"textColor":"black","fontSize":"2-x-large"} /-->
+
+					<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|40"}},"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+					<div class="wp-block-group">
+						<!-- wp:post-date {"textColor":"dark-gray","fontSize":"small"} /-->
+						<!-- wp:post-terms {"term":"category","textColor":"primary","fontSize":"small"} /-->
+					</div>
+					<!-- /wp:group -->
+
+					<!-- wp:post-excerpt {"excerptLength":40,"moreText":"Read More →","textColor":"black","fontSize":"base"} /-->
+
+					<!-- wp:separator {"backgroundColor":"light-gray","className":"is-style-wide"} -->
+					<hr class="wp-block-separator has-text-color has-light-gray-color has-alpha-channel-opacity has-light-gray-background-color has-background is-style-wide"/>
+					<!-- /wp:separator -->
+				</div>
+				<!-- /wp:group -->
+			<!-- /wp:post-template -->
+
+			<!-- wp:query-pagination {"layout":{"type":"flex","justifyContent":"center"},"style":{"spacing":{"margin":{"top":"var:preset|spacing|80"}}}} -->
+				<!-- wp:query-pagination-previous {"fontSize":"base"} /-->
+				<!-- wp:query-pagination-numbers /-->
+				<!-- wp:query-pagination-next {"fontSize":"base"} /-->
+			<!-- /wp:query-pagination -->
+
+			<!-- wp:query-no-results -->
+				<!-- wp:group {"backgroundColor":"accent-lighter","style":{"spacing":{"padding":{"top":"var:preset|spacing|80","bottom":"var:preset|spacing|80","left":"var:preset|spacing|60","right":"var:preset|spacing|60"}},"border":{"radius":"12px"}},"layout":{"type":"constrained"}} -->
+				<div class="wp-block-group has-accent-lighter-background-color has-background" style="border-radius:12px;padding-top:var(--wp--preset--spacing--80);padding-right:var(--wp--preset--spacing--60);padding-bottom:var(--wp--preset--spacing--80);padding-left:var(--wp--preset--spacing--60)">
+					<!-- wp:heading {"textAlign":"center","textColor":"black","fontSize":"x-large"} -->
+					<h2 class="wp-block-heading has-text-align-center has-black-color has-text-color has-x-large-font-size">No Results Found</h2>
+					<!-- /wp:heading -->
+
+					<!-- wp:paragraph {"align":"center","textColor":"black","fontSize":"medium"} -->
+					<p class="has-text-align-center has-black-color has-text-color has-medium-font-size">We couldn't find any content matching your search. Try different keywords or browse our main topics below.</p>
+					<!-- /wp:paragraph -->
+
+					<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"},"style":{"spacing":{"margin":{"top":"var:preset|spacing|60"},"blockGap":"var:preset|spacing|40"}}} -->
+					<div class="wp-block-buttons" style="margin-top:var(--wp--preset--spacing--60)">
+						<!-- wp:button {"backgroundColor":"accent","textColor":"black","style":{"border":{"radius":"12px"},"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}},"fontSize":"base"} -->
+						<div class="wp-block-button has-custom-font-size has-base-font-size"><a class="wp-block-button__link has-black-color has-accent-background-color has-text-color has-background wp-element-button" href="/learn-about-rcv" style="border-radius:12px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--40)">Learn About RCV</a></div>
+						<!-- /wp:button -->
+
+						<!-- wp:button {"backgroundColor":"secondary","textColor":"white","style":{"border":{"radius":"12px"},"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}},"fontSize":"base"} -->
+						<div class="wp-block-button has-custom-font-size has-base-font-size"><a class="wp-block-button__link has-white-color has-secondary-background-color has-text-color has-background wp-element-button" href="/" style="border-radius:12px;padding-top:var(--wp--preset--spacing--30);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--30);padding-left:var(--wp--preset--spacing--40)">Back to Home</a></div>
+						<!-- /wp:button -->
+					</div>
+					<!-- /wp:buttons -->
+				</div>
+				<!-- /wp:group -->
+			<!-- /wp:query-no-results -->
+		</div>
+		<!-- /wp:query -->
+	</div>
+	<!-- /wp:group -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

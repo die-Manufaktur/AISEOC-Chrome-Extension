@@ -267,46 +267,26 @@ define( 'SCRIPT_DEBUG', true );
 
 ### Installed Plugins (5 Total)
 
-This project uses a lean, WordPress-optimized plugin configuration:
+This project uses a lean, WordPress-optimized plugin configuration with 5 plugins:
+- **episodic-memory** - Conversation search and memory
+- **commit-commands** - Git workflow automation
+- **php-lsp** - PHP language server
+- **superpowers** - Advanced development workflows
+- **ai-taskmaster** - Task management (local)
 
-**User Plugins (4):**
-1. **episodic-memory** - Semantic search and persistent memory across sessions
-   - `/search-conversations` - Search previous conversations
-   - `/remember` - Save important context
-2. **commit-commands** - Structured git workflows (uses `gh` CLI)
-   - `/commit` - Create structured commits
-   - `/commit-push-pr` - Commit + push + create PR
-   - `/clean_gone` - Clean up merged branches
-3. **php-lsp** - PHP language server providing autocomplete, go-to-definition, and error detection
-4. **superpowers** - Advanced development workflows and best practices skills
+**Note:** GitHub integration via `gh` CLI (not a plugin)
 
-**Local Plugins (1):**
-- **ai-taskmaster** - Task management and project planning
-
-**Note:** GitHub integration works through the `gh` CLI (installed separately), not a plugin. See [GitHub CLI workflows](#github-cli-workflows) below.
-
-**Documentation:** See `.claude/PLUGINS-REFERENCE.md` for detailed plugin usage
+**Full documentation:** `.claude/PLUGINS-REFERENCE.md`
 
 ---
 
 ### Custom Agents (24 Total)
 
-Custom agents provide specialized capabilities for specific development tasks.
+24 specialized agents provide WordPress FSE development and general development capabilities. Key WordPress agents include `frontend-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
 
-**WordPress FSE Development (8 agents):**
-- `frontend-developer` - Build block patterns, theme JS/CSS
-- `test-writer-fixer` - Write and fix PHP unit tests
-- `ui-designer` - Design block patterns and theme layouts
-- `ux-researcher` - Theme usability testing
-- `performance-benchmarker` - Performance optimization
-- `api-tester` - REST API testing
-- `analytics-reporter` - Performance metrics
-- `workflow-optimizer` - Development process improvement
+Agents are invoked automatically based on task context.
 
-**General Development (16 agents):**
-- Marketing, infrastructure, tooling, and product agents available for multi-purpose development
-
-**Documentation:** See `.claude/CUSTOM-AGENTS-GUIDE.md` for complete agent catalog
+**Full catalog:** `.claude/CUSTOM-AGENTS-GUIDE.md`
 
 ---
 
@@ -327,71 +307,15 @@ Use this guide to select the right one:
 
 ### Custom WordPress Skills (8 Total)
 
-This template includes custom WordPress development skills that provide systematic workflows and best practices:
+8 WordPress-specific skills provide systematic workflows:
 
-**Core WordPress Workflows (Priority 1):**
+**Core:** FSE block theme development, block pattern creation, security hardening, WP-CLI workflows
 
-1. **fse-block-theme-development**
-   - Systematic workflow for FSE block theme creation
-   - theme.json-first approach with template hierarchy
-   - Triggers: "create block theme", "theme.json", "FSE", "block theme"
-   - Location: `.claude/skills/fse-block-theme-development/`
+**Advanced:** Testing, deployment automation, internationalization, hook integration
 
-2. **block-pattern-creation**
-   - Creating and registering reusable block patterns
-   - Pattern categories, keywords, and best practices
-   - Triggers: "create pattern", "register pattern", "block pattern"
-   - Location: `.claude/skills/block-pattern-creation/`
+Skills auto-trigger based on keywords (e.g., "FSE", "security review", "deploy").
 
-3. **wordpress-security-hardening**
-   - Security best practices: sanitize input, escape output, nonces
-   - XSS, SQL injection, and CSRF prevention
-   - Triggers: "security review", "sanitize", "escape", "nonce"
-   - Location: `.claude/skills/wordpress-security-hardening/`
-
-4. **wp-cli-workflows**
-   - WP-CLI automation for scaffolding, database ops, WordPress management
-   - Safe workflows with backups and dry-runs
-   - Triggers: "scaffold theme", "wp command", "database export"
-   - Location: `.claude/skills/wp-cli-workflows/`
-
-**Advanced Workflows (Priority 2):**
-
-5. **wordpress-testing-workflows**
-   - PHPUnit testing for WordPress themes/plugins
-   - Test fixtures, factories, and WordPress test suite integration
-   - Triggers: "write tests", "PHPUnit", "test coverage"
-   - Location: `.claude/skills/wordpress-testing-workflows/`
-
-6. **wordpress-deployment-automation**
-   - CI/CD pipelines with GitHub Actions
-   - Deployment workflows with WP-CLI and rsync
-   - Triggers: "deploy to production", "CI/CD", "GitHub Actions"
-   - Location: `.claude/skills/wordpress-deployment-automation/`
-
-7. **wordpress-internationalization**
-   - i18n/l10n implementation with translation functions
-   - POT file generation and GlotPress workflows
-   - Triggers: "translate", "i18n", "localization", "POT file"
-   - Location: `.claude/skills/wordpress-internationalization/`
-
-8. **wordpress-hook-integration**
-   - Creating Claude Code agent hooks for WordPress workflows
-   - PreToolUse/PostToolUse patterns for automation
-   - Triggers: "agent hook", "create hook", "automate"
-   - Location: `.claude/skills/wordpress-hook-integration/`
-
-**Skills Documentation:** See `.claude/skills/README.md` for complete skill catalog and usage guide.
-
-**Key Features:**
-- All skills created using TDD methodology (RED-GREEN-REFACTOR)
-- Comprehensive quick reference tables
-- Common mistakes and rationalization detection
-- Integration with existing agents and plugins
-- No-exceptions lists for critical practices
-
-**When Skills Are Triggered:**
-Skills are automatically invoked when Claude Code detects relevant keywords in your requests. Each skill provides systematic workflows, prevents common mistakes, and enforces WordPress best practices.
+**Full catalog:** `.claude/skills/README.md`
 
 ---
 
@@ -446,6 +370,29 @@ User: "Write tests for my custom post type"
 Claude: [Uses test-writer-fixer agent]
 ```
 
+**4. Figma-to-WordPress Automation**
+Convert Figma designs to WordPress FSE themes automatically:
+```
+User: "Convert this Figma design to WordPress"
+      [Provide Figma URL]
+
+Claude: [Autonomous workflow 5-90 minutes]
+        → Complete FSE theme with theme.json, templates, patterns
+        → Images work immediately (pattern-first architecture)
+        → Zero manual intervention
+
+Result: themes/[theme-name]/ ready for WordPress
+```
+
+**Features:**
+- Wholesale design system extraction (colors, typography, spacing)
+- FSE template generation with WordPress blocks
+- PHP patterns for images (avoids broken src="" in HTML templates)
+- Automatic validation (security, standards, architecture)
+- 100% theme.json token usage (no hardcoded values)
+
+**Documentation:** `docs/figma-to-wordpress/README.md`
+
 ---
 
 ### WordPress + Claude Code Best Practices
@@ -487,11 +434,16 @@ Claude: [Uses test-writer-fixer agent]
 - Optional: Remove 16 non-WordPress agents (see `.claude/CUSTOM-AGENTS-GUIDE.md`)
 
 **Documentation Structure:**
-- `CLAUDE.md` (this file) - WordPress development guidance
-- `.claude/PLUGINS-REFERENCE.md` - Plugin commands and usage
-- `.claude/AGENT-NAMING-GUIDE.md` - Agent disambiguation
-- `.claude/CUSTOM-AGENTS-GUIDE.md` - Agent catalog
-- `.claude/skills/README.md` - WordPress skills catalog and usage
+- `CLAUDE.md` (this file) - WordPress development guidance and quick reference
+- `docs/figma-to-wordpress/` - Figma-to-FSE automation documentation
+  - `README.md` - User guide and quick start
+  - `IMPLEMENTATION.md` - Technical implementation details
+  - `EXAMPLES.md` - FSE template syntax examples
+- `.claude/PLUGINS-REFERENCE.md` - Plugin commands and detailed usage
+- `.claude/CUSTOM-AGENTS-GUIDE.md` - Complete agent catalog
+- `.claude/AGENT-NAMING-GUIDE.md` - Agent name disambiguation
+- `.claude/skills/README.md` - WordPress skills catalog
+- `LOCAL-DEVELOPMENT.md` - Docker setup for local WordPress
 
 ---
 

@@ -15,6 +15,8 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: command
+          command: "./scripts/figma-fse/validate-pattern-architecture.sh"
+        - type: command
           command: "./scripts/figma-fse/validate-template.sh"
         - type: command
           command: "./scripts/wordpress/security-scan.sh"
@@ -382,7 +384,72 @@ Continue: Next template (don't stop)
 - Animations → Skip in MVP (can add with custom CSS)
 - If unclear → Use simpler structure, log note, continue
 
-### 6. Autonomous Execution Excellence
+### 6. Pattern-First Image Architecture (CRITICAL)
+
+**MANDATORY: WordPress .html templates do NOT execute PHP code.**
+
+**Architecture Rule:**
+```
+Images/Media → PHP Patterns (patterns/*.php)
+Templates → Pattern References (templates/*.html)
+```
+
+**Implementation:**
+
+1. **Identify sections with images** during Figma extraction
+   - Any `wp:image`, `wp:cover`, or media blocks
+   - Reusable components
+
+2. **Create PHP pattern files** for image sections:
+   ```php
+   // patterns/hero-section.php
+   <?php
+   /**
+    * Title: Hero Section
+    * Slug: themename/hero-section
+    * Categories: banner
+    */
+   ?>
+   <!-- wp:cover ... -->
+     <img src="<?php echo esc_url( get_template_directory_uri() ); ?>/assets/images/hero.png" alt="..."/>
+   <!-- /wp:cover -->
+   ```
+
+3. **Templates reference patterns:**
+   ```html
+   <!-- templates/front-page.html -->
+   <!-- wp:pattern {"slug":"themename/hero-section"} /-->
+   ```
+
+**Pattern Creation Workflow:**
+
+For each Figma template:
+1. Identify image-containing sections
+2. Extract each to `patterns/[section-name].php`
+3. Use `get_template_directory_uri()` for image paths
+4. Save images to `assets/images/`
+5. Template references pattern, not inline blocks
+
+**NEVER:**
+- ❌ PHP code in .html templates (won't execute)
+- ❌ Empty `src=""` attributes (breaks images)
+- ❌ Inline images in templates (use patterns)
+- ❌ Hardcoded URLs (use `get_template_directory_uri()`)
+
+**Why This Matters:**
+- Template generators produce working themes immediately
+- Images work without WordPress admin uploads
+- Portable across environments
+- Follows WordPress core theme patterns
+
+**Validation:**
+PostToolUse hook `validate-pattern-architecture.sh` automatically enforces this.
+
+**See:** `.claude/skills/fse-pattern-first-architecture/` for complete guide
+
+---
+
+### 7. Autonomous Execution Excellence
 
 **You work autonomously without interruptions:**
 

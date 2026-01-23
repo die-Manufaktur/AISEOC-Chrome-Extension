@@ -149,11 +149,16 @@ This template is optimized for WordPress development with Claude Code, featuring
 **Skills Documentation:** `.claude/skills/README.md`
 
 ### **Claude Code Documentation**
-- **`CLAUDE.md`** - WordPress development guidance for Claude Code
-- **`.claude/skills/README.md`** - WordPress skills catalog and usage guide
-- **`.claude/PLUGINS-REFERENCE.md`** - Plugin usage and commands
-- **`.claude/AGENT-NAMING-GUIDE.md`** - Agent disambiguation (code-reviewer variants)
-- **`.claude/CUSTOM-AGENTS-GUIDE.md`** - Custom agent catalog and WordPress relevance
+- **`CLAUDE.md`** - WordPress development guidance and quick reference
+- **`docs/figma-to-wordpress/`** - Figma-to-FSE automation documentation
+  - `README.md` - User guide and quick start
+  - `IMPLEMENTATION.md` - Technical implementation details
+  - `EXAMPLES.md` - FSE template syntax examples
+- **`.claude/skills/README.md`** - WordPress skills catalog
+- **`.claude/PLUGINS-REFERENCE.md`** - Plugin commands and usage
+- **`.claude/CUSTOM-AGENTS-GUIDE.md`** - Custom agent catalog
+- **`.claude/AGENT-NAMING-GUIDE.md`** - Agent disambiguation
+- **`LOCAL-DEVELOPMENT.md`** - Docker setup for local WordPress
 
 ### **What Claude Code Provides**
 - WordPress coding standards compliance
