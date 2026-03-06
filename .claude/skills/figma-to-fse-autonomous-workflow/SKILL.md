@@ -327,6 +327,54 @@ themes/<theme-name>/
 └── patterns/          # Generated patterns
 ```
 
+**Step 2.3.5: MANDATORY Asset Identification & Semantic Mapping**
+
+⚠️ **CRITICAL:** After downloading Figma assets (images with hash filenames), you MUST view every image file to identify what it depicts BEFORE any template or pattern generation begins. Subagents cannot guess image content from hash filenames.
+
+**Procedure:**
+
+1. **View every downloaded image** using the Read tool (which renders images visually):
+   ```
+   For each PNG/JPG in themes/{theme-name}/assets/images/:
+     Read the file → describe what it shows
+   For each SVG in themes/{theme-name}/assets/images/:
+     Read the file → identify what icon/logo it is
+   ```
+
+2. **Create semantic mapping file** at `.claude/figma-data/asset-semantic-mapping.json`:
+   ```json
+   {
+     "images": {
+       "abc123def456.png": {
+         "description": "Group photo of lodge members in regalia with flags",
+         "semantic_name": "hero-group-photo",
+         "suggested_usage": ["hero section", "about page header"]
+       },
+       "789xyz000111.png": {
+         "description": "Masonic square and compass symbol on black background",
+         "semantic_name": "masonic-symbol",
+         "suggested_usage": ["what-is-masonry section", "decorative"]
+       }
+     },
+     "icons": {
+       "aaa111bbb222.svg": {
+         "description": "Facebook social media icon",
+         "semantic_name": "icon-facebook"
+       }
+     }
+   }
+   ```
+
+3. **Provide the semantic mapping to ALL subagents** implementing templates/patterns. Include the full mapping in every subagent prompt so they reference images by verified content, not guessed associations.
+
+**Why this is mandatory:**
+- Hash filenames (e.g., `1dc507e8bed...png`) reveal nothing about image content
+- Subagents will assign wrong images to wrong sections if they guess
+- A lodge seal assigned as a hero photo, or a dinner photo used for a scholarship section, produces obviously wrong results that undermine user trust
+- This step takes 2-3 minutes but prevents hours of debugging
+
+**NEVER skip this step. NEVER let subagents guess image assignments.**
+
 **Step 2.4: Convert Templates (Autonomous Loop for 6-15 Templates) + Phase 3 Attribute Validation**
 
 **Phase 2 + 3 Multi-Template Processing:**
@@ -475,7 +523,84 @@ Automated checks:
 
 If failures occur: Log them but complete remaining templates.
 
-**Step 2.7: Generate Comparison Report**
+**Step 2.7: MANDATORY Visual Verification Loop**
+
+⚠️ **CRITICAL:** After all templates and patterns are generated, you MUST render the actual site in a browser and compare screenshots against the Figma designs. Code review alone is NOT sufficient - it cannot catch wrong images, broken layouts, or visual regressions.
+
+**Procedure:**
+
+1. **Start local WordPress environment:**
+   ```bash
+   ./wordpress-local.sh start
+   # Install WP-CLI if needed
+   docker-compose exec wordpress bash -c "curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp"
+   # Install WordPress if needed
+   docker-compose exec wordpress wp core install --url="http://localhost:8080" --title="Site" --admin_user=admin --admin_password=admin --admin_email=admin@example.com --allow-root
+   # Activate theme
+   docker-compose exec wordpress wp theme activate {theme-name} --allow-root
+   # Create pages with correct slugs and template assignments
+   # Set front page, set permalinks
+   ```
+
+2. **For EACH page template, run the verification loop:**
+   ```
+   For each page (home, about, contact, etc.):
+     a. Navigate browser to page URL (chrome-devtools MCP: navigate_page)
+     b. Take full-page screenshot (chrome-devtools MCP: take_screenshot fullPage=true)
+     c. Get Figma screenshot of same page (figma MCP: get_screenshot)
+     d. View both screenshots side-by-side (Read tool on screenshot file)
+     e. Compare section-by-section:
+        - Are the correct images in the correct sections?
+        - Do layouts match (columns, grids, alignment)?
+        - Are colors/backgrounds correct?
+        - Is typography rendering properly?
+        - Are full-bleed sections actually full-bleed?
+     f. Log differences found
+     g. Fix any issues directly in the template/pattern files
+     h. Reload and re-verify until the page matches
+   ```
+
+3. **Minimum verification checklist per page:**
+   - [ ] Hero/header image is the CORRECT image (not just "an image")
+   - [ ] Section backgrounds match Figma (dark/light/muted)
+   - [ ] Column layouts render side-by-side (not stacked)
+   - [ ] Full-bleed images go edge-to-edge (no padding)
+   - [ ] Text is readable (correct colors on backgrounds)
+   - [ ] Buttons are visible and styled correctly
+   - [ ] Footer renders with all elements
+
+4. **Create verification report** at `.claude/reports/visual-verification.md`:
+   ```markdown
+   # Visual Verification Report
+   ## Page: Home (front-page.html)
+   - Screenshot: [path]
+   - Figma match: 95%
+   - Issues found: 2
+     - Hero image was lodge seal instead of group photo → FIXED
+     - CTA image not full-bleed → FIXED
+   - Final status: PASS
+
+   ## Page: About (page-about.html)
+   ...
+   ```
+
+**Iteration rules:**
+- If a page has visual issues, fix them and re-verify
+- Maximum 3 iteration rounds per page (if still failing after 3, log and move on)
+- Do NOT declare the theme complete until at least the homepage passes visual verification
+- Image mismatches are ALWAYS fixed (never acceptable)
+- Layout issues that affect readability are ALWAYS fixed
+- Minor spacing differences (< 8px) can be logged as acceptable
+
+**Why this is mandatory:**
+- Code review cannot detect wrong images (hash filenames all look the same in code)
+- Layout bugs only manifest when rendered in a real browser
+- Full-bleed issues depend on WordPress CSS cascade, not just markup
+- This is the difference between "code that looks correct" and "a site that looks correct"
+
+**NEVER skip visual verification. NEVER declare the theme complete based on code review alone.**
+
+**Step 2.8: Generate Comparison Report**
 
 Create `.claude/reports/figma-fse-comparison.md`:
 - Templates converted count
@@ -483,6 +608,7 @@ Create `.claude/reports/figma-fse-comparison.md`:
 - Zero hardcoded values verification
 - Quality checks results
 - Screenshots comparison (Figma vs rendered)
+- Visual verification results (from Step 2.7)
 - Issues log
 
 ### Phase 3: Completion & Handoff
@@ -872,6 +998,19 @@ Runs when all templates complete:
 ## No-Exceptions List
 
 **NEVER do these (zero tolerance):**
+
+0. ❌ **Skip asset identification (Step 2.3.5)**
+   - NEVER let subagents guess image content from hash filenames
+   - ALWAYS view every downloaded image BEFORE template generation
+   - ALWAYS create semantic mapping and provide it to all subagents
+   - Hash filenames like `1dc507e8...png` reveal NOTHING about content
+
+0.5. ❌ **Skip visual verification (Step 2.7)**
+   - NEVER declare theme complete based on code review alone
+   - ALWAYS render pages in a real browser and compare to Figma
+   - ALWAYS fix image mismatches (wrong image = always wrong)
+   - ALWAYS fix broken layouts visible in screenshots
+   - Code that "looks correct" is NOT the same as a site that looks correct
 
 1. ❌ **Skip design system extraction**
    - ALWAYS extract complete design system FIRST
