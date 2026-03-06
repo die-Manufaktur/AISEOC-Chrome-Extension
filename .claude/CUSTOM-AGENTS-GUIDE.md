@@ -245,4 +245,37 @@ Ready for release
 
 ---
 
+## Agent Hook Configurations
+
+Agents with automated hooks (12 of 18):
+
+### WordPress Core Quality Hooks (shared scripts)
+These scripts are shared across multiple agents:
+- `scripts/wordpress/security-scan.sh` — Used by: frontend-developer, figma-fse-converter, performance-benchmarker, test-writer-fixer
+- `scripts/wordpress/check-coding-standards.sh` — Used by: frontend-developer, figma-fse-converter, test-writer-fixer
+- `scripts/wordpress/check-performance.sh` — Used by: frontend-developer, performance-benchmarker, test-writer-fixer
+
+### Theme Protection Hooks
+- `.claude/hooks/validate-theme-location.sh` — Blocks writes to wp-content/ (project-level, applied to: frontend-developer, block-markup-validator, ui-designer, theme-token-auditor)
+- `scripts/figma-fse/validate-theme-location.sh` — Same protection for figma-fse-converter
+
+### New Agent Hooks
+| Agent | Hook Type | Script | Purpose |
+|-------|-----------|--------|---------|
+| block-markup-validator | PostToolUse | validate-block-markup.sh | Block syntax, class consistency, slug validation |
+| theme-token-auditor | PostToolUse | audit-tokens.sh | Hardcoded value detection |
+| content-seeder | Stop | verify-pages.sh | Page existence verification |
+| wp-environment-manager | SubagentStart | check-environment.sh | Docker/WP-CLI status check |
+
+### Agents Without Hooks (6)
+These agents are research/audit-only and don't need automated hooks:
+- accessibility-auditor (runs Lighthouse on demand)
+- asset-cataloger (views images on demand)
+- visual-qa-agent (captures screenshots on demand)
+- seo-schema-agent (audits on demand)
+- ux-researcher (research only)
+- workflow-optimizer (analysis only)
+
+---
+
 **Architecture Assessment:** 32 agents provide comprehensive WordPress FSE development coverage. The 8 new agents close critical gaps in visual QA, asset management, environment management, markup validation, accessibility, token compliance, content seeding, and SEO.
