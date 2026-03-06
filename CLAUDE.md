@@ -280,9 +280,9 @@ This project uses a lean, WordPress-optimized plugin configuration with 5 plugin
 
 ---
 
-### Custom Agents (24 Total)
+### Custom Agents (18 Total)
 
-24 specialized agents provide WordPress FSE development and general development capabilities. Key WordPress agents include `frontend-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
+18 specialized agents provide WordPress FSE development capabilities. Key WordPress agents include `frontend-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
 
 Agents are invoked automatically based on task context.
 
@@ -428,7 +428,7 @@ Result: themes/[theme-name]/ ready for WordPress
 - GitHub integration via `gh` CLI (not a plugin)
 
 **Agent Philosophy:**
-- 24 custom agents available (8 WordPress-focused)
+- 18 custom agents available (all WordPress-focused)
 - Agents invoked contextually by Claude Code
 - No action required - automatic selection
 - Optional: Remove 16 non-WordPress agents (see `.claude/CUSTOM-AGENTS-GUIDE.md`)

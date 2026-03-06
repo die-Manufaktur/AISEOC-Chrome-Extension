@@ -1,7 +1,7 @@
 # Custom Agents Reference Guide
 
-**Last Updated:** 2026-01-18
-**Total Custom Agents:** 24
+**Last Updated:** 2026-03-06
+**Total Custom Agents:** 18
 **Location:** `.claude/agents/`
 
 This guide categorizes all custom agents by relevance to WordPress FSE theme development.
@@ -37,6 +37,46 @@ These agents directly support WordPress block theme development:
 - **Use for:** Theme performance optimization, measuring page load times
 - **WordPress relevance:** Critical - WordPress performance is a key concern
 
+### **visual-qa-agent** (NEW)
+- **Purpose:** Visual regression testing and design comparison
+- **Use for:** Comparing rendered WordPress pages against Figma designs, catching wrong images, layout issues
+- **WordPress relevance:** Critical - ensures pixel-perfect Figma-to-FSE conversion
+
+### **asset-cataloger** (NEW)
+- **Purpose:** Image/asset semantic mapping and validation
+- **Use for:** Viewing hash-named images, creating semantic mappings, validating correct image usage in patterns
+- **WordPress relevance:** Critical - prevents wrong-image-assignment errors
+
+### **wp-environment-manager** (NEW)
+- **Purpose:** Local WordPress development environment management
+- **Use for:** Docker, WP-CLI, theme activation, user management, environment troubleshooting
+- **WordPress relevance:** Critical - eliminates dev environment friction
+
+### **block-markup-validator** (NEW)
+- **Purpose:** WordPress block syntax validation
+- **Use for:** Validating block JSON attributes, HTML class consistency, heading hierarchy, theme.json slug references
+- **WordPress relevance:** Critical - catches silent rendering bugs
+
+### **accessibility-auditor** (NEW)
+- **Purpose:** WCAG 2.1 AA compliance auditing
+- **Use for:** Color contrast, heading hierarchy, ARIA labels, alt text, keyboard navigation, Lighthouse audits
+- **WordPress relevance:** Critical - WordPress themes must be accessible
+
+### **theme-token-auditor** (NEW)
+- **Purpose:** Design token compliance auditing
+- **Use for:** Detecting hardcoded colors/pixels, validating CSS variable references, ensuring 100% theme.json token usage
+- **WordPress relevance:** High - enforces design system discipline
+
+### **content-seeder** (NEW)
+- **Purpose:** WordPress demo content generation
+- **Use for:** Creating pages matching templates, sample posts, navigation menus, homepage configuration
+- **WordPress relevance:** High - fully populated sites for testing
+
+### **seo-schema-agent** (NEW)
+- **Purpose:** SEO and structured data auditing
+- **Use for:** Heading hierarchy, meta tags, Open Graph, Schema.org recommendations, image SEO
+- **WordPress relevance:** High - themes must support good SEO
+
 ---
 
 ## WordPress Development - Moderately Relevant ⚠️
@@ -70,113 +110,15 @@ These agents can be useful but aren't WordPress-specific:
 
 ---
 
-## Not WordPress-Specific ❌
+## Removed Agents (14 total)
 
-These agents were designed for app/product development, not WordPress:
+The following agents were removed as they had zero relevance to WordPress FSE development:
 
-### **Marketing & Business (8 agents)**
-- **tiktok-strategist** - Social media marketing strategy
-- **trend-researcher** - Market trend analysis
-- **brand-guardian** - Brand consistency management
-- **visual-storyteller** - Marketing content creation
-- **support-responder** - Customer support automation
-- **feedback-synthesizer** - User feedback analysis
-- **project-shipper** - Product launch coordination
-- **legal-compliance-checker** - Legal/regulatory compliance
+**Marketing/Business (8):** tiktok-strategist, trend-researcher, brand-guardian, visual-storyteller, support-responder, feedback-synthesizer, project-shipper, legal-compliance-checker
 
-**WordPress relevance:** Low - these are for business/product ops, not theme development
+**Infrastructure/Tooling (4):** mcp-expert, tool-evaluator, rapid-prototyper, db-reader
 
-### **Infrastructure & Tooling (4 agents)**
-- **mcp-expert** - Model Context Protocol integration
-- **tool-evaluator** - Development tool evaluation
-- **rapid-prototyper** - Rapid application prototyping
-- **db-reader** - Direct database querying
-
-**WordPress relevance:** Low to none - niche use cases
-
-### **Product/UX (2 agents)**
-- **experiment-tracker** - A/B testing and experiments
-- **whimsy-injector** - Delightful UI micro-interactions
-
-**WordPress relevance:** Very low - more for app development
-
----
-
-## Recommended WordPress FSE Agent Stack
-
-For focused WordPress theme development, these agents provide the most value:
-
-```
-✅ frontend-developer       (JS/CSS implementation)
-✅ test-writer-fixer        (PHP testing)
-✅ ui-designer              (Block pattern design)
-✅ ux-researcher            (Theme usability)
-✅ performance-benchmarker  (Performance optimization)
-⚠️ api-tester              (REST API development)
-⚠️ analytics-reporter      (Performance metrics)
-⚠️ workflow-optimizer      (Process improvement)
-```
-
-**Total recommended:** 5 core + 3 situational = **8 agents**
-
----
-
-## Optional Cleanup (If Desired)
-
-The surgical cleanup plan retained all 24 custom agents. If you want to streamline further, consider removing these 16 agents that aren't WordPress-relevant:
-
-**Safe to Remove (Marketing/Business):**
-```bash
-rm .claude/agents/tiktok-strategist.md
-rm .claude/agents/trend-researcher.md
-rm .claude/agents/brand-guardian.md
-rm .claude/agents/visual-storyteller.md
-rm .claude/agents/support-responder.md
-rm .claude/agents/feedback-synthesizer.md
-rm .claude/agents/project-shipper.md
-rm .claude/agents/legal-compliance-checker.md
-```
-
-**Safe to Remove (Infrastructure/Tooling):**
-```bash
-rm .claude/agents/mcp-expert.md
-rm .claude/agents/tool-evaluator.md
-rm .claude/agents/rapid-prototyper.md
-rm .claude/agents/db-reader.md
-```
-
-**Safe to Remove (Product/UX):**
-```bash
-rm .claude/agents/experiment-tracker.md
-rm .claude/agents/whimsy-injector.md
-```
-
-**Consider Keeping:**
-- **test-results-analyzer** - Pairs with test-writer-fixer
-- **docusaurus-expert** - Useful for theme documentation
-
-**Potential Reduction:** 24 agents → 8-10 agents (66% reduction)
-
----
-
-## Agent Consolidation Ideas
-
-If you want to keep capabilities but reduce file count:
-
-### **Merge into "theme-ux-expert":**
-- ui-designer
-- ux-researcher
-- whimsy-injector (optional)
-
-### **Merge into "performance-expert":**
-- performance-benchmarker
-- analytics-reporter
-
-### **Merge into "test-expert":**
-- test-writer-fixer
-- test-results-analyzer
-
-**Result:** 24 agents → 5-7 consolidated experts
+**Product/UX (2):** experiment-tracker, whimsy-injector
 
 ---
 
@@ -246,15 +188,7 @@ Automation Scripts (4)
 ## Current Architecture Status
 
 **Plugins:** ✅ Already optimized (5 user + 1 local)
-**Custom Agents:** 📦 All 24 retained (as per surgical cleanup plan)
-
-**Next steps (optional):**
-1. Review agent list above
-2. Decide if you want to remove non-WordPress agents
-3. Run removal commands if desired
-4. Update this guide with final agent count
-
-**No action required** - current setup works for WordPress development, just has extra agents available if needed.
+**Custom Agents:** 18 total (all WordPress-relevant)
 
 ---
 
@@ -270,7 +204,45 @@ Automation Scripts (4)
 | Optimize workflow | workflow-optimizer | - |
 | Document theme | docusaurus-expert | - |
 | Usability testing | ux-researcher | - |
+| **Compare render vs Figma** | **visual-qa-agent** | - |
+| **Identify/map images** | **asset-cataloger** | - |
+| **Docker/WP-CLI setup** | **wp-environment-manager** | - |
+| **Validate block markup** | **block-markup-validator** | theme-token-auditor |
+| **Accessibility audit** | **accessibility-auditor** | - |
+| **Token compliance** | **theme-token-auditor** | block-markup-validator |
+| **Seed demo content** | **content-seeder** | wp-environment-manager |
+| **SEO audit** | **seo-schema-agent** | - |
 
 ---
 
-**Architecture Assessment:** While 16 agents aren't WordPress-specific, they don't harm performance and may be useful for future projects. The surgical cleanup successfully streamlined plugins (the heavy lifting), while preserving agent flexibility.
+## Figma-to-FSE Conversion Pipeline
+
+The new agents form an automated quality pipeline for Figma-to-WordPress conversions:
+
+```
+Figma Design
+    ↓
+figma-fse-converter (generates theme)
+    ↓
+asset-cataloger (maps images semantically)
+    ↓
+block-markup-validator (validates block syntax)
+    ↓
+theme-token-auditor (ensures 100% token usage)
+    ↓
+wp-environment-manager (starts WordPress)
+    ↓
+content-seeder (creates pages/posts/menus)
+    ↓
+visual-qa-agent (compares render vs Figma)
+    ↓
+accessibility-auditor (WCAG compliance)
+    ↓
+seo-schema-agent (SEO best practices)
+    ↓
+Ready for release
+```
+
+---
+
+**Architecture Assessment:** 32 agents provide comprehensive WordPress FSE development coverage. The 8 new agents close critical gaps in visual QA, asset management, environment management, markup validation, accessibility, token compliance, content seeding, and SEO.
