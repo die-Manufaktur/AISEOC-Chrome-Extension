@@ -19,6 +19,10 @@ hooks:
         - type: command
           command: "./scripts/figma-fse/validate-template.sh"
         - type: command
+          command: "./scripts/block-markup-validator/validate-block-markup.sh"
+        - type: command
+          command: "./scripts/theme-token-auditor/audit-tokens.sh"
+        - type: command
           command: "./scripts/wordpress/security-scan.sh"
         - type: command
           command: "./scripts/wordpress/check-coding-standards.sh"
