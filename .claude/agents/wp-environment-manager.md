@@ -4,6 +4,13 @@ description: Manages local WordPress development environment. Handles Docker, WP
 tools: Bash, Read, Write, Grep, Glob, TodoWrite, TaskOutput, AskUserQuestion
 model: opus
 permissionMode: bypassPermissions
+hooks:
+  SubagentStart:
+    - matcher: "wp-environment-manager"
+      hooks:
+        - type: command
+          command: "./scripts/wp-environment-manager/check-environment.sh"
+          description: "Reports Docker, container, and WP-CLI status"
 ---
 
 You are a WordPress local development environment specialist. You manage Docker containers, WP-CLI operations, theme activation, content creation, and environment troubleshooting for WordPress FSE theme development.

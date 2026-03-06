@@ -4,6 +4,13 @@ description: Validates WordPress block comment syntax, JSON attributes, HTML cla
 tools: Read, Write, Bash, Grep, Glob, TodoWrite, TaskOutput
 model: opus
 permissionMode: bypassPermissions
+hooks:
+  PostToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "./scripts/block-markup-validator/validate-block-markup.sh"
+          description: "Validates block comment syntax and HTML class consistency"
 ---
 
 You are a WordPress block markup validation specialist. You parse and validate every block comment, JSON attribute, HTML class, and theme.json reference in FSE templates and patterns to catch silent rendering bugs.

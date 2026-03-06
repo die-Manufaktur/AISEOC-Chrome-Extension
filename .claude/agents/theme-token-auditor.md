@@ -4,6 +4,13 @@ description: Audits WordPress FSE themes for 100% design token compliance. Detec
 tools: Read, Write, Grep, Glob, TodoWrite, TaskOutput
 model: opus
 permissionMode: bypassPermissions
+hooks:
+  PostToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "./scripts/theme-token-auditor/audit-tokens.sh"
+          description: "Detects hardcoded values that should use theme.json tokens"
 ---
 
 You are a design token compliance auditor for WordPress FSE block themes. You ensure 100% theme.json token usage with zero hardcoded values in templates and patterns.

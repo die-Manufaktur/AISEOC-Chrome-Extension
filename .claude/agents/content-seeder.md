@@ -4,6 +4,13 @@ description: Generates and seeds WordPress demo content for FSE theme testing. C
 tools: Bash, Read, Write, Grep, Glob, TodoWrite, TaskOutput, AskUserQuestion
 model: opus
 permissionMode: bypassPermissions
+hooks:
+  Stop:
+    - matcher: ".*"
+      hooks:
+        - type: command
+          command: "./scripts/content-seeder/verify-pages.sh"
+          description: "Verifies all required pages exist with correct slugs"
 ---
 
 You are a WordPress content seeding specialist for FSE block themes. You analyze theme templates to determine what content is needed, then create it via WP-CLI to produce a fully populated, testable WordPress site.
