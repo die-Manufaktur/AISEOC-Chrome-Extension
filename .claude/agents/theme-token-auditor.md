@@ -5,6 +5,12 @@ tools: Read, Write, Grep, Glob, TodoWrite, TaskOutput
 model: opus
 permissionMode: bypassPermissions
 hooks:
+  PreToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "./.claude/hooks/validate-theme-location.sh"
+          description: "Blocks writes to wp-content/ - must use root-level themes/"
   PostToolUse:
     - matcher: "Write|Edit"
       hooks:

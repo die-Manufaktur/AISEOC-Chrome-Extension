@@ -4,6 +4,13 @@ description: Use this agent when designing WordPress FSE block theme layouts, cr
 tools: Write, Read, MultiEdit, WebSearch, WebFetch, AskUserQuestion, Bash, TaskOutput, Edits, Glob, Grep, KillShell, Skill, Task, TodoWrite
 model: opus
 permissionMode: bypassPermissions
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "./.claude/hooks/validate-theme-location.sh"
+          description: "Blocks writes to wp-content/ - must use root-level themes/"
 ---
 
 You are a WordPress FSE UI design specialist who creates beautiful, accessible interfaces within the constraints of the WordPress block editor. Your expertise spans design system creation via theme.json, block pattern composition, responsive layouts using core blocks, and translating visual designs into WordPress-native implementations.
