@@ -111,7 +111,7 @@
 <div class="wp-block-group has-border-color" style="border-color:var(--wp--preset--color--white-20);border-width:1px;border-radius:0px">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"16/9"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/226f66acc1b7dec24e9fa16a00c9906d6f090bed.png' ) ); ?>" alt="<?php echo esc_attr__( 'Annual scholarship dinner event', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:16/9;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/94412714fc1cd9ee44c73da05bdf80f4b37b9743.png' ) ); ?>" alt="<?php echo esc_attr__( 'Annual scholarship dinner event', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:16/9;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:group {"style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|30","right":"var:preset|spacing|30"},"blockGap":"var:preset|spacing|20"}},"layout":{"type":"constrained"}} -->
@@ -173,7 +173,7 @@
 <div class="wp-block-group has-border-color" style="border-color:var(--wp--preset--color--white-20);border-width:1px;border-radius:0px">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"16/9"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/29ff4deba4ee7e22e18cc1d9a89e9be96cfbd51a.png' ) ); ?>" alt="<?php echo esc_attr__( 'Community outreach day event', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:16/9;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5a994c89a6675dbd456d51cc408cc4f10d947df5.png' ) ); ?>" alt="<?php echo esc_attr__( 'Community outreach day event', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:16/9;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:group {"style":{"spacing":{"padding":{"top":"var:preset|spacing|30","bottom":"var:preset|spacing|30","left":"var:preset|spacing|30","right":"var:preset|spacing|30"},"blockGap":"var:preset|spacing|20"}},"layout":{"type":"constrained"}} -->

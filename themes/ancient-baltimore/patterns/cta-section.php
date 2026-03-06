@@ -31,15 +31,9 @@
 </div>
 <!-- /wp:buttons -->
 
-<!-- wp:group {"align":"wide","style":{"spacing":{"padding":{"top":"var:preset|spacing|60"}}},"layout":{"type":"constrained","wideSize":"1280px"}} -->
-<div class="wp-block-group alignwide" style="padding-top:var(--wp--preset--spacing--60)">
-
-<!-- wp:image {"align":"wide","sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}}} -->
-<figure class="wp-block-image alignwide size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5a994c89a6675dbd456d51cc408cc4f10d947df5.png' ) ); ?>" alt="<?php echo esc_attr__( 'Ancient Baltimore Lodge building exterior', 'ancient-baltimore' ); ?>" style="border-radius:0px"/></figure>
+<!-- wp:image {"align":"full","sizeSlug":"full","linkDestination":"none","style":{"spacing":{"margin":{"top":"var:preset|spacing|60"}}}} -->
+<figure class="wp-block-image alignfull size-full" style="margin-top:var(--wp--preset--spacing--60)"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5e240f92b1203307225a996200b7e28a3d285415.png' ) ); ?>" alt="<?php echo esc_attr__( 'Ancient Baltimore Lodge building exterior', 'ancient-baltimore' ); ?>"/></figure>
 <!-- /wp:image -->
-
-</div>
-<!-- /wp:group -->
 
 </div>
 <!-- /wp:group -->

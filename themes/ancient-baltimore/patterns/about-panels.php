@@ -34,7 +34,7 @@
 <div class="wp-block-column" style="flex-basis:50%">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"4/3"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/96e86b30d0e7915f1805177a6d710002d6b958a7.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge brothers engaged in community activities', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5a994c89a6675dbd456d51cc408cc4f10d947df5.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge brothers engaged in community activities', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 </div>
@@ -50,7 +50,7 @@
 <div class="wp-block-column" style="flex-basis:50%">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"4/3"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/29ff4deba4ee7e22e18cc1d9a89e9be96cfbd51a.png' ) ); ?>" alt="<?php echo esc_attr__( 'Masonic fraternal tradition ceremony', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5e240f92b1203307225a996200b7e28a3d285415.png' ) ); ?>" alt="<?php echo esc_attr__( 'Masonic fraternal tradition ceremony', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 </div>
@@ -102,7 +102,7 @@
 <div class="wp-block-column" style="flex-basis:50%">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"4/3"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/226f66acc1b7dec24e9fa16a00c9906d6f090bed.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge brothers in fellowship and learning', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/94412714fc1cd9ee44c73da05bdf80f4b37b9743.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge brothers in fellowship and learning', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 </div>
@@ -118,7 +118,7 @@
 <div class="wp-block-column" style="flex-basis:50%">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"4/3"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/b017525cbce32e3c87bac19aef62f761038a39a5.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge dinner gathering', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/226f66acc1b7dec24e9fa16a00c9906d6f090bed.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge dinner gathering', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 </div>

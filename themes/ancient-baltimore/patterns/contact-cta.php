@@ -35,7 +35,7 @@
 <div class="wp-block-group alignwide" style="padding-top:var(--wp--preset--spacing--60)">
 
 <!-- wp:image {"align":"wide","sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}}} -->
-<figure class="wp-block-image alignwide size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5a994c89a6675dbd456d51cc408cc4f10d947df5.png' ) ); ?>" alt="<?php echo esc_attr__( 'Interior of Ancient Baltimore Lodge 234', 'ancient-baltimore' ); ?>" style="border-radius:0px"/></figure>
+<figure class="wp-block-image alignwide size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/29ff4deba4ee7e22e18cc1d9a89e9be96cfbd51a.png' ) ); ?>" alt="<?php echo esc_attr__( 'Interior of Ancient Baltimore Lodge 234', 'ancient-baltimore' ); ?>" style="border-radius:0px"/></figure>
 <!-- /wp:image -->
 
 </div>

@@ -96,7 +96,7 @@
 <div class="wp-block-column" style="flex-basis:40%">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"3/4"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/94412714fc1cd9ee44c73da05bdf80f4b37b9743.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge members participating in charitable community service', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:3/4;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/b017525cbce32e3c87bac19aef62f761038a39a5.png' ) ); ?>" alt="<?php echo esc_attr__( 'Lodge members participating in charitable community service', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:3/4;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 </div>

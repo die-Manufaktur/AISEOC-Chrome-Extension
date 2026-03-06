@@ -82,7 +82,7 @@
 <div class="wp-block-column" style="flex-basis:60%">
 
 <!-- wp:image {"sizeSlug":"full","linkDestination":"none","style":{"border":{"radius":"0px"}},"aspectRatio":"4/3"} -->
-<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5a994c89a6675dbd456d51cc408cc4f10d947df5.png' ) ); ?>" alt="<?php echo esc_attr__( 'Ancient Baltimore Lodge 234 building exterior', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
+<figure class="wp-block-image size-full has-custom-border"><img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/5e240f92b1203307225a996200b7e28a3d285415.png' ) ); ?>" alt="<?php echo esc_attr__( 'Ancient Baltimore Lodge 234 building exterior', 'ancient-baltimore' ); ?>" style="border-radius:0px;aspect-ratio:4/3;object-fit:cover"/></figure>
 <!-- /wp:image -->
 
 </div>
