@@ -29,6 +29,8 @@ Use this skill when:
 - "POT file"
 - "localization"
 - "translation ready"
+- "generate pattern" (FSE pattern generation should include i18n)
+- "create pattern" (block patterns must wrap visible strings)
 
 ## Quick Reference
 
@@ -214,6 +216,71 @@ $formatted_number = number_format_i18n( 1234567.89 );
 ?>
 ```
 
+## i18n in FSE Pattern Generation
+
+When the figma-fse-converter agent generates block patterns, all visible strings MUST be wrapped in translation functions. This is the most common i18n gap in the Figma-to-FSE pipeline.
+
+### Pattern PHP Files — Required Wrapping
+
+Every PHP pattern file registers visible text. Wrap it at generation time, not as an afterthought.
+
+```php
+<?php
+/**
+ * Title: Hero Section
+ * Slug: mytheme/hero-section
+ * Categories: featured
+ */
+?>
+
+<!-- WRONG: Raw strings in pattern -->
+<!-- wp:heading {"level":1} -->
+<h1 class="wp-block-heading">Welcome to Our Site</h1>
+<!-- /wp:heading -->
+
+<!-- CORRECT: Translated strings in pattern -->
+<!-- wp:heading {"level":1} -->
+<h1 class="wp-block-heading"><?php echo esc_html__( 'Welcome to Our Site', 'mytheme' ); ?></h1>
+<!-- /wp:heading -->
+```
+
+### Button and Link Text
+
+```php
+<!-- WRONG -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link">Get Started</a></div>
+<!-- /wp:button -->
+
+<!-- CORRECT -->
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link"><?php echo esc_html__( 'Get Started', 'mytheme' ); ?></a></div>
+<!-- /wp:button -->
+```
+
+### Attribute Values (alt text, aria-labels)
+
+```php
+<!-- CORRECT: Escaped for attribute context -->
+<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/hero.webp' ) ); ?>"
+     alt="<?php echo esc_attr__( 'Hero background image', 'mytheme' ); ?>" />
+```
+
+### What NOT to Translate in Patterns
+
+- Block comment markup (`<!-- wp:heading -->`) — never translate
+- CSS class names — never translate
+- theme.json token slugs (`var(--wp--preset--color--primary)`) — never translate
+- HTML tag names and attributes — never translate
+
+### Integration with figma-fse-converter Agent
+
+The figma-fse-converter agent should apply these rules during pattern generation:
+1. All visible text in `<h1>`-`<h6>`, `<p>`, `<a>`, `<span>`, `<button>` gets `esc_html__()`
+2. All `alt` attributes get `esc_attr__()`
+3. Text domain matches the theme slug from `style.css`
+4. POT file generation runs after all patterns are created
+
 ## Common Mistakes
 
 ### 1. Hardcoding English Text
@@ -317,6 +384,8 @@ echo number_format_i18n( 1234567, 2 ); // Locale-specific formatting
 ## Integration with This Template
 
 This skill works with:
+- **figma-to-fse-autonomous-workflow skill** - i18n during Figma-to-FSE conversion
+- **figma-fse-converter agent** - Pattern generation with translation wrappers
 - **fse-block-theme-development skill** - i18n in block themes
 - **block-pattern-creation skill** - Translatable patterns
 - **wp-cli-workflows skill** - Generating POT files with WP-CLI
@@ -330,6 +399,6 @@ This skill works with:
 
 ---
 
-**Skill Version:** 1.0.0
-**Last Updated:** 2026-01-18
+**Skill Version:** 1.1.0
+**Last Updated:** 2026-03-06
 **Testing Methodology:** RED-GREEN-REFACTOR (TDD for documentation)
