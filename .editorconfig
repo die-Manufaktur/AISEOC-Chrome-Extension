@@ -1,0 +1,53 @@
+# EditorConfig - WordPress Coding Standards
+# https://editorconfig.org
+# https://developer.wordpress.org/coding-standards/
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = tab
+indent_size = 4
+
+# WordPress PHP files use tabs
+[*.php]
+indent_style = tab
+
+# WordPress JavaScript uses tabs
+[*.js]
+indent_style = tab
+
+# WordPress CSS uses tabs
+[*.css]
+indent_style = tab
+
+# WordPress HTML templates
+[*.html]
+indent_style = tab
+
+# JSON files (theme.json, block.json, etc.)
+[*.json]
+indent_style = tab
+indent_size = 4
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# Shell scripts
+[*.sh]
+indent_style = tab
+indent_size = 4
+
+# Composer and npm configs
+[{composer.json,package.json}]
+indent_style = tab
+indent_size = 4

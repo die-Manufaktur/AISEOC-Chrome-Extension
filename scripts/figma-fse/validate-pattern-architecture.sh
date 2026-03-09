@@ -28,7 +28,7 @@ if grep -q '<?php' "$THEME_FILE" 2>/dev/null; then
     echo ""
     grep -n '<?php' "$THEME_FILE"
     echo ""
-    echo "See: .claude/agents/PATTERN-FIRST-ARCHITECTURE.md"
+    echo "See: docs/architecture/PATTERN-FIRST-ARCHITECTURE.md"
     exit 1
 fi
 
@@ -41,7 +41,7 @@ if grep -q '<img.*src=""' "$THEME_FILE" 2>/dev/null; then
     echo ""
     grep -n '<img.*src=""' "$THEME_FILE"
     echo ""
-    echo "See: .claude/agents/PATTERN-FIRST-ARCHITECTURE.md"
+    echo "See: docs/architecture/PATTERN-FIRST-ARCHITECTURE.md"
     exit 1
 fi
 

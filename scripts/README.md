@@ -6,7 +6,7 @@ This directory contains hook scripts for Claude Code agents. These hooks provide
 
 The hook system consists of:
 - **4 WordPress validation scripts** - Global validation for PHP files
-- **30 agent-specific scripts** - 3 scripts per agent for 10 specialized agents
+- **21 agent-specific scripts** - 3 scripts per agent for 7 specialized agents
 - **Automated reporting** - All hooks save reports to `.claude/reports/`
 
 ## WordPress Global Hooks
@@ -129,19 +129,6 @@ Each agent has 3 specialized hooks that run at different lifecycle stages.
 
 ---
 
-### experiment-tracker
-
-**Hooks**:
-1. **PreToolUse** - `validate-config.sh` - Validates experiment JSON schemas
-2. **PostToolUse** - `update-registry.sh` - Updates experiment registry
-3. **Stop** - `save-state.sh` - Persists experiment state
-
-**WordPress Integration**: No
-
-**Reports**: `.claude/experiments/`
-
----
-
 ### test-results-analyzer
 
 **Hooks**:
@@ -152,32 +139,6 @@ Each agent has 3 specialized hooks that run at different lifecycle stages.
 **WordPress Integration**: No
 
 **Reports**: `.claude/reports/test-results-analyzer/`
-
----
-
-### rapid-prototyper
-
-**Hooks**:
-1. **SubagentStart** - `check-dependencies.sh` - Installs missing dependencies
-2. **PostToolUse** - `validate-package-json.sh` - Validates package.json
-3. **Stop** - `verify-runnable.sh` - Tests if prototype is runnable
-
-**WordPress Integration**: Yes (all WordPress hooks for PHP files)
-
-**Reports**: `.claude/reports/rapid-prototyper/`
-
----
-
-### mcp-expert
-
-**Hooks**:
-1. **PreToolUse** - `validate-mcp-schema.sh` - Validates MCP JSON schema
-2. **PostToolUse** - `test-config.sh` - Tests MCP configuration
-3. **Stop** - `generate-docs.sh` - Creates setup documentation
-
-**WordPress Integration**: No
-
-**Reports**: `.claude/reports/mcp-expert/`
 
 ## Hook Exit Codes
 
@@ -341,7 +302,7 @@ When adding new hooks:
 
 ---
 
-**Generated**: 2026-01-18
-**Agents with hooks**: 10
-**Total scripts**: 34
+**Generated**: 2026-01-18 | **Updated**: 2026-03-09
+**Agents with hooks**: 7
+**Total scripts**: 35
 **WordPress validation scripts**: 4

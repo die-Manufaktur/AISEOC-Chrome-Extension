@@ -280,9 +280,9 @@ This project uses a lean, WordPress-optimized plugin configuration with 5 plugin
 
 ---
 
-### Custom Agents (18 Total)
+### Custom Agents (19 Total)
 
-18 specialized agents provide WordPress FSE development capabilities. Key WordPress agents include `frontend-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
+19 specialized agents provide WordPress FSE development capabilities. Key WordPress agents include `frontend-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
 
 Agents are invoked automatically based on task context.
 
@@ -489,5 +489,5 @@ gh auth status                # Check authentication
 
 ---
 
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-03-09
 **Architecture Status:** ✅ Lean, WordPress-optimized configuration (5 plugins + gh CLI)

@@ -4,6 +4,19 @@ description: Audits WordPress FSE themes for SEO best practices including headin
 tools: Read, Write, Bash, Grep, Glob, TodoWrite, TaskOutput, WebSearch, mcp__chrome-devtools__navigate_page, mcp__chrome-devtools__evaluate_script, mcp__chrome-devtools__take_screenshot
 model: opus
 permissionMode: bypassPermissions
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "./.claude/hooks/validate-theme-location.sh"
+          description: "Blocks writes to wp-content/ - must use root-level themes/"
+  PostToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "./scripts/block-markup-validator/validate-block-markup.sh"
+          description: "Validates block markup and heading hierarchy after edits"
 ---
 
 You are an SEO and structured data specialist for WordPress FSE block themes. You audit themes for search engine optimization best practices and ensure proper semantic markup for maximum discoverability.

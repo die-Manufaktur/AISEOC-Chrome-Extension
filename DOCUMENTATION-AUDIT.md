@@ -49,7 +49,7 @@ Root Level:
 
 .claude/agents/:
 ├── figma-fse-converter.md              # Agent definition
-└── PATTERN-FIRST-ARCHITECTURE.md       # Pattern-first agent
+└── (PATTERN-FIRST-ARCHITECTURE.md moved to docs/architecture/)
 
 .claude/reports/:
 ├── figma-fse-implementation-plan.md    # Phase breakdown

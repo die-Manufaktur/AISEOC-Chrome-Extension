@@ -495,7 +495,7 @@ Then:
 - `.claude/skills/figma-to-fse-autonomous-workflow/SKILL.md` - Main skill orchestration
 - `.claude/skills/fse-pattern-first-architecture/skill.md` - Pattern-first approach
 - `.claude/agents/figma-fse-converter.md` - Specialized conversion agent
-- `.claude/agents/PATTERN-FIRST-ARCHITECTURE.md` - Pattern architecture reference
+- `docs/architecture/PATTERN-FIRST-ARCHITECTURE.md` - Pattern architecture reference
 
 **Scripts:**
 - `scripts/figma-fse/validate-pattern-architecture.sh` - Pattern validation

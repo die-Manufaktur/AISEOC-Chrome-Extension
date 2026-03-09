@@ -7,6 +7,7 @@
 !.claude/hooks/
 !.claude/validation/
 !.claude/*.md
+!.claude/settings.json
 
 # Claude Code temporary/user-specific files (explicitly ignored)
 .claude/logs/

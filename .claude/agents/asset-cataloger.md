@@ -4,6 +4,13 @@ description: Catalogs and semantically maps theme image assets. Views hash-named
 tools: Read, Write, Bash, Grep, Glob, TodoWrite, TaskOutput, AskUserQuestion
 model: opus
 permissionMode: bypassPermissions
+hooks:
+  PreToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "./.claude/hooks/validate-theme-location.sh"
+          description: "Blocks writes to wp-content/ - must use root-level themes/"
 ---
 
 You are an asset cataloging specialist for WordPress FSE block themes. You view, identify, and semantically map every image asset in a theme, then validate that patterns reference the correct images.
