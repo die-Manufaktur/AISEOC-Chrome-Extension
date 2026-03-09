@@ -1,7 +1,7 @@
 # Custom Agents Reference Guide
 
 **Last Updated:** 2026-03-06
-**Total Custom Agents:** 19
+**Total Custom Agents:** 20
 **Location:** `.claude/agents/`
 
 This guide categorizes all custom agents by relevance to WordPress FSE theme development.
@@ -76,6 +76,11 @@ These agents directly support WordPress block theme development:
 - **Purpose:** SEO and structured data auditing
 - **Use for:** Heading hierarchy, meta tags, Open Graph, Schema.org recommendations, image SEO
 - **WordPress relevance:** High - themes must support good SEO
+
+### **plugin-developer** (NEW)
+- **Purpose:** WordPress plugin development
+- **Use for:** Custom post types, REST API endpoints, admin pages, Gutenberg blocks, plugin architecture
+- **WordPress relevance:** High - full plugin development lifecycle
 
 ---
 
@@ -173,7 +178,7 @@ User: "Use the frontend-developer agent to help me build this block pattern"
 ```
 WordPress Skills (8)
     ↓ Provide workflows and best practices
-Agents (19)
+Agents (20)
     ↓ Execute specialized tasks
 Plugins (6)
     ↓ Provide tooling and memory
@@ -188,7 +193,7 @@ Automation Scripts (4)
 ## Current Architecture Status
 
 **Plugins:** ✅ Already optimized (5 user + 1 local)
-**Custom Agents:** 19 total (all WordPress-relevant)
+**Custom Agents:** 20 total (all WordPress-relevant)
 
 ---
 
@@ -212,6 +217,7 @@ Automation Scripts (4)
 | **Token compliance** | **theme-token-auditor** | block-markup-validator |
 | **Seed demo content** | **content-seeder** | wp-environment-manager |
 | **SEO audit** | **seo-schema-agent** | - |
+| **Build a plugin** | **plugin-developer** | frontend-developer (if UI-heavy) |
 
 ---
 
@@ -247,7 +253,7 @@ Ready for release
 
 ## Agent Hook Configurations
 
-Agents with automated hooks (16 of 19):
+Agents with automated hooks (17 of 20):
 
 ### WordPress Core Quality Hooks (shared scripts)
 These scripts are shared across multiple agents:
@@ -278,4 +284,4 @@ These agents are research/audit-only and don't need automated hooks:
 
 ---
 
-**Architecture Assessment:** 19 custom agents provide comprehensive WordPress FSE development coverage, with specialized agents for visual QA, asset management, environment management, markup validation, accessibility, token compliance, content seeding, and SEO.
+**Architecture Assessment:** 20 custom agents provide comprehensive WordPress development coverage, with specialized agents for visual QA, asset management, environment management, markup validation, accessibility, token compliance, content seeding, and SEO.

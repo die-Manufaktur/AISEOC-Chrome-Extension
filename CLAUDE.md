@@ -280,9 +280,9 @@ This project uses a lean, WordPress-optimized plugin configuration with 5 plugin
 
 ---
 
-### Custom Agents (19 Total)
+### Custom Agents (20 Total)
 
-19 specialized agents provide WordPress FSE development capabilities. Key WordPress agents include `frontend-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
+20 specialized agents provide WordPress development capabilities. Key agents include `frontend-developer`, `plugin-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
 
 Agents are invoked automatically based on task context.
 
