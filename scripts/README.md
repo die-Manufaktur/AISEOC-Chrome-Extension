@@ -302,7 +302,34 @@ When adding new hooks:
 
 ---
 
+## Cross-Browser Testing Scripts
+
+### `setup-playwright.sh`
+- **Purpose**: One-time setup — installs Playwright and Chromium, Firefox, WebKit browser engines
+- **Run**: `./scripts/setup-playwright.sh`
+- **Requirements**: Node.js 18+
+
+### `cross-browser-test.sh`
+- **Purpose**: Captures screenshots at 4 breakpoints (1920, 1440, 768, 375px) for a given browser engine
+- **Usage**: `./scripts/cross-browser-test.sh <browser> <url>`
+- **Browsers**: `chromium`, `firefox`, `webkit`
+- **Output**: `.claude/visual-qa/screenshots/wordpress/<browser>/`
+
+### `validate-theme.sh`
+- **Purpose**: Unified theme validation orchestrator — runs all 8 checks in sequence
+- **Usage**: `./scripts/validate-theme.sh <theme-name> [--strict] [--report]`
+
+### `deploy.sh`
+- **Purpose**: Deploy themes/plugins from root-level directories to wp-content/
+- **Usage**: `./scripts/deploy.sh [theme <name>|plugin <name>] [--validate] [--target <path>]`
+
+### `install-git-hooks.sh`
+- **Purpose**: Installs pre-commit hook for security/standards validation
+- **Run once**: `./scripts/install-git-hooks.sh`
+
+---
+
 **Generated**: 2026-01-18 | **Updated**: 2026-03-09
 **Agents with hooks**: 7
-**Total scripts**: 35
+**Total scripts**: 40
 **WordPress validation scripts**: 4

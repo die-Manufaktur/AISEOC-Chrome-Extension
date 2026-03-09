@@ -61,8 +61,9 @@ Take screenshots at standard breakpoints and compare against the Figma source.
 | Tablet | 768px | iPad portrait |
 | Desktop | 1280px | Standard laptop |
 | Wide | 1440px | Design canvas (Figma default) |
+| Extra-large | 1920px | Full HD monitors / large displays |
 
-**Using Chrome DevTools MCP:**
+**Using Chrome DevTools MCP (Chromium — primary):**
 
 ```
 1. Navigate to local WordPress URL
@@ -70,12 +71,26 @@ Take screenshots at standard breakpoints and compare against the Figma source.
 3. Compare visually against Figma source (get_screenshot from Figma MCP)
 ```
 
+**Using Playwright MCP (Firefox & WebKit — cross-browser):**
+
+```
+1. Run: ./scripts/cross-browser-test.sh firefox http://localhost:8080
+2. Run: ./scripts/cross-browser-test.sh webkit http://localhost:8080
+3. Compare Firefox/WebKit screenshots against Chromium baseline
+4. Flag any browser-specific rendering differences
+```
+
+Or use the Playwright MCP tools directly (`browser_navigate`, `browser_resize`, `browser_take_screenshot`) for interactive testing.
+
+**Setup (one-time):** `./scripts/setup-playwright.sh`
+
 **What to compare:**
 - Layout structure (columns, rows, spacing)
 - Typography (font sizes, weights, line heights)
 - Color accuracy (background, text, borders)
 - Component alignment (centered, left, right)
 - Whitespace and padding
+- Cross-browser rendering consistency (Chromium vs Firefox vs WebKit)
 
 ### Step 3: Image Rendering
 

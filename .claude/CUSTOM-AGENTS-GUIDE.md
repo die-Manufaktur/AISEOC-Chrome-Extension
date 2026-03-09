@@ -38,9 +38,10 @@ These agents directly support WordPress block theme development:
 - **WordPress relevance:** Critical - WordPress performance is a key concern
 
 ### **visual-qa-agent** (NEW)
-- **Purpose:** Visual regression testing and design comparison
-- **Use for:** Comparing rendered WordPress pages against Figma designs, catching wrong images, layout issues
-- **WordPress relevance:** Critical - ensures pixel-perfect Figma-to-FSE conversion
+- **Purpose:** Visual regression testing, design comparison, and cross-browser verification
+- **Use for:** Comparing rendered WordPress pages against Figma designs, catching wrong images, layout issues, and testing across Chromium, Firefox, and WebKit (Safari)
+- **WordPress relevance:** Critical - ensures pixel-perfect Figma-to-FSE conversion across browsers
+- **Requires:** Chrome DevTools MCP + Playwright MCP (`./scripts/setup-playwright.sh`)
 
 ### **asset-cataloger** (NEW)
 - **Purpose:** Image/asset semantic mapping and validation

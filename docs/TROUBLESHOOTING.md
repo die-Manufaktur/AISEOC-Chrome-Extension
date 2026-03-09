@@ -157,6 +157,61 @@ Common issues and solutions for the Claude Code WordPress Template.
 
 ---
 
+## Playwright MCP (Cross-Browser Testing)
+
+### Playwright browsers not installed
+
+**Symptoms:** `browser_navigate` fails with "browser not found" or similar
+
+**Solutions:**
+1. Run the setup script:
+   ```bash
+   ./scripts/setup-playwright.sh
+   ```
+2. Or install browsers individually:
+   ```bash
+   npx playwright install chromium
+   npx playwright install firefox
+   npx playwright install webkit
+   ```
+
+### Playwright MCP server not starting
+
+**Symptoms:** Playwright tools are unavailable in Claude Code
+
+**Solutions:**
+1. Check Node.js version (18+ required): `node -v`
+2. Verify `@playwright/mcp` is available: `npx @playwright/mcp@latest --help`
+3. Check `.mcp.json` has the playwright server configured
+4. On Linux, install system dependencies: `npx playwright install-deps`
+
+### Cross-browser screenshots fail
+
+**Symptoms:** `scripts/cross-browser-test.sh` errors out
+
+**Solutions:**
+1. Ensure Playwright is installed: `./scripts/setup-playwright.sh`
+2. Check the target URL is accessible: `curl http://localhost:8080`
+3. On headless Linux servers, install display dependencies:
+   ```bash
+   npx playwright install-deps
+   ```
+4. Try running with a single browser first:
+   ```bash
+   ./scripts/cross-browser-test.sh chromium http://localhost:8080
+   ```
+
+### WebKit (Safari) renders differently than expected
+
+**Symptoms:** WebKit screenshots look different from real Safari
+
+**Note:** Playwright's WebKit engine closely matches Safari but is not identical. Known differences:
+- Font rendering/antialiasing may vary slightly
+- Some CSS features may have minor rendering differences
+- For pixel-perfect Safari testing, use a real macOS device or BrowserStack
+
+---
+
 ## Chrome DevTools MCP
 
 ### Chrome DevTools MCP not connecting
