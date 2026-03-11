@@ -1,10 +1,10 @@
 # Test Runner
 
-Run Python tests with pytest, unittest, or other testing frameworks.
+Run Vitest tests with coverage reporting.
 
 ## Purpose
 
-This command helps you run Python tests effectively with proper configuration and reporting.
+This command runs the project's test suite using Vitest and React Testing Library.
 
 ## Usage
 
@@ -14,60 +14,56 @@ This command helps you run Python tests effectively with proper configuration an
 
 ## What this command does
 
-1. **Detects test framework** (pytest, unittest, nose2)
-2. **Runs appropriate tests** with proper configuration
-3. **Provides coverage reporting** if available
-4. **Shows clear test results** with failure details
+1. **Detects test configuration** (vitest.config.ts or vite.config.ts)
+2. **Runs all tests** with proper configuration
+3. **Shows coverage report** if configured
+4. **Reports failures** with clear error details
 
-## Example Commands
+## Steps
 
-### pytest (recommended)
+### 1. Run all tests
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=src --cov-report=html
-
-# Run specific test file
-pytest tests/test_models.py
-
-# Run with verbose output
-pytest -v
-
-# Run tests matching pattern
-pytest -k "test_user"
+pnpm vitest run
 ```
 
-### unittest
+### 2. Run with coverage
 ```bash
-# Run all tests
-python -m unittest discover
-
-# Run specific test file
-python -m unittest tests.test_models
-
-# Run with verbose output
-python -m unittest -v
+pnpm vitest run --coverage
 ```
 
-### Django tests
+### 3. Run specific test file
 ```bash
-# Run all Django tests
-python manage.py test
-
-# Run specific app tests
-python manage.py test myapp
-
-# Run with coverage
-coverage run --source='.' manage.py test
-coverage report
+pnpm vitest run src/components/Button.test.tsx
 ```
 
-## Best Practices
+### 4. Run in watch mode (interactive development)
+```bash
+pnpm vitest
+```
 
-- Write tests for all critical functionality
-- Use descriptive test names
-- Keep tests isolated and independent
-- Mock external dependencies
-- Aim for high test coverage (80%+)
+### 5. Run tests matching a pattern
+```bash
+pnpm vitest run -t "should render"
+```
+
+## Or use the project script
+
+```bash
+./scripts/run-tests.sh
+```
+
+## Test Types
+
+| Type | Tool | Pattern | Purpose |
+|------|------|---------|---------|
+| Unit | Vitest | `*.test.ts` | Pure functions, utilities |
+| Component | Vitest + RTL | `*.test.tsx` | React component behavior |
+| Hook | Vitest + RTL | `*.test.ts` | Custom hook logic |
+| E2E | Playwright | `*.spec.ts` | Full user flows |
+| Visual | Storybook | `*.stories.tsx` | Component states |
+
+## Common Issues
+
+- **Missing setup file**: Create `src/test/setup.ts` with `import '@testing-library/jest-dom'`
+- **JSX not recognized**: Ensure `environment: 'jsdom'` in vitest config
+- **Module resolution**: Check `resolve.alias` matches tsconfig paths

@@ -1,10 +1,10 @@
-# Python Linter
+# Lint & Format
 
-Run Python code linting and formatting tools.
+Run ESLint and Prettier across the project.
 
 ## Purpose
 
-This command helps you maintain code quality using Python's best linting and formatting tools.
+This command checks and fixes code quality and formatting issues using ESLint and Prettier.
 
 ## Usage
 
@@ -14,98 +14,41 @@ This command helps you maintain code quality using Python's best linting and for
 
 ## What this command does
 
-1. **Runs multiple linters** (flake8, pylint, black, isort)
-2. **Provides detailed feedback** on code quality issues
-3. **Auto-fixes formatting** where possible
-4. **Checks type hints** if mypy is configured
+1. **Runs ESLint** to check for code quality issues
+2. **Runs Prettier** to check formatting
+3. **Auto-fixes** where possible
+4. **Reports** remaining issues that need manual attention
 
-## Example Commands
+## Steps
 
-### Black (code formatting)
+### 1. Check if tools are installed
 ```bash
-# Format all Python files
-black .
-
-# Check formatting without changing files
-black --check .
-
-# Format specific file
-black src/main.py
+pnpm eslint --version && pnpm prettier --version
 ```
 
-### flake8 (style guide enforcement)
+### 2. Run ESLint with auto-fix
 ```bash
-# Check all Python files
-flake8 .
-
-# Check specific directory
-flake8 src/
-
-# Check with specific rules
-flake8 --max-line-length=88 .
+pnpm eslint . --fix --ext .ts,.tsx,.js,.jsx
 ```
 
-### isort (import sorting)
+### 3. Run Prettier
 ```bash
-# Sort imports in all files
-isort .
-
-# Check import sorting
-isort --check-only .
-
-# Sort imports in specific file
-isort src/main.py
+pnpm prettier --write "src/**/*.{ts,tsx,js,jsx,css,json,md}"
 ```
 
-### pylint (comprehensive linting)
+### 4. Type check
 ```bash
-# Run pylint on all files
-pylint src/
-
-# Run with specific score threshold
-pylint --fail-under=8.0 src/
-
-# Generate detailed report
-pylint --output-format=html src/ > pylint_report.html
+pnpm tsc --noEmit
 ```
 
-### mypy (type checking)
+## Or use the project script
+
 ```bash
-# Check types in all files
-mypy .
-
-# Check specific module
-mypy src/models.py
-
-# Check with strict mode
-mypy --strict src/
+./scripts/lint-and-format.sh
 ```
 
-## Configuration Files
+## Common Issues
 
-Most projects benefit from configuration files:
-
-### .flake8
-```ini
-[flake8]
-max-line-length = 88
-exclude = .git,__pycache__,venv
-ignore = E203,W503
-```
-
-### pyproject.toml
-```toml
-[tool.black]
-line-length = 88
-
-[tool.isort]
-profile = "black"
-```
-
-## Best Practices
-
-- Run linters before committing code
-- Use consistent formatting across the project
-- Fix linting issues promptly
-- Configure linters to match your team's style
-- Use type hints for better code documentation
+- **Missing ESLint config**: Copy `templates/shared/eslint.config.js` to project root
+- **Missing Prettier config**: Copy `templates/shared/prettier.config.js` to project root
+- **Conflicting rules**: Ensure eslint-config-prettier is installed to disable formatting rules in ESLint

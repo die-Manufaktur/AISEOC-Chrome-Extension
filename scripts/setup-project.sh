@@ -105,24 +105,54 @@ if [[ ${#ADDITIONAL_DEPS[@]} -gt 0 ]]; then
     pnpm add -D "${ADDITIONAL_DEPS[@]}"
 fi
 
-# Copy template configs if templates/ directory exists in the framework repo
+# Copy template configs from the framework repo
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TEMPLATES_DIR="$SCRIPT_DIR/../templates"
 
 if [[ -d "$TEMPLATES_DIR" ]]; then
     echo ""
     echo "Copying template configurations..."
-    for template_file in "$TEMPLATES_DIR"/*; do
-        if [[ -f "$template_file" ]]; then
-            FILENAME=$(basename "$template_file")
-            if [[ ! -f "$FILENAME" ]]; then
-                cp "$template_file" "./$FILENAME"
-                echo "  Copied: $FILENAME"
-            else
-                echo "  Skipped (already exists): $FILENAME"
+
+    # Copy shared configs (ESLint, Prettier, Vitest, Tailwind, tsconfig)
+    if [[ -d "$TEMPLATES_DIR/shared" ]]; then
+        for template_file in "$TEMPLATES_DIR/shared"/*; do
+            if [[ -f "$template_file" ]]; then
+                FILENAME=$(basename "$template_file")
+                if [[ ! -f "$FILENAME" ]]; then
+                    cp "$template_file" "./$FILENAME"
+                    echo "  Copied: $FILENAME"
+                else
+                    echo "  Skipped (already exists): $FILENAME"
+                fi
             fi
+        done
+
+        # Copy Storybook config directory
+        if [[ -d "$TEMPLATES_DIR/shared/.storybook" ]] && [[ ! -d ".storybook" ]]; then
+            cp -r "$TEMPLATES_DIR/shared/.storybook" ./.storybook
+            echo "  Copied: .storybook/"
         fi
-    done
+    fi
+
+    # Copy framework-specific configs
+    FRAMEWORK_DIR="$TEMPLATES_DIR/$FRAMEWORK"
+    if [[ "$FRAMEWORK" == "react" ]]; then
+        FRAMEWORK_DIR="$TEMPLATES_DIR/vite"
+    fi
+
+    if [[ -d "$FRAMEWORK_DIR" ]]; then
+        for template_file in "$FRAMEWORK_DIR"/*; do
+            if [[ -f "$template_file" ]]; then
+                FILENAME=$(basename "$template_file")
+                if [[ ! -f "$FILENAME" ]]; then
+                    cp "$template_file" "./$FILENAME"
+                    echo "  Copied: $FILENAME (${FRAMEWORK}-specific)"
+                else
+                    echo "  Skipped (already exists): $FILENAME"
+                fi
+            fi
+        done
+    fi
 fi
 
 echo ""
