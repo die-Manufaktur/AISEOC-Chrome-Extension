@@ -20,48 +20,53 @@ mkdir -p "$REPORT_DIR"
     echo "## Files Modified"
     echo ""
 
-    PHP_COUNT=$(git diff --name-only HEAD 2>/dev/null | grep -c '\.php$' || echo 0)
+    TSX_COUNT=$(git diff --name-only HEAD 2>/dev/null | grep -c '\.tsx$' || echo 0)
+    TS_COUNT=$(git diff --name-only HEAD 2>/dev/null | grep -c '\.ts$' || echo 0)
     CSS_COUNT=$(git diff --name-only HEAD 2>/dev/null | grep -c '\.css$' || echo 0)
     JS_COUNT=$(git diff --name-only HEAD 2>/dev/null | grep -c '\.js$' || echo 0)
-    HTML_COUNT=$(git diff --name-only HEAD 2>/dev/null | grep -c '\.html$' || echo 0)
+    JSX_COUNT=$(git diff --name-only HEAD 2>/dev/null | grep -c '\.jsx$' || echo 0)
 
     echo "| Type | Count |"
     echo "|------|-------|"
-    echo "| PHP | $PHP_COUNT |"
+    echo "| TSX | $TSX_COUNT |"
+    echo "| TS | $TS_COUNT |"
     echo "| CSS | $CSS_COUNT |"
     echo "| JS | $JS_COUNT |"
-    echo "| HTML | $HTML_COUNT |"
+    echo "| JSX | $JSX_COUNT |"
     echo ""
 
-    # List theme files changed
-    echo "## Theme Files Changed"
+    # List source files changed
+    echo "## Source Files Changed"
     echo ""
-    git diff --name-only HEAD 2>/dev/null | grep -E '^themes/' || echo "None"
+    git diff --name-only HEAD 2>/dev/null | grep -E '^src/' || echo "None"
     echo ""
 
     # Run quick validation
     echo "## Validation Status"
     echo ""
 
-    # Check for security issues in changed PHP files
-    CHANGED_PHP=$(git diff --name-only HEAD 2>/dev/null | grep '\.php$')
-    if [ -n "$CHANGED_PHP" ] && [ -f "./scripts/wordpress/security-scan.sh" ]; then
-        SECURITY_ISSUES=0
-        for f in $CHANGED_PHP; do
-            if [ -f "$f" ]; then
-                echo "{\"tool_input\":{\"file_path\":\"$f\"}}" | ./scripts/wordpress/security-scan.sh > /dev/null 2>&1
-                if [ $? -eq 2 ]; then
-                    SECURITY_ISSUES=$((SECURITY_ISSUES + 1))
-                fi
-            fi
-        done
-        if [ $SECURITY_ISSUES -gt 0 ]; then
-            echo "- Security: $SECURITY_ISSUES file(s) with issues"
+    # Check for TypeScript errors in changed files
+    if [ -f "tsconfig.json" ] && [ -f "node_modules/.bin/tsc" ]; then
+        TSC_ERRORS=$(npx tsc --noEmit 2>&1 | grep -c 'error TS' || echo 0)
+        if [ "$TSC_ERRORS" -gt 0 ]; then
+            echo "- TypeScript: $TSC_ERRORS error(s)"
         else
-            echo "- Security: Passed"
+            echo "- TypeScript: Passed"
         fi
     else
-        echo "- Security: No PHP files changed"
+        echo "- TypeScript: Not configured"
+    fi
+
+    # Check for ESLint issues
+    if [ -f "node_modules/.bin/eslint" ]; then
+        ESLINT_ERRORS=$(npx eslint . --ext .ts,.tsx,.js,.jsx 2>&1 | grep -c 'error' || echo 0)
+        if [ "$ESLINT_ERRORS" -gt 0 ]; then
+            echo "- ESLint: $ESLINT_ERRORS issue(s)"
+        else
+            echo "- ESLint: Passed"
+        fi
+    else
+        echo "- ESLint: Not configured"
     fi
 
 } > "$REPORT_FILE"

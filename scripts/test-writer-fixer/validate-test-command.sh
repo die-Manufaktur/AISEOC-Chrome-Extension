@@ -31,22 +31,9 @@ for pattern in "${DANGEROUS_PATTERNS[@]}"; do
 done
 
 # Check if it's a test command
-if ! echo "$COMMAND" | grep -iE '(phpunit|jest|vitest|pytest|npm test|npm run test|composer test|vendor/bin/phpunit)' > /dev/null; then
+if ! echo "$COMMAND" | grep -iE '(jest|vitest|pytest|npm test|npm run test|pnpm test|pnpm vitest)' > /dev/null; then
     # Not a test command, allow it
     exit 0
-fi
-
-# Validate test command structure
-if echo "$COMMAND" | grep -iE 'phpunit' > /dev/null; then
-    # Check for valid PHPUnit options
-    if echo "$COMMAND" | grep -E -- '--bootstrap[= ]' > /dev/null; then
-        # Has bootstrap, verify it's a safe path
-        BOOTSTRAP=$(echo "$COMMAND" | grep -oE '--bootstrap[= ][^ ]+' | cut -d'=' -f2 | tr -d ' ')
-        if [[ "$BOOTSTRAP" == /* ]] || [[ "$BOOTSTRAP" =~ ^[A-Za-z]: ]]; then
-            echo "⚠️  Warning: PHPUnit bootstrap uses absolute path: $BOOTSTRAP" >&2
-            echo "Consider using relative paths for better portability" >&2
-        fi
-    fi
 fi
 
 # Allow the command

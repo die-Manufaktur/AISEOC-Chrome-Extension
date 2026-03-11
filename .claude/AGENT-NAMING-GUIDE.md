@@ -1,145 +1,40 @@
 # Agent Naming Guide
 
-This guide clarifies naming conflicts and helps you choose the right agent for your task.
+**Last Updated:** 2026-03-11
 
-## Code Reviewer Variants
+## Naming Convention
 
-There are **three agents** named "code-reviewer" with different purposes. Use this guide to select the correct one:
+All 44 agents use unique, hyphenated names (e.g., `frontend-developer`, `figma-react-converter`). There are no naming conflicts in the current agent set.
 
-### 1. feature-dev/code-reviewer
-**When to use:** General code quality review during active development
+Agent files live in `.claude/agents/` as `<agent-name>.md`.
 
-**Focus:**
-- Bug detection
-- Security vulnerabilities
-- Code smells and anti-patterns
-- Best practices compliance
+## How Agents Are Selected
 
-**Model:** Sonnet (faster reviews)
+Claude Code automatically selects agents based on task context. You do not need to specify which agent to use unless you want to override the default selection.
 
-**Tools:** Read-only (Glob, Grep, Read)
+**Examples:**
 
-**Confidence:** Reports issues ≥80% confidence
+| Your Request | Agent Selected |
+|-------------|---------------|
+| "Build a login form component" | frontend-developer |
+| "Write tests for the useAuth hook" | test-writer-fixer |
+| "Convert this Figma design to React" | figma-react-converter |
+| "Check this page for accessibility" | accessibility-auditor |
+| "Optimize the bundle size" | performance-benchmarker |
+| "Set up the CI pipeline" | devops-automator |
+| "Design the component API" | backend-architect |
 
-**Example scenarios:**
-- "Review this function for bugs"
-- "Check if this code is secure"
-- "Is this following best practices?"
+## Explicit Selection
 
----
-
-### 2. pr-review-toolkit/code-reviewer
-**When to use:** Pull request reviews before merging
-
-**Focus:**
-- PR-specific analysis
-- Cross-file impact assessment
-- Merge readiness
-- Integration concerns
-
-**Model:** Opus (comprehensive reviews)
-
-**Tools:** Full access (can run tests, check dependencies)
-
-**Confidence:** Reports issues ≥80% confidence
-
-**Example scenarios:**
-- "Review this PR for merge"
-- "What's the impact of these changes?"
-- "Is this PR ready to ship?"
-
----
-
-### 3. superpowers/code-reviewer
-**When to use:** Verifying implementation matches the plan
-
-**Focus:**
-- Plan alignment verification
-- Architectural decision validation
-- Implementation completeness
-- Requirement traceability
-
-**Model:** Inherits from parent (flexible)
-
-**Tools:** Full access
-
-**Example scenarios:**
-- "Does this implementation match our plan?"
-- "Did we follow the architecture we agreed on?"
-- "Are all planned features implemented?"
-
----
-
-## Quick Decision Tree
+To force a specific agent, name it in your request:
 
 ```
-Need to review code?
-│
-├─ Is there an implementation plan? ────> superpowers/code-reviewer
-│
-├─ Is this for a PR/merge? ────────────> pr-review-toolkit/code-reviewer
-│
-└─ General development review ─────────> feature-dev/code-reviewer
+User: "Use the visual-qa-agent to compare these screenshots"
+User: "Have the docusaurus-expert set up the docs site"
 ```
 
----
+## Agent Categories
 
-## Code Simplifier Location
+Agents are grouped into 12 categories: Engineering, Design, Design-to-Code, Testing & QA, Product, Marketing, Project Management, Operations, Documentation, Meta, and Bonus.
 
-**Previously:** Had both standalone `code-simplifier` plugin AND `pr-review-toolkit/code-simplifier` agent (duplicate)
-
-**Now:** Only `pr-review-toolkit/code-simplifier` remains (standalone plugin removed)
-
-**When to use:** After code review suggests simplification, invoke this agent to refactor complex code while preserving functionality.
-
----
-
-## Other Naming Clarifications
-
-### Test Agents
-- **test-writer-fixer** (custom): Writes tests, runs them, fixes failures
-- **pr-test-analyzer** (pr-review-toolkit): Analyzes test coverage in PRs
-- **Use both:** They're complementary (active vs. passive testing)
-
-### Frontend Agents
-- **frontend-developer** (custom): Full-stack frontend implementation
-- **frontend-design** (plugin): UI/UX design and prototyping
-- **Use both:** Design first, then implement
-
----
-
-## WordPress FSE Development Stack
-
-For WordPress block theme development, your core agents are:
-
-**Code Quality:**
-- feature-dev/code-reviewer (development reviews)
-- pr-review-toolkit/code-reviewer (PR reviews)
-
-**Development:**
-- frontend-developer (JS/CSS implementation)
-- test-writer-fixer (PHP unit tests)
-
-**Performance:**
-- performance-benchmarker (optimization)
-
-**Design:**
-- ui-designer (block patterns, theme design)
-- ux-researcher (usability testing)
-
-**Infrastructure:**
-- php-lsp (code intelligence)
-- security-guidance (WordPress security)
-
----
-
-## When in Doubt
-
-If you're unsure which agent to use:
-1. Check this guide's decision tree
-2. Use the more specific agent (e.g., pr-review-toolkit for PRs)
-3. Ask Claude Code: "Which code-reviewer should I use for [task]?"
-
----
-
-**Last Updated:** 2026-01-18
+See `.claude/CUSTOM-AGENTS-GUIDE.md` for the full catalog with descriptions.

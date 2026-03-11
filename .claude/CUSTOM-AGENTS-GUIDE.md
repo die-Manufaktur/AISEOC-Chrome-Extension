@@ -1,288 +1,166 @@
-# Custom Agents Reference Guide
+# Custom Agents Guide
 
-**Last Updated:** 2026-03-06
-**Total Custom Agents:** 20
+**Last Updated:** 2026-03-11
+**Total Agents:** 44
 **Location:** `.claude/agents/`
 
-This guide categorizes all custom agents by relevance to WordPress FSE theme development.
+Agents are auto-selected by Claude Code based on task context, or you can request one explicitly.
 
 ---
 
-## WordPress FSE Development - Highly Relevant ✅
+## Engineering
 
-These agents directly support WordPress block theme development:
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| frontend-developer | React component implementation, styling, and client-side logic | Building UI components, pages, Tailwind styling, client-side state |
+| backend-architect | API design, server architecture, and data modeling | Designing REST/GraphQL APIs, database schemas, server-side patterns |
+| ai-engineer | AI/ML integration, prompt engineering, and model pipelines | Adding AI features, LLM integrations, embeddings, inference workflows |
+| devops-automator | CI/CD pipelines, Docker, deployment automation | Setting up GitHub Actions, containerization, deployment scripts |
+| mobile-app-builder | React Native and mobile-first development | Building cross-platform mobile apps, responsive mobile experiences |
+| rapid-prototyper | Quick proof-of-concept implementations | Validating ideas fast, throwaway prototypes, spike solutions |
+| test-writer-fixer | Write tests, run them, fix failures iteratively | Unit tests, integration tests, increasing coverage, fixing flaky tests |
 
-### **frontend-developer**
-- **Purpose:** Full-stack frontend implementation for themes
-- **Use for:** Building block patterns, customizing block editor UI, theme JavaScript/CSS
-- **WordPress relevance:** High - FSE themes require significant frontend work
+## Design
 
-### **test-writer-fixer**
-- **Purpose:** Write tests, run them, fix failures
-- **Use for:** PHPUnit tests for theme functions, block registration testing
-- **WordPress relevance:** High - quality themes need test coverage
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| ui-designer | UI component design, layout systems, visual hierarchy | Designing component libraries, page layouts, design system tokens |
+| ux-researcher | User experience research, usability analysis | User flow analysis, heuristic evaluation, accessibility reviews |
+| brand-guardian | Brand consistency enforcement across assets | Ensuring colors, typography, tone, and imagery match brand guidelines |
+| visual-storyteller | Data visualization and narrative-driven UI | Charts, dashboards, infographics, storytelling through design |
+| whimsy-injector | Micro-interactions, animations, delightful UI details | Adding loading animations, transitions, easter eggs, playful touches |
 
-### **ui-designer**
-- **Purpose:** User interface design and components
-- **Use for:** Designing block patterns, theme layouts, editor UI
-- **WordPress relevance:** High - FSE is UI-focused
+## Design-to-Code
 
-### **ux-researcher**
-- **Purpose:** User experience research and testing
-- **Use for:** Theme usability testing, editor experience optimization
-- **WordPress relevance:** High - themes must be user-friendly
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| figma-react-converter | Figma-to-React conversion pipeline orchestration | Converting Figma designs into React components with Tailwind CSS |
+| asset-cataloger | Image/asset semantic mapping and validation | Mapping hash-named exports to meaningful names, validating asset usage |
 
-### **performance-benchmarker**
-- **Purpose:** Performance testing and profiling
-- **Use for:** Theme performance optimization, measuring page load times
-- **WordPress relevance:** Critical - WordPress performance is a key concern
+## Testing & QA
 
-### **visual-qa-agent** (NEW)
-- **Purpose:** Visual regression testing, design comparison, and cross-browser verification
-- **Use for:** Comparing rendered WordPress pages against Figma designs, catching wrong images, layout issues, and testing across Chromium, Firefox, and WebKit (Safari)
-- **WordPress relevance:** Critical - ensures pixel-perfect Figma-to-FSE conversion across browsers
-- **Requires:** Chrome DevTools MCP + Playwright MCP (`./scripts/setup-playwright.sh`)
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| api-tester | API endpoint testing and validation | Testing REST/GraphQL endpoints, response schemas, error handling |
+| performance-benchmarker | Performance profiling and optimization | Bundle size analysis, Lighthouse audits, runtime profiling |
+| test-results-analyzer | Test suite analysis and trend reporting | Analyzing CI test results, identifying flaky tests, coverage trends |
+| tool-evaluator | Evaluate libraries, frameworks, and tools | Comparing NPM packages, assessing dependencies, tech stack decisions |
+| workflow-optimizer | Development process improvement | Streamlining build pipelines, reducing dev friction, automation gaps |
+| visual-qa-agent | Visual regression testing and cross-browser verification | Comparing rendered output against Figma designs, screenshot diffing |
+| accessibility-auditor | WCAG 2.1 AA compliance auditing | Color contrast, ARIA labels, keyboard navigation, Lighthouse a11y |
 
-### **asset-cataloger** (NEW)
-- **Purpose:** Image/asset semantic mapping and validation
-- **Use for:** Viewing hash-named images, creating semantic mappings, validating correct image usage in patterns
-- **WordPress relevance:** Critical - prevents wrong-image-assignment errors
+## Product
 
-### **wp-environment-manager** (NEW)
-- **Purpose:** Local WordPress development environment management
-- **Use for:** Docker, WP-CLI, theme activation, user management, environment troubleshooting
-- **WordPress relevance:** Critical - eliminates dev environment friction
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| sprint-prioritizer | Backlog prioritization and sprint planning | Ordering features by impact, planning sprints, scope management |
+| feedback-synthesizer | User feedback analysis and insight extraction | Aggregating survey data, support tickets, feature requests |
+| trend-researcher | Market and technology trend analysis | Researching competitors, emerging tech, industry benchmarks |
 
-### **block-markup-validator** (NEW)
-- **Purpose:** WordPress block syntax validation
-- **Use for:** Validating block JSON attributes, HTML class consistency, heading hierarchy, theme.json slug references
-- **WordPress relevance:** Critical - catches silent rendering bugs
+## Marketing
 
-### **accessibility-auditor** (NEW)
-- **Purpose:** WCAG 2.1 AA compliance auditing
-- **Use for:** Color contrast, heading hierarchy, ARIA labels, alt text, keyboard navigation, Lighthouse audits
-- **WordPress relevance:** Critical - WordPress themes must be accessible
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| content-creator | Marketing copy, blog posts, and content strategy | Writing landing pages, blog content, email campaigns |
+| growth-hacker | Growth experiments and conversion optimization | A/B test ideas, funnel analysis, user acquisition strategies |
+| app-store-optimizer | App store listing optimization (ASO) | Writing app descriptions, keyword research, screenshot strategy |
+| instagram-curator | Instagram content strategy and visual planning | Post scheduling, hashtag strategy, visual grid planning |
+| reddit-community-builder | Reddit engagement and community growth | Subreddit strategy, authentic engagement, community building |
+| tiktok-strategist | TikTok content strategy and trends | Video content ideas, trending sounds, audience targeting |
+| twitter-engager | Twitter/X engagement and thought leadership | Tweet threads, engagement strategy, audience growth |
 
-### **theme-token-auditor** (NEW)
-- **Purpose:** Design token compliance auditing
-- **Use for:** Detecting hardcoded colors/pixels, validating CSS variable references, ensuring 100% theme.json token usage
-- **WordPress relevance:** High - enforces design system discipline
+## Project Management
 
-### **content-seeder** (NEW)
-- **Purpose:** WordPress demo content generation
-- **Use for:** Creating pages matching templates, sample posts, navigation menus, homepage configuration
-- **WordPress relevance:** High - fully populated sites for testing
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| studio-producer | End-to-end project production management | Coordinating multi-phase projects, resource allocation, timelines |
+| project-shipper | Getting projects from 90% to shipped | Final polish, launch checklists, shipping blockers, release prep |
+| experiment-tracker | A/B test and experiment tracking | Logging experiments, tracking results, statistical significance |
 
-### **seo-schema-agent** (NEW)
-- **Purpose:** SEO and structured data auditing
-- **Use for:** Heading hierarchy, meta tags, Open Graph, Schema.org recommendations, image SEO
-- **WordPress relevance:** High - themes must support good SEO
+## Operations
 
-### **plugin-developer** (NEW)
-- **Purpose:** WordPress plugin development
-- **Use for:** Custom post types, REST API endpoints, admin pages, Gutenberg blocks, plugin architecture
-- **WordPress relevance:** High - full plugin development lifecycle
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| analytics-reporter | Metrics dashboards and data reporting | Building analytics views, KPI tracking, report generation |
+| finance-tracker | Financial tracking and budget management | Cost tracking, subscription management, budget forecasting |
+| infrastructure-maintainer | Server and infrastructure maintenance | Monitoring, uptime, dependency updates, security patches |
+| legal-compliance-checker | Legal and regulatory compliance review | Privacy policies, GDPR, terms of service, license compliance |
+| support-responder | Customer support response drafting | Drafting support replies, FAQ creation, escalation handling |
 
----
+## Documentation
 
-## WordPress Development - Moderately Relevant ⚠️
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| docusaurus-expert | Docusaurus documentation site creation | Building docs sites, MDX content, versioned documentation |
 
-These agents can be useful but aren't WordPress-specific:
+## Meta
 
-### **api-tester**
-- **Purpose:** API testing and validation
-- **Use for:** Testing WordPress REST API endpoints, custom API integrations
-- **WordPress relevance:** Moderate - useful for headless WordPress or custom APIs
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| agent-expert | Agent creation and configuration guidance | Creating new agents, optimizing agent prompts, agent architecture |
+| command-expert | Claude Code command and configuration help | Slash commands, settings, hooks, plugin configuration |
 
-### **test-results-analyzer**
-- **Purpose:** Analyze test data and trends
-- **Use for:** CI/CD test result analysis for theme releases
-- **WordPress relevance:** Moderate - complements test-writer-fixer
+## Bonus
 
-### **docusaurus-expert**
-- **Purpose:** Documentation site creation
-- **Use for:** Theme documentation, developer guides
-- **WordPress relevance:** Moderate - if documenting complex themes
-
-### **workflow-optimizer**
-- **Purpose:** Development process improvement
-- **Use for:** Optimizing theme development workflows
-- **WordPress relevance:** Moderate - applicable to any development
-
-### **analytics-reporter**
-- **Purpose:** Metrics and reporting
-- **Use for:** Theme performance metrics, usage analytics
-- **WordPress relevance:** Moderate - useful for theme analytics
+| Agent | Purpose | When to Use |
+|-------|---------|-------------|
+| joker | Comic relief and creative brainstorming | When you need a laugh or creative lateral thinking |
+| studio-coach | Development coaching and mentorship | Code review mentoring, learning paths, skill development |
 
 ---
 
-## Removed Agents (14 total)
+## How Agents Work
 
-The following agents were removed as they had zero relevance to WordPress FSE development:
-
-**Marketing/Business (8):** tiktok-strategist, trend-researcher, brand-guardian, visual-storyteller, support-responder, feedback-synthesizer, project-shipper, legal-compliance-checker
-
-**Infrastructure/Tooling (4):** mcp-expert, tool-evaluator, rapid-prototyper, db-reader
-
-**Product/UX (2):** experiment-tracker, whimsy-injector
-
----
-
-## Using Custom Agents
-
-Custom agents are invoked through Claude Code's Task tool:
+Agents are invoked through Claude Code's Task tool. They are automatically selected based on task context:
 
 ```
-User: "Can you help optimize the theme performance?"
-Claude: [Uses Task tool with subagent_type="performance-benchmarker"]
+User: "Help me optimize this component's rendering"
+Claude: [Uses performance-benchmarker agent]
+
+User: "Convert this Figma design to React"
+Claude: [Uses figma-react-converter agent]
+
+User: "Write tests for the auth hook"
+Claude: [Uses test-writer-fixer agent]
 ```
 
-Agents are automatically selected based on task context, or you can explicitly request:
-
+You can also request a specific agent:
 ```
-User: "Use the frontend-developer agent to help me build this block pattern"
+User: "Use the accessibility-auditor agent to check this page"
 ```
 
 ---
 
-## How Agents Work with WordPress Skills
+## Agent + Skill Integration
 
-**NEW:** This template includes 8 custom WordPress development skills that complement the agents.
+Agents work alongside the 6 custom skills in `.claude/skills/`:
 
-### Skills vs Agents
+| Agent | Complementary Skill |
+|-------|-------------------|
+| figma-react-converter | figma-to-react-workflow |
+| frontend-developer | react-component-development |
+| test-writer-fixer | react-testing-workflows |
+| performance-benchmarker | react-performance-optimization |
+| accessibility-auditor | react-accessibility |
+| visual-qa-agent | visual-qa-verification |
 
-| Type | Purpose | When Triggered | Example |
-|------|---------|----------------|---------|
-| **Skills** | Systematic workflows and best practices | Keyword detection in conversation | "create block theme" triggers `fse-block-theme-development` |
-| **Agents** | Specialized task execution | Task tool invocation | frontend-developer builds block patterns |
-
-### Agent-Skill Integration
-
-**frontend-developer agent** + WordPress Skills:
-- Works with `fse-block-theme-development` for theme structure
-- Works with `block-pattern-creation` for pattern registration
-- Works with `wordpress-security-hardening` for secure code
-- Works with `wp-cli-workflows` for theme scaffolding
-
-**test-writer-fixer agent** + WordPress Skills:
-- Works with `wordpress-testing-workflows` for PHPUnit setup
-- Works with `wp-cli-workflows` for test scaffolding
-- Works with `wordpress-security-hardening` for security tests
-
-**All agents** benefit from:
-- `wordpress-security-hardening` - Security best practices
-- `wp-cli-workflows` - WordPress automation
-- `wordpress-hook-integration` - Agent-specific hooks
-
-### Complete WordPress Development Stack
-
-```
-WordPress Skills (8)
-    ↓ Provide workflows and best practices
-Agents (20)
-    ↓ Execute specialized tasks
-Plugins (6)
-    ↓ Provide tooling and memory
-Automation Scripts (4)
-    ↓ Run security/performance checks
-```
-
-**Skills Documentation:** See `.claude/skills/README.md` for complete catalog
+**Skills Documentation:** `.claude/skills/README.md`
 
 ---
 
-## Current Architecture Status
+## Quick Reference
 
-**Plugins:** ✅ Already optimized (5 user + 1 local)
-**Custom Agents:** 20 total (all WordPress-relevant)
-
----
-
-## Quick Reference: When to Use Which Agent
-
-| Task | Agent | Alternative |
-|------|-------|-------------|
-| Build block pattern | frontend-developer | ui-designer (design first) |
-| Theme performance | performance-benchmarker | analytics-reporter (metrics) |
-| Write PHP tests | test-writer-fixer | - |
-| Design theme UI | ui-designer | ux-researcher (research first) |
-| Test REST API | api-tester | - |
-| Optimize workflow | workflow-optimizer | - |
-| Document theme | docusaurus-expert | - |
-| Usability testing | ux-researcher | - |
-| **Compare render vs Figma** | **visual-qa-agent** | - |
-| **Identify/map images** | **asset-cataloger** | - |
-| **Docker/WP-CLI setup** | **wp-environment-manager** | - |
-| **Validate block markup** | **block-markup-validator** | theme-token-auditor |
-| **Accessibility audit** | **accessibility-auditor** | - |
-| **Token compliance** | **theme-token-auditor** | block-markup-validator |
-| **Seed demo content** | **content-seeder** | wp-environment-manager |
-| **SEO audit** | **seo-schema-agent** | - |
-| **Build a plugin** | **plugin-developer** | frontend-developer (if UI-heavy) |
-
----
-
-## Figma-to-FSE Conversion Pipeline
-
-The new agents form an automated quality pipeline for Figma-to-WordPress conversions:
-
-```
-Figma Design
-    ↓
-figma-fse-converter (generates theme)
-    ↓
-asset-cataloger (maps images semantically)
-    ↓
-block-markup-validator (validates block syntax)
-    ↓
-theme-token-auditor (ensures 100% token usage)
-    ↓
-wp-environment-manager (starts WordPress)
-    ↓
-content-seeder (creates pages/posts/menus)
-    ↓
-visual-qa-agent (compares render vs Figma)
-    ↓
-accessibility-auditor (WCAG compliance)
-    ↓
-seo-schema-agent (SEO best practices)
-    ↓
-Ready for release
-```
-
----
-
-## Agent Hook Configurations
-
-Agents with automated hooks (17 of 20):
-
-### WordPress Core Quality Hooks (shared scripts)
-These scripts are shared across multiple agents:
-- `scripts/wordpress/security-scan.sh` — Used by: frontend-developer, figma-fse-converter, performance-benchmarker, test-writer-fixer
-- `scripts/wordpress/check-coding-standards.sh` — Used by: frontend-developer, figma-fse-converter, test-writer-fixer
-- `scripts/wordpress/check-performance.sh` — Used by: frontend-developer, performance-benchmarker, test-writer-fixer
-
-### Theme Protection Hooks
-- `.claude/hooks/validate-theme-location.sh` — Blocks writes to wp-content/ (project-level, applied to: frontend-developer, block-markup-validator, ui-designer, theme-token-auditor)
-- `scripts/figma-fse/validate-theme-location.sh` — Same protection for figma-fse-converter
-
-### New Agent Hooks
-| Agent | Hook Type | Script | Purpose |
-|-------|-----------|--------|---------|
-| block-markup-validator | PostToolUse | validate-block-markup.sh | Block syntax, class consistency, slug validation |
-| theme-token-auditor | PostToolUse | audit-tokens.sh | Hardcoded value detection |
-| content-seeder | Stop | verify-pages.sh | Page existence verification |
-| wp-environment-manager | SubagentStart | check-environment.sh | Docker/WP-CLI status check |
-| ui-designer | PostToolUse | audit-tokens.sh | Design token compliance |
-| seo-schema-agent | PostToolUse | validate-block-markup.sh | Block markup and heading hierarchy |
-| asset-cataloger | PreToolUse | validate-theme-location.sh | Blocks wp-content/ writes |
-
-### Agents Without Hooks (3)
-These agents are research/audit-only and don't need automated hooks:
-- accessibility-auditor (runs Lighthouse on demand)
-- visual-qa-agent (captures screenshots on demand)
-- ux-researcher (research only)
-
----
-
-**Architecture Assessment:** 20 custom agents provide comprehensive WordPress development coverage, with specialized agents for visual QA, asset management, environment management, markup validation, accessibility, token compliance, content seeding, and SEO.
+| Task | Best Agent |
+|------|-----------|
+| Build a React component | frontend-developer |
+| Convert Figma to React | figma-react-converter |
+| Write unit tests | test-writer-fixer |
+| Optimize bundle size | performance-benchmarker |
+| WCAG compliance audit | accessibility-auditor |
+| Visual regression check | visual-qa-agent |
+| Map exported assets | asset-cataloger |
+| Design a component | ui-designer |
+| Set up CI/CD | devops-automator |
+| API endpoint testing | api-tester |
+| Create documentation site | docusaurus-expert |
+| Ship a release | project-shipper |

@@ -1,15 +1,2 @@
 {
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "./.claude/hooks/validate-theme-location.sh"
-          }
-        ]
-      }
-    ]
-  }
 }

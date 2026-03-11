@@ -41,14 +41,6 @@ else
     WARNINGS+=("Artillery not installed - run: npm install -g artillery")
 fi
 
-# Check for PHP (for WordPress benchmarking)
-if command -v php &> /dev/null; then
-    PHP_VERSION=$(php --version 2>&1 | head -n 1)
-    AVAILABLE_TOOLS+=("$PHP_VERSION")
-else
-    WARNINGS+=("PHP not found - PHP profiling unavailable")
-fi
-
 # Check for Apache Bench (ab)
 if command -v ab &> /dev/null; then
     AVAILABLE_TOOLS+=("Apache Bench (ab)")

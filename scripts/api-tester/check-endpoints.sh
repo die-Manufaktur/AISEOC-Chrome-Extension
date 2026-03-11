@@ -31,14 +31,12 @@ for config in "${ENDPOINT_CONFIGS[@]}"; do
     fi
 done
 
-# Check for WordPress REST API
-if [ -f "wp-config.php" ]; then
-    # Try to detect site URL from wp-config.php
-    if grep -q "WP_HOME\|WP_SITEURL" wp-config.php; then
-        SITE_URL=$(grep -E "(WP_HOME|WP_SITEURL)" wp-config.php | head -n 1 | grep -oE 'https?://[a-zA-Z0-9./?=_-]+' || true)
-        if [ -n "$SITE_URL" ]; then
-            ENDPOINTS+=("${SITE_URL}/wp-json/")
-        fi
+# Check for common API config patterns
+if [ -f "package.json" ]; then
+    # Try to detect API URL from package.json proxy or scripts
+    PROXY_URL=$(grep -oE '"proxy"\s*:\s*"https?://[^"]+"' package.json 2>/dev/null | grep -oE 'https?://[^"]+' || true)
+    if [ -n "$PROXY_URL" ]; then
+        ENDPOINTS+=("$PROXY_URL")
     fi
 fi
 

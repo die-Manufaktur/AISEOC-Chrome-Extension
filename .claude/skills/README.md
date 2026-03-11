@@ -1,63 +1,46 @@
-# WordPress Skills Catalog
+# Skills Catalog
 
-This directory contains custom WordPress development skills for Claude Code, optimized for the Figma-to-FSE (Full Site Editing) block theme pipeline.
+**Last Updated:** 2026-03-11
+**Total Skills:** 6
+**Location:** `.claude/skills/`
 
-## Skill Index
+Skills are documentation-based workflows that trigger automatically when relevant keywords appear in conversation. They provide systematic guidance, not tool integrations.
 
-### Core Pipeline Skills (Priority 1)
+---
 
-1. **figma-to-fse-autonomous-workflow**
-   - Orchestrator for the Figma-to-FSE conversion pipeline
-   - Triggers: "convert Figma", "Figma to WordPress", "FSE conversion"
-   - Role: Main workflow skill that coordinates all other skills
+## Skills Index
 
-2. **fse-block-theme-development**
-   - theme.json syntax, template hierarchy, and FSE structure
-   - Triggers: "create block theme", "add template", "theme.json"
-   - Complements: frontend-developer agent, ui-designer agent
+### 1. figma-to-react-workflow
+- **Purpose:** Orchestrates the Figma-to-React conversion pipeline
+- **Triggers:** "convert Figma", "Figma to React", "design to code"
+- **Works with:** figma-react-converter agent, asset-cataloger agent
 
-3. **fse-pattern-first-architecture**
-   - Enforces PHP patterns for images (not inline HTML)
-   - Triggers: auto-triggered when creating FSE templates with images
-   - Role: Architecture enforcement during conversion
+### 2. react-component-development
+- **Purpose:** React component patterns, TypeScript conventions, and Tailwind CSS best practices
+- **Triggers:** "create component", "component pattern", "React best practices"
+- **Works with:** frontend-developer agent, ui-designer agent
 
-4. **block-pattern-creation**
-   - Pattern registration, structure, and reusable UI patterns
-   - Triggers: "create pattern", "register pattern", "pattern category"
-   - Complements: fse-block-theme-development skill, ui-designer agent
+### 3. react-testing-workflows
+- **Purpose:** Testing strategy with Vitest, React Testing Library, Playwright, and Storybook
+- **Triggers:** "write tests", "test coverage", "Vitest", "Playwright", "Storybook"
+- **Works with:** test-writer-fixer agent, test-results-analyzer agent
 
-5. **wordpress-security-hardening**
-   - Security validation during theme generation
-   - Triggers: "security review", "sanitize input", "escape output", "nonce verification"
-   - Complements: security-scan.sh script
+### 4. react-performance-optimization
+- **Purpose:** Performance profiling, bundle analysis, code splitting, and Web Vitals
+- **Triggers:** "performance", "bundle size", "Web Vitals", "lazy loading", "profiling"
+- **Works with:** performance-benchmarker agent, analytics-reporter agent
 
-### Pipeline Support Skills (Priority 2)
+### 5. react-accessibility
+- **Purpose:** WCAG 2.1 AA patterns for React, ARIA usage, keyboard navigation
+- **Triggers:** "accessibility", "WCAG", "ARIA", "a11y", "keyboard navigation"
+- **Works with:** accessibility-auditor agent, ux-researcher agent
 
-6. **visual-qa-verification** *(NEW)*
-   - Post-conversion verification: screenshots, responsive checks, Lighthouse, accessibility
-   - Triggers: "verify theme", "visual QA", "compare to Figma", "check screenshots"
-   - Complements: visual-qa-agent, accessibility-auditor agent, chrome-devtools MCP
+### 6. visual-qa-verification
+- **Purpose:** Post-conversion visual QA: screenshots, responsive checks, cross-browser testing
+- **Triggers:** "visual QA", "compare to Figma", "screenshot diff", "cross-browser"
+- **Works with:** visual-qa-agent agent, accessibility-auditor agent
 
-7. **wordpress-internationalization**
-   - i18n/l10n for themes and plugins, including FSE pattern generation
-   - Triggers: "translate", "i18n", "generate pattern", "create pattern"
-   - Complements: figma-fse-converter agent, theme/plugin development workflows
-
-8. **wordpress-hook-integration**
-   - Creating and managing Claude Code agent hooks
-   - Triggers: "create hook", "agent hook", "PreToolUse", "PostToolUse"
-   - Documents the 3 actual hooks in `.claude/hooks/`
-
-### Supporting Skills
-
-9. **wp-cli-workflows**
-   - WP-CLI commands for local testing (theme activation, content seeding, cache flush)
-   - Triggers: "scaffold theme", "create plugin", "export database", "search-replace"
-
-10. **wordpress-testing-workflows**
-    - PHPUnit test creation and execution for WordPress
-    - Triggers: "write tests", "run phpunit", "test coverage", "integration tests"
-    - Complements: test-writer-fixer agent
+---
 
 ## Pipeline Flow
 
@@ -65,50 +48,36 @@ This directory contains custom WordPress development skills for Claude Code, opt
 Figma Design
     |
     v
-figma-to-fse-autonomous-workflow (orchestrator)
+figma-to-react-workflow (orchestrator)
     |
-    +-- fse-block-theme-development (theme.json, templates)
-    +-- block-pattern-creation (pattern registration)
-    +-- fse-pattern-first-architecture (image handling)
-    +-- wordpress-internationalization (i18n wrappers)
-    +-- wordpress-security-hardening (security validation)
+    +-- react-component-development (component patterns)
+    +-- react-accessibility (WCAG compliance)
     |
     v
-Generated Theme (themes/[name]/)
+Generated React Components
     |
-    +-- wordpress-hook-integration (validation hooks run automatically)
-    |       +-- validate-theme-location.sh (blocks wp-content/ paths)
-    |       +-- figma-fse-post-template.sh (per-template validation)
-    |       +-- figma-fse-completion.sh (final report)
-    |
-    v
-visual-qa-verification (post-conversion QA)
-    |
-    +-- wp-cli-workflows (activate theme, seed content)
-    +-- wordpress-testing-workflows (PHPUnit tests)
+    +-- react-testing-workflows (test coverage)
+    +-- react-performance-optimization (bundle/runtime)
+    +-- visual-qa-verification (visual regression)
     |
     v
-Verified Theme Ready for WordPress
+Production-Ready Components
 ```
 
-## Integration with Custom Agents
+## Skills vs Agents vs Plugins
 
-Each skill works with the 19 custom agents in this template:
+| Type | Purpose | Invocation |
+|------|---------|------------|
+| **Skills** | Systematic workflows and best practices | Automatic keyword detection |
+| **Agents** | Specialized task execution | Task tool (auto or explicit) |
+| **Plugins** | Tool integrations and commands | Manual `/` commands |
 
-- **figma-fse-converter** + figma-to-fse-autonomous-workflow + fse-pattern-first-architecture
-- **frontend-developer** + fse-block-theme-development
-- **ui-designer** + block-pattern-creation
-- **test-writer-fixer** + wordpress-testing-workflows
-- **visual-qa-agent** + visual-qa-verification
-- **accessibility-auditor** + visual-qa-verification
-- All agents + wordpress-security-hardening + wordpress-hook-integration
-
-## Skill Structure
+## Skill File Structure
 
 ```yaml
 ---
-name: skill-name-with-hyphens
-description: Use when [specific triggers]. Keywords: relevant, search, terms
+name: skill-name
+description: Use when [triggers]. Keywords: term1, term2
 ---
 
 # Skill Name
@@ -118,16 +87,3 @@ description: Use when [specific triggers]. Keywords: relevant, search, terms
 ## Implementation
 ## Common Mistakes
 ```
-
-## Maintenance
-
-Skills are version-controlled and updated when:
-- WordPress core changes require updates
-- Pipeline workflow changes
-- New hooks or agents are added
-- Better patterns emerge from conversion results
-
----
-
-**Last Updated:** 2026-03-06
-**Total Skills:** 10 (removed wordpress-deployment-automation, added visual-qa-verification)

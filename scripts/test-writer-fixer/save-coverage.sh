@@ -8,7 +8,7 @@ INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
 # Only process if this was a test command with coverage
-if [[ ! "$COMMAND" =~ (phpunit|jest|vitest|pytest).*coverage ]]; then
+if [[ ! "$COMMAND" =~ (jest|vitest|pytest).*coverage ]]; then
     exit 0
 fi
 
@@ -19,19 +19,15 @@ mkdir -p "$REPORTS_DIR"
 # Look for coverage files in common locations
 COVERAGE_FILES=()
 
-# PHP coverage files
+# JavaScript/TypeScript coverage files
 [[ -d "coverage" ]] && COVERAGE_FILES+=(coverage)
 [[ -f "coverage.xml" ]] && COVERAGE_FILES+=(coverage.xml)
-[[ -f "clover.xml" ]] && COVERAGE_FILES+=(clover.xml)
 [[ -f "coverage.json" ]] && COVERAGE_FILES+=(coverage.json)
-
-# JavaScript coverage files
-[[ -d "coverage" ]] && COVERAGE_FILES+=(coverage)
 [[ -f "coverage/lcov.info" ]] && COVERAGE_FILES+=(coverage/lcov.info)
+[[ -f "coverage/clover.xml" ]] && COVERAGE_FILES+=(coverage/clover.xml)
 
 # Python coverage files
 [[ -f ".coverage" ]] && COVERAGE_FILES+=(.coverage)
-[[ -f "coverage.xml" ]] && COVERAGE_FILES+=(coverage.xml)
 [[ -d "htmlcov" ]] && COVERAGE_FILES+=(htmlcov)
 
 # Remove duplicates

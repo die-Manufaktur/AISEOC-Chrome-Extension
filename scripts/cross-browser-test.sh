@@ -3,22 +3,22 @@
 #
 # Usage:
 #   ./scripts/cross-browser-test.sh <browser> <url> [breakpoints]
-#   ./scripts/cross-browser-test.sh firefox http://localhost:8080
-#   ./scripts/cross-browser-test.sh webkit http://localhost:8080
-#   ./scripts/cross-browser-test.sh firefox http://localhost:8080 "1920,1440,768,375"
+#   ./scripts/cross-browser-test.sh firefox http://localhost:3000
+#   ./scripts/cross-browser-test.sh webkit http://localhost:3000
+#   ./scripts/cross-browser-test.sh firefox http://localhost:3000 "1920,1440,768,375"
 #
 # Captures screenshots at all breakpoints for the specified browser engine.
-# Results saved to .claude/visual-qa/screenshots/wordpress/<browser>/
+# Results saved to .claude/visual-qa/screenshots/<browser>/
 #
 # Browsers: chromium, firefox, webkit
 
 set -e
 
 BROWSER="${1:-chromium}"
-URL="${2:-http://localhost:8080}"
+URL="${2:-http://localhost:3000}"
 BREAKPOINTS="${3:-1920,1440,768,375}"
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-OUTPUT_DIR="$PROJECT_ROOT/.claude/visual-qa/screenshots/wordpress/$BROWSER"
+OUTPUT_DIR="$PROJECT_ROOT/.claude/visual-qa/screenshots/$BROWSER"
 
 if [ -z "$1" ]; then
     echo "Usage: $0 <browser> <url> [breakpoints]"
@@ -27,8 +27,8 @@ if [ -z "$1" ]; then
     echo "Breakpoints: comma-separated widths (default: 1920,1440,768,375)"
     echo ""
     echo "Examples:"
-    echo "  $0 firefox http://localhost:8080"
-    echo "  $0 webkit http://localhost:8080 \"1920,1440,768,375\""
+    echo "  $0 firefox http://localhost:3000"
+    echo "  $0 webkit http://localhost:3000 \"1920,1440,768,375\""
     exit 1
 fi
 

@@ -8,7 +8,7 @@ INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
 # Only process if this was a benchmarking/profiling command
-if [[ ! "$COMMAND" =~ (lighthouse|artillery|ab|wrk|node --prof|phpunit.*--coverage|benchmark|profile|perf) ]]; then
+if [[ ! "$COMMAND" =~ (lighthouse|artillery|ab|wrk|node --prof|benchmark|profile|perf) ]]; then
     exit 0
 fi
 
@@ -35,10 +35,6 @@ BENCHMARK_FILES=()
 [[ -f "benchmark.json" ]] && BENCHMARK_FILES+=(benchmark.json)
 [[ -f "benchmark-results.json" ]] && BENCHMARK_FILES+=(benchmark-results.json)
 [[ -f "performance.json" ]] && BENCHMARK_FILES+=(performance.json)
-
-# PHP profiling
-[[ -f "cachegrind.out.*" ]] && BENCHMARK_FILES+=(cachegrind.out.*)
-[[ -f "xdebug.*.xt" ]] && BENCHMARK_FILES+=(xdebug.*.xt)
 
 # Remove duplicates
 BENCHMARK_FILES=($(echo "${BENCHMARK_FILES[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))

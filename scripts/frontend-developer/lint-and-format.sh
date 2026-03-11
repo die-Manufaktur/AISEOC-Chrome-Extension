@@ -17,30 +17,35 @@ fi
 EXT="${FILE_PATH##*.}"
 
 case "$EXT" in
-    php)
-        # Run PHPCS if available
-        if [ -f "./vendor/bin/phpcs" ]; then
-            RESULT=$(./vendor/bin/phpcs --standard=WordPress --severity=1 "$FILE_PATH" 2>&1)
+    ts|tsx)
+        # Run ESLint if available
+        if [ -f "node_modules/.bin/eslint" ]; then
+            RESULT=$(npx eslint "$FILE_PATH" --fix 2>&1)
             if [ $? -ne 0 ]; then
-                echo "WordPress Coding Standards issues in: $FILE_PATH" >&2
+                echo "ESLint issues in: $FILE_PATH" >&2
                 echo "$RESULT" >&2
             fi
         fi
-        # Run security scan
-        if [ -f "./scripts/wordpress/security-scan.sh" ]; then
-            echo "$INPUT" | ./scripts/wordpress/security-scan.sh
-            if [ $? -eq 2 ]; then
-                exit 2
-            fi
+        # Run Prettier if available
+        if [ -f "node_modules/.bin/prettier" ]; then
+            npx prettier --write "$FILE_PATH" 2>/dev/null
         fi
         ;;
     css)
-        # Check for hardcoded colors (should use CSS custom properties)
+        # Check for hardcoded colors (should use CSS custom properties or Tailwind)
         if grep -nE '#[0-9a-fA-F]{3,8}' "$FILE_PATH" 2>/dev/null | grep -v '^\s*//' | grep -v '^\s*\*'; then
-            echo "CSS contains hardcoded color values. Use CSS custom properties from theme.json instead." >&2
+            echo "CSS contains hardcoded color values. Use design tokens or Tailwind utilities instead." >&2
         fi
         ;;
-    js)
+    js|jsx)
+        # Run ESLint if available
+        if [ -f "node_modules/.bin/eslint" ]; then
+            RESULT=$(npx eslint "$FILE_PATH" --fix 2>&1)
+            if [ $? -ne 0 ]; then
+                echo "ESLint issues in: $FILE_PATH" >&2
+                echo "$RESULT" >&2
+            fi
+        fi
         # Basic JS checks - warn about console.log in production code
         if grep -n 'console\.log' "$FILE_PATH" 2>/dev/null; then
             echo "JavaScript contains console.log statements. Remove before production." >&2

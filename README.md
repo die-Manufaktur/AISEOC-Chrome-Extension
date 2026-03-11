@@ -1,188 +1,148 @@
-# WordPress Development Template
+# React App Development Framework
 
-A clean `wp-content` directory structure for modern WordPress development, enhanced with Claude Code integration and WordPress-specific development tools.
+A Claude Code-integrated framework for building React applications with TypeScript, Tailwind CSS, and an automated Figma-to-React pipeline.
 
-## What This Template Provides
+## What This Framework Provides
 
-- **Clean Directory Structure**: Empty `wp-content` structure ready for theme and plugin development
-- **WordPress Development Scripts**: Security scanning, performance checking, coding standards validation
-- **Git Configuration**: Comprehensive `.gitignore` for WordPress development
-- **Claude Code Integration**: WordPress-specific guidance in `CLAUDE.md` for AI-assisted development
+- **44 Custom Agents** -- Specialized AI agents for engineering, design, testing, marketing, operations, and more
+- **6 Development Skills** -- Automated workflows for React development, testing, accessibility, and Figma conversion
+- **Figma-to-React Pipeline** -- Convert Figma designs directly into production-ready React components
+- **Testing Stack** -- Vitest, React Testing Library, Playwright (cross-browser), and Storybook
+- **Code Quality Scripts** -- Linting, formatting, type checking, bundle analysis, and accessibility scanning
 
 ## Quick Start
 
-### Option 1: Use as wp-content Directory
 ```bash
-# Clone or copy this template
-git clone <repository-url> wp-content
-cd wp-content
+# Clone the repository
+git clone <repository-url>
+cd coding-framework
 
-# Download WordPress core (one level up)
-cd ..
-wp core download --skip-content
+# Set up the project
+./scripts/setup-project.sh
 
-# Create config and install
-wp config create --dbname=your_db --dbuser=root --dbpass=password
-wp core install --url=example.test --title="Your Site" --admin_user=admin --admin_password=password --admin_email=you@example.com
+# Install dependencies
+pnpm install
+
+# Start development
+pnpm dev
 ```
-
-### Option 2: Develop Separately and Sync
-Develop themes/plugins here and sync to your WordPress installation's `wp-content` directory.
 
 ## Directory Structure
 
-### ⚠️ Development Structure (Root-Level Folders)
-
-**During development, this project uses ROOT-LEVEL WordPress folders:**
-
 ```
 project-root/
-├── themes/              ← Themes go HERE during development
-├── plugins/             ← Plugins go HERE during development
-├── mu-plugins/          ← Must-use plugins go HERE during development
-├── scripts/             # Development automation scripts
-│   └── wordpress/       # WordPress-specific tools
-│   └── figma-fse/       # Figma-to-FSE conversion scripts
-├── docs/                # Documentation and planning
-└── .claude/             # Claude Code configuration
+├── src/                  # Application source code
+│   ├── components/       # React components
+│   ├── hooks/            # Custom hooks
+│   ├── lib/              # Utilities
+│   ├── types/            # TypeScript types
+│   ├── styles/           # Global styles
+│   └── assets/           # Static assets
+├── scripts/              # Automation scripts
+│   ├── setup-project.sh
+│   ├── setup-playwright.sh
+│   ├── run-tests.sh
+│   ├── cross-browser-test.sh
+│   ├── check-types.sh
+│   ├── lint-and-format.sh
+│   ├── check-bundle-size.sh
+│   └── check-accessibility.sh
+├── docs/                 # Documentation
+│   ├── figma-to-react/   # Figma pipeline guide
+│   └── react-development/# Development standards
+├── .claude/              # Claude Code configuration
+│   ├── agents/           # 44 custom agents
+│   ├── skills/           # 6 development skills
+│   ├── CUSTOM-AGENTS-GUIDE.md
+│   ├── PLUGINS-REFERENCE.md
+│   └── AGENT-NAMING-GUIDE.md
+├── tailwind.config.ts
+├── tsconfig.json
+└── vitest.config.ts
 ```
 
-**Why root-level?**
-- Cleaner development structure (no nested wp-content)
-- Easier version control
-- Separation between development and deployment environments
+## Key Features
 
-### Deployment Structure (WordPress wp-content)
+### Figma-to-React Conversion
 
-**When deploying to WordPress, files are copied to standard wp-content structure:**
+Convert Figma designs into React components automatically:
 
 ```
-wordpress-install/
-└── wp-content/
-    ├── themes/          ← Development themes/ copied here for testing
-    ├── plugins/         ← Development plugins/ copied here for testing
-    ├── mu-plugins/      ← Development mu-plugins/ copied here for testing
-    ├── uploads/         # Media files (gitignored)
-    ├── languages/       # Translation files
-    └── upgrade/         # WordPress upgrade files (gitignored)
+User: "Convert this Figma design to React: [Figma URL]"
 ```
 
-**NEVER create files in `wp-content/` during development.** Use root-level `themes/`, `plugins/`, `mu-plugins/` folders.
+The pipeline extracts design tokens, generates a Tailwind config, creates typed React components, maps assets, and runs visual QA. See `docs/figma-to-react/README.md`.
 
-## WordPress Development Tools
+### 44 Custom Agents
 
-### Security & Quality Scripts
+Agents are auto-selected by Claude Code based on your task:
+
+| Category | Agents | Examples |
+|----------|--------|---------|
+| Engineering | 7 | frontend-developer, backend-architect, test-writer-fixer |
+| Design | 5 | ui-designer, ux-researcher, brand-guardian |
+| Design-to-Code | 2 | figma-react-converter, asset-cataloger |
+| Testing & QA | 7 | api-tester, performance-benchmarker, visual-qa-agent |
+| Product | 3 | sprint-prioritizer, feedback-synthesizer |
+| Marketing | 7 | content-creator, growth-hacker |
+| Project Mgmt | 3 | studio-producer, project-shipper |
+| Operations | 5 | analytics-reporter, infrastructure-maintainer |
+| Other | 5 | docusaurus-expert, agent-expert, joker |
+
+Full catalog: `.claude/CUSTOM-AGENTS-GUIDE.md`
+
+### 6 Development Skills
+
+Skills auto-trigger based on conversation keywords:
+
+1. **figma-to-react-workflow** -- Figma conversion pipeline orchestration
+2. **react-component-development** -- Component patterns and best practices
+3. **react-testing-workflows** -- Vitest, RTL, Playwright, Storybook
+4. **react-performance-optimization** -- Profiling, bundle analysis, Web Vitals
+5. **react-accessibility** -- WCAG patterns for React
+6. **visual-qa-verification** -- Post-conversion visual QA
+
+Full catalog: `.claude/skills/README.md`
+
+### Testing
 
 ```bash
-# Set up PHP CodeSniffer with WordPress standards
-./scripts/wordpress/setup-phpcs.sh
-
-# Check WordPress coding standards
-./scripts/wordpress/check-coding-standards.sh [path]
-
-# Run security scan
-./scripts/wordpress/security-scan.sh [path]
-
-# Check performance
-./scripts/wordpress/check-performance.sh [path]
+./scripts/run-tests.sh           # Vitest unit/component tests
+./scripts/cross-browser-test.sh  # Playwright E2E (Chromium, Firefox, WebKit)
+./scripts/check-accessibility.sh # Automated a11y scanning
 ```
 
-### WP-CLI Commands
+### Code Quality
 
-See `CLAUDE.md` for comprehensive WP-CLI command reference for:
-- WordPress core management
-- Theme development
-- Plugin development
-- Database operations
-- Development server setup
-
-## Claude Code Integration
-
-This template is optimized for WordPress development with Claude Code, featuring:
-
-### **Architecture Overview**
-- **Lean Plugin Setup**: 5 WordPress-focused plugins + 1 local task manager
-- **Custom Agents**: 24 specialized agents (8 WordPress-relevant, 16 general-purpose)
-- **Documentation Hub**: Comprehensive guides in `.claude/` directory
-
-### **Installed Plugins**
-```
-✅ episodic-memory     # Semantic search and persistent memory
-✅ commit-commands     # Structured git workflows (/commit, /commit-push-pr)
-✅ github              # GitHub integration (gh CLI)
-✅ php-lsp             # PHP code intelligence (autocomplete, go-to-definition)
-✅ superpowers         # Advanced development workflows and skills
-✅ ai-taskmaster       # Task management (local plugin)
+```bash
+./scripts/check-types.sh         # TypeScript type checking
+./scripts/lint-and-format.sh     # ESLint + Prettier
+./scripts/check-bundle-size.sh   # Bundle size analysis
 ```
 
-### **WordPress-Relevant Custom Agents**
+## Claude Code Plugins
+
 ```
-✅ frontend-developer       # JS/CSS implementation for FSE themes
-✅ test-writer-fixer        # PHP unit testing
-✅ ui-designer              # Block pattern design
-✅ ux-researcher            # Theme usability testing
-✅ performance-benchmarker  # Performance optimization
-✅ api-tester              # REST API testing
-✅ analytics-reporter      # Performance metrics
-✅ workflow-optimizer      # Development process improvement
+episodic-memory    # Persistent memory across sessions
+commit-commands    # Git workflow automation (/commit, /commit-push-pr)
+github             # GitHub integration (gh CLI)
+superpowers        # Advanced development workflows
+ai-taskmaster      # Task management (local)
 ```
 
-### **WordPress Development Skills (NEW! ✨)**
-```
-✅ fse-block-theme-development      # FSE block theme creation workflows
-✅ block-pattern-creation           # Reusable block pattern registration
-✅ wordpress-security-hardening     # Security best practices (sanitize, escape, nonces)
-✅ wp-cli-workflows                 # WP-CLI automation with safe workflows
-✅ wordpress-testing-workflows      # PHPUnit testing for WordPress
-✅ wordpress-deployment-automation  # CI/CD pipelines with GitHub Actions
-✅ wordpress-internationalization   # i18n/l10n implementation
-✅ wordpress-hook-integration       # Claude Code agent hooks for WordPress
-```
+Details: `.claude/PLUGINS-REFERENCE.md`
 
-**What Skills Provide:**
-- Systematic workflows for WordPress development tasks
-- Prevention of common WordPress mistakes
-- Quick reference tables and code examples
-- Security-first approaches with rationalization detection
-- Integration with existing agents and automation scripts
+## Documentation
 
-**Skills Documentation:** `.claude/skills/README.md`
-
-### **Claude Code Documentation**
-- **`CLAUDE.md`** - WordPress development guidance and quick reference
-- **`docs/figma-to-wordpress/`** - Figma-to-FSE automation documentation
-  - `README.md` - User guide and quick start
-  - `IMPLEMENTATION.md` - Technical implementation details
-  - `EXAMPLES.md` - FSE template syntax examples
-- **`.claude/skills/README.md`** - WordPress skills catalog
-- **`.claude/PLUGINS-REFERENCE.md`** - Plugin commands and usage
-- **`.claude/CUSTOM-AGENTS-GUIDE.md`** - Custom agent catalog
-- **`.claude/AGENT-NAMING-GUIDE.md`** - Agent disambiguation
-- **`LOCAL-DEVELOPMENT.md`** - Docker setup for local WordPress
-
-### **What Claude Code Provides**
-- WordPress coding standards compliance
-- Proper use of WordPress APIs and functions
-- Security best practices (escaping, sanitization, nonces)
-- Structured git commits and PR workflows
-- PHP code intelligence and autocomplete
-- Specialized agents for WordPress development tasks
-
-## Development Best Practices
-
-- **Follow WordPress Coding Standards**: Use PHPCS with WordPress standards
-- **Security First**: Sanitize input, escape output, use nonces, check capabilities
-- **Use WordPress APIs**: Leverage built-in WordPress functions instead of reinventing
-- **Test Locally**: Use Local by Flywheel, XAMPP, MAMP, or Docker for development
-- **Version Control**: This template includes comprehensive `.gitignore` for WordPress
-
-## Resources
-
-- [WordPress Developer Handbook](https://developer.wordpress.org/)
-- [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/)
-- [WP-CLI Documentation](https://wp-cli.org/)
-- [Block Editor Handbook](https://developer.wordpress.org/block-editor/)
+| Document | Location |
+|----------|----------|
+| Figma-to-React pipeline | `docs/figma-to-react/README.md` |
+| React development standards | `docs/react-development/README.md` |
+| Agent catalog | `.claude/CUSTOM-AGENTS-GUIDE.md` |
+| Plugin reference | `.claude/PLUGINS-REFERENCE.md` |
+| Skills catalog | `.claude/skills/README.md` |
+| Agent naming guide | `.claude/AGENT-NAMING-GUIDE.md` |
 
 ## License
 
-This template structure is provided as-is for WordPress development. WordPress itself is licensed under GPL v2 or later.
+MIT

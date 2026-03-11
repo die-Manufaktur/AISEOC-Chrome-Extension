@@ -4,262 +4,101 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Claude Code-integrated WordPress development template** providing a clean `wp-content` directory structure with WordPress-specific development tools and scripts.
+This is a **Claude Code-integrated React app development framework** providing specialized agents, skills, scripts, and a Figma-to-React conversion pipeline.
 
-The template is designed for:
-- WordPress FSE (Full Site Editing) block theme development
-- Custom WordPress plugin development
-- WordPress security, performance, and accessibility auditing
-- Integration with Claude Code for WordPress development workflows
+The framework is designed for:
+- Framework-agnostic React app development (Next.js, Vite, Remix)
+- Figma-to-React component conversion with Tailwind CSS
+- Comprehensive testing (Vitest, React Testing Library, Playwright, Storybook)
+- Full product lifecycle support (engineering, design, testing, marketing, operations)
 
-## ⚠️ CRITICAL: File Location Requirements
-
-**This project uses ROOT-LEVEL WordPress folders, NOT `wp-content/` subfolders:**
+## Project Structure
 
 ```
 project-root/
-├── themes/          ← Theme files go HERE (NOT wp-content/themes/)
-├── plugins/         ← Plugin files go HERE (NOT wp-content/plugins/)
-├── mu-plugins/      ← Must-use plugins go HERE (NOT wp-content/mu-plugins/)
-└── .claude/         ← Claude Code configuration
+├── .claude/              # Claude Code configuration
+│   ├── agents/           # 44 specialized agents
+│   ├── skills/           # 6 React-specific skills
+│   ├── commands/         # Custom slash commands
+│   └── hooks/            # Git and tool hooks
+├── scripts/              # Development automation scripts
+├── templates/            # Starter configs (ESLint, Tailwind, Vitest, etc.)
+├── docs/                 # Documentation
+│   ├── figma-to-react/   # Figma conversion pipeline docs
+│   └── react-development/# React development standards
+└── CLAUDE.md             # This file
 ```
 
-**Why root-level?**
-- Cleaner development structure
-- Easier version control (no nested wp-content)
-- Testing copies files to WordPress `wp-content/` for deployment
-- Development and testing environments separated
+## Development Scripts
 
-**NEVER create files in `wp-content/themes/` or `wp-content/plugins/` during development.**
-
-When deploying to WordPress, files are copied from root folders to `wp-content/` by deployment scripts.
-
-## WordPress Development Scripts
-
-This template includes WordPress-specific automation scripts:
-
-### Security and Quality Tools
 ```bash
-# Set up PHP CodeSniffer with WordPress standards
-./scripts/wordpress/setup-phpcs.sh
+# Lint and format code
+./scripts/lint-and-format.sh
 
-# Check WordPress coding standards
-./scripts/wordpress/check-coding-standards.sh
+# Run tests with coverage
+./scripts/run-tests.sh
 
-# Run security scan
-./scripts/wordpress/security-scan.sh
+# TypeScript type checking
+./scripts/check-types.sh
 
-# Check performance
-./scripts/wordpress/check-performance.sh
+# Bundle size analysis
+./scripts/check-bundle-size.sh
+
+# Accessibility linting
+./scripts/check-accessibility.sh
+
+# Initialize a new React project
+./scripts/setup-project.sh my-app --next  # or --vite
+
+# Cross-browser testing (Playwright)
+./scripts/cross-browser-test.sh chromium http://localhost:3000
+./scripts/cross-browser-test.sh firefox http://localhost:3000
+./scripts/cross-browser-test.sh webkit http://localhost:3000
+
+# Setup Playwright browsers (one-time)
+./scripts/setup-playwright.sh
 ```
 
 ## Development Commands
 
-### WordPress Setup
+### Package Management (always use pnpm)
 ```bash
-# Download WordPress core files
-wp core download
-
-# Create wp-config.php
-wp config create --dbname=dbname --dbuser=root --dbpass=password --dbhost=localhost
-
-# Install WordPress
-wp core install --url=example.com --title="Site Title" --admin_user=admin --admin_password=password --admin_email=admin@example.com
-
-# Update WordPress core
-wp core update
-
-# Update all plugins
-wp plugin update --all
-
-# Update all themes
-wp theme update --all
-```
-
-### Theme Development
-```bash
-# Activate a theme
-wp theme activate theme-name
-
-# Generate theme starter files
-wp scaffold _s theme-name --theme_name="Theme Name" --author="Author Name"
-
-# Check theme for errors
-wp theme verify theme-name
-```
-
-### Plugin Development
-```bash
-# Activate a plugin
-wp plugin activate plugin-name
-
-# Deactivate a plugin
-wp plugin deactivate plugin-name
-
-# Generate plugin starter files
-wp scaffold plugin plugin-name --plugin_name="Plugin Name"
-
-# Run plugin tests (if PHPUnit is configured)
-phpunit
-```
-
-### Database Operations
-```bash
-# Export database
-wp db export backup.sql
-
-# Import database
-wp db import backup.sql
-
-# Search and replace in database
-wp search-replace 'old-domain.com' 'new-domain.com'
-
-# Reset database
-wp db reset
+pnpm install              # Install dependencies
+pnpm add <package>        # Add a dependency
+pnpm add -D <package>     # Add a dev dependency
+pnpm update               # Update dependencies
 ```
 
 ### Development Server
 ```bash
-# Using PHP built-in server
-php -S localhost:8000
+# Next.js
+pnpm dev                  # Start dev server (port 3000)
+pnpm build                # Production build
+pnpm start                # Start production server
 
-# Using wp-cli server
-wp server --host=localhost --port=8080
-
-# Using Local by Flywheel, XAMPP, MAMP, or Docker
-# Configure according to your local environment
+# Vite
+pnpm dev                  # Start dev server (port 5173)
+pnpm build                # Production build
+pnpm preview              # Preview production build
 ```
 
-## WordPress File Structure
-
-When developing, follow these conventions:
-
-### Theme Structure (Development - Root Level)
-```
-themes/theme-name/              ← ROOT-LEVEL (not wp-content/themes/)
-├── style.css                   # Theme information and main styles
-├── functions.php               # Theme functions and hooks
-├── index.php                   # Main template file (classic themes)
-├── theme.json                  # FSE theme configuration (REQUIRED for FSE)
-├── templates/                  # FSE block templates
-│   ├── index.html             # Main template
-│   ├── front-page.html        # Homepage template
-│   ├── single.html            # Single post template
-│   ├── page.html              # Page template
-│   └── 404.html               # 404 error template
-├── parts/                      # FSE template parts
-│   ├── header.html            # Header template part
-│   ├── footer.html            # Footer template part
-│   └── sidebar.html           # Sidebar template part
-├── patterns/                   # Block patterns
-├── assets/
-│   ├── css/                   # Additional stylesheets
-│   ├── js/                    # JavaScript files
-│   └── images/                # Theme images
-└── inc/                        # PHP includes
-
-# Classic theme alternatives (if not using FSE):
-# ├── header.php, footer.php, sidebar.php
-# ├── single.php, page.php, archive.php
-# └── template-parts/
-```
-
-### Plugin Structure (Development - Root Level)
-```
-plugins/plugin-name/            ← ROOT-LEVEL (not wp-content/plugins/)
-├── plugin-name.php            # Main plugin file with header
-├── includes/                  # PHP includes
-├── admin/                     # Admin-specific functionality
-├── public/                    # Public-facing functionality
-├── assets/
-│   ├── css/
-│   ├── js/
-│   └── images/
-└── languages/                 # Translation files
-```
-
-**Deployment Note:** During testing/deployment, files from `themes/` are copied to `wp-content/themes/` and files from `plugins/` are copied to `wp-content/plugins/`. See `.claude/skills/figma-to-fse-autonomous-workflow/TESTING-GUIDE.md` for deployment procedures.
-
-## WordPress Development Standards
-
-### PHP Coding Standards
-- Follow WordPress PHP Coding Standards
-- Use WordPress functions and APIs where available
-- Properly escape output: `esc_html()`, `esc_url()`, `esc_attr()`
-- Sanitize input: `sanitize_text_field()`, `sanitize_email()`, etc.
-- Use nonces for form submissions and AJAX requests
-
-### Database Interactions
-- Use `$wpdb` global for custom queries
-- Prepare SQL queries to prevent injection: `$wpdb->prepare()`
-- Use WordPress functions for common operations (get_posts, WP_Query, etc.)
-
-### Hooks and Filters
-- Use action hooks: `add_action()`, `do_action()`
-- Use filter hooks: `add_filter()`, `apply_filters()`
-- Follow WordPress hook naming conventions
-- Document custom hooks
-
-### JavaScript and CSS
-- Enqueue scripts and styles properly using `wp_enqueue_script()` and `wp_enqueue_style()`
-- Localize scripts for AJAX: `wp_localize_script()`
-- Use `wp_register_script()` for conditional loading
-
-### Security Best Practices
-- Validate and sanitize all user input
-- Escape all output
-- Use nonces for state-changing operations
-- Check user capabilities: `current_user_can()`
-- Keep WordPress, themes, and plugins updated
-
-## Testing
-
-### PHPUnit Testing
+### Testing
 ```bash
-# Install PHPUnit
-composer require --dev phpunit/phpunit
-
-# Run tests
-vendor/bin/phpunit
-
-# Run specific test file
-vendor/bin/phpunit tests/test-sample.php
+pnpm vitest               # Run tests in watch mode
+pnpm vitest run           # Run tests once
+pnpm vitest run --coverage # Run with coverage report
+pnpm storybook            # Start Storybook dev server
+pnpm build-storybook      # Build Storybook static site
 ```
 
-### WordPress Debugging
-Add to wp-config.php:
-```php
-define( 'WP_DEBUG', true );
-define( 'WP_DEBUG_LOG', true );
-define( 'WP_DEBUG_DISPLAY', false );
-define( 'SCRIPT_DEBUG', true );
+### Code Quality
+```bash
+pnpm eslint .             # Run ESLint
+pnpm eslint . --fix       # Auto-fix ESLint issues
+pnpm prettier --check .   # Check formatting
+pnpm prettier --write .   # Fix formatting
+pnpm tsc --noEmit         # Type check without emitting
 ```
-
-## Common WordPress Functions
-
-### Content Retrieval
-- `get_posts()` - Retrieve posts
-- `WP_Query` - Advanced post queries
-- `get_pages()` - Retrieve pages
-- `get_categories()` - Get categories
-- `get_tags()` - Get tags
-
-### Theme Functions
-- `get_header()`, `get_footer()`, `get_sidebar()`
-- `get_template_part()`
-- `wp_head()`, `wp_footer()`
-- `the_loop()`, `have_posts()`, `the_post()`
-
-### User and Permissions
-- `is_user_logged_in()`
-- `current_user_can()`
-- `wp_get_current_user()`
-- `get_current_user_id()`
-
-### Options and Settings
-- `get_option()`, `update_option()`, `add_option()`
-- `get_theme_mod()`, `set_theme_mod()`
-- `get_site_option()` (for multisite)
 
 ---
 
@@ -267,22 +106,34 @@ define( 'SCRIPT_DEBUG', true );
 
 ### Installed Plugins (5 Total)
 
-This project uses a lean, WordPress-optimized plugin configuration with 5 plugins:
 - **episodic-memory** - Conversation search and memory
 - **commit-commands** - Git workflow automation
-- **php-lsp** - PHP language server
 - **superpowers** - Advanced development workflows
 - **ai-taskmaster** - Task management (local)
 
-**Note:** GitHub integration via `gh` CLI (not a plugin)
+**Note:** GitHub integration via `gh` CLI
 
 **Full documentation:** `.claude/PLUGINS-REFERENCE.md`
 
 ---
 
-### Custom Agents (20 Total)
+### Custom Agents (44 Total)
 
-20 specialized agents provide WordPress development capabilities. Key agents include `frontend-developer`, `plugin-developer`, `test-writer-fixer`, `ui-designer`, `figma-fse-converter`, and others.
+44 specialized agents covering the full product lifecycle:
+
+| Category | Count | Key Agents |
+|----------|-------|------------|
+| Engineering | 7 | frontend-developer, backend-architect, rapid-prototyper, test-writer-fixer |
+| Design | 5 | ui-designer, ux-researcher, brand-guardian |
+| Design-to-Code | 2 | figma-react-converter, asset-cataloger |
+| Testing & QA | 7 | visual-qa-agent, accessibility-auditor, api-tester, performance-benchmarker |
+| Product | 3 | sprint-prioritizer, feedback-synthesizer, trend-researcher |
+| Marketing | 7 | content-creator, growth-hacker, app-store-optimizer |
+| Project Management | 3 | studio-producer, project-shipper, experiment-tracker |
+| Operations | 5 | analytics-reporter, infrastructure-maintainer, legal-compliance-checker |
+| Documentation | 1 | docusaurus-expert |
+| Meta | 2 | agent-expert, command-expert |
+| Bonus | 2 | joker, studio-coach |
 
 Agents are invoked automatically based on task context.
 
@@ -290,172 +141,150 @@ Agents are invoked automatically based on task context.
 
 ---
 
-### Agent Naming Conflicts
+### React Skills (6 Total)
 
-**⚠️ Important:** Multiple agents share the name "code-reviewer"
-
-Use this guide to select the right one:
-- **feature-dev/code-reviewer** - General development code reviews
-- **pr-review-toolkit/code-reviewer** - Pull request reviews before merge
-- **superpowers/code-reviewer** - Plan alignment verification
-
-**Quick rule:** Use the most specific agent for your context (PR → pr-review-toolkit, plan verification → superpowers, general → feature-dev)
-
-**Full guide:** See `.claude/AGENT-NAMING-GUIDE.md`
-
----
-
-### Custom WordPress Skills (8 Total)
-
-8 WordPress-specific skills provide systematic workflows:
-
-**Core:** FSE block theme development, block pattern creation, security hardening, WP-CLI workflows
-
-**Advanced:** Testing, deployment automation, internationalization, hook integration
-
-Skills auto-trigger based on keywords (e.g., "FSE", "security review", "deploy").
+| Skill | Purpose | Triggers |
+|-------|---------|----------|
+| figma-to-react-workflow | Figma-to-React conversion pipeline | "convert Figma", "Figma to React" |
+| react-component-development | Component patterns and best practices | "create component", "custom hook" |
+| react-testing-workflows | Vitest, RTL, Playwright, Storybook | "write tests", "test coverage" |
+| react-performance-optimization | Profiling, bundle analysis, Web Vitals | "performance", "bundle size" |
+| react-accessibility | WCAG patterns for React | "accessibility", "a11y", "ARIA" |
+| visual-qa-verification | Post-conversion visual QA | "verify", "visual QA", "compare to Figma" |
 
 **Full catalog:** `.claude/skills/README.md`
 
 ---
 
-### Development Workflow with Claude Code
+### Figma-to-React Pipeline
 
-**1. Theme Development Cycle**
-```bash
-# Start feature branch
-git checkout -b feature/hero-block-pattern
+Convert Figma designs to React components automatically:
 
-# Develop with Claude Code
-# - Use php-lsp for autocomplete
-# - Use frontend-developer agent for UI work
-# - Use test-writer-fixer for PHP tests
-
-# Commit with structure
-/commit
-# Suggested: "feat: Add hero section block pattern"
-
-# Create PR
-/commit-push-pr
-# Auto-generates PR with test plan
 ```
-
-**2. Code Quality Workflow**
-```bash
-# Check coding standards (use root-level paths)
-./scripts/wordpress/check-coding-standards.sh themes/my-theme
-
-# Security scan (use root-level paths)
-./scripts/wordpress/security-scan.sh themes/my-theme
-
-# Performance check (use root-level paths)
-./scripts/wordpress/check-performance.sh themes/my-theme
-
-# Fix issues and commit
-/commit
-```
-
-**Note:** Always use root-level paths (`themes/`, `plugins/`) for development scripts.
-
-**3. Using Custom Agents**
-Agents are invoked automatically based on task context, or explicitly:
-```
-User: "Help me optimize theme performance"
-Claude: [Uses performance-benchmarker agent]
-
-User: "Build a hero block pattern"
-Claude: [Uses frontend-developer agent]
-
-User: "Write tests for my custom post type"
-Claude: [Uses test-writer-fixer agent]
-```
-
-**4. Figma-to-WordPress Automation**
-Convert Figma designs to WordPress FSE themes automatically:
-```
-User: "Convert this Figma design to WordPress"
+User: "Convert this Figma design to React"
       [Provide Figma URL]
 
-Claude: [Autonomous workflow 5-90 minutes]
-        → Complete FSE theme with theme.json, templates, patterns
-        → Images work immediately (pattern-first architecture)
-        → Zero manual intervention
+Claude: [Autonomous workflow]
+        → Extract design tokens from Figma
+        → Generate Tailwind config
+        → Create TypeScript React components
+        → Framework-specific output (Next.js, Vite, Remix)
 
-Result: themes/[theme-name]/ ready for WordPress
+Result: Production-ready components with Tailwind CSS
 ```
 
 **Features:**
-- Wholesale design system extraction (colors, typography, spacing)
-- FSE template generation with WordPress blocks
-- PHP patterns for images (avoids broken src="" in HTML templates)
-- Automatic validation (security, standards, architecture)
-- 100% theme.json token usage (no hardcoded values)
+- Design token extraction (colors, typography, spacing, shadows)
+- Tailwind CSS config generation from Figma tokens
+- TypeScript React components with proper interfaces
+- Framework detection (Next.js, Vite, Remix)
+- Responsive implementation with Tailwind breakpoints
+- Accessibility attributes included
 
-**Documentation:** `docs/figma-to-wordpress/README.md`
-
----
-
-### WordPress + Claude Code Best Practices
-
-**When Claude Code should:**
-- ✅ Follow WordPress coding standards automatically
-- ✅ Use WordPress functions instead of raw PHP/MySQL
-- ✅ Escape output with `esc_html()`, `esc_url()`, `esc_attr()`
-- ✅ Sanitize input with `sanitize_text_field()`, etc.
-- ✅ Use nonces for form submissions
-- ✅ Check user capabilities with `current_user_can()`
-- ✅ Enqueue scripts/styles with `wp_enqueue_script()`
-- ✅ Use `$wpdb->prepare()` for custom queries
-- ✅ Create structured git commits with `/commit`
-- ✅ Use appropriate specialized agents for tasks
-
-**Security Reminders for Claude Code:**
-- Never trust user input
-- Always escape output
-- Use nonces for state-changing operations
-- Verify user capabilities before sensitive operations
-- Keep WordPress, themes, and plugins updated
+**Documentation:** `docs/figma-to-react/README.md`
 
 ---
 
-### Architecture Notes
+### MCP Server Integration
 
-**Plugin Philosophy:**
-- Lean configuration (5 plugins total)
-- WordPress-specific focus (php-lsp, not 9+ language servers)
-- No redundant or duplicate plugins
-- All plugins serve WordPress development
-- GitHub integration via `gh` CLI (not a plugin)
+- **Figma Desktop MCP** - Local Figma integration (port 3845)
+- **Figma Remote MCP** - Fallback remote access
+- **Playwright MCP** - Cross-browser testing (Chromium, Firefox, WebKit)
+- **Chrome DevTools MCP** - Screenshots, Lighthouse audits, DOM inspection
 
-**Agent Philosophy:**
-- 18 custom agents available (all WordPress-focused)
-- Agents invoked contextually by Claude Code
-- No action required - automatic selection
-- Optional: Remove 16 non-WordPress agents (see `.claude/CUSTOM-AGENTS-GUIDE.md`)
+---
 
-**Documentation Structure:**
-- `CLAUDE.md` (this file) - WordPress development guidance and quick reference
-- `docs/figma-to-wordpress/` - Figma-to-FSE automation documentation
-  - `README.md` - User guide and quick start
-  - `IMPLEMENTATION.md` - Technical implementation details
-  - `EXAMPLES.md` - FSE template syntax examples
-- `.claude/PLUGINS-REFERENCE.md` - Plugin commands and detailed usage
-- `.claude/CUSTOM-AGENTS-GUIDE.md` - Complete agent catalog
-- `.claude/AGENT-NAMING-GUIDE.md` - Agent name disambiguation
-- `.claude/skills/README.md` - WordPress skills catalog
-- `LOCAL-DEVELOPMENT.md` - Docker setup for local WordPress
+## React Development Standards
+
+### TypeScript
+- Strict mode enabled
+- No `any` types - use proper interfaces and generics
+- Export prop interfaces alongside components
+- Use discriminated unions for complex prop patterns
+
+### Component Patterns
+- Functional components only (no class components)
+- Custom hooks for reusable logic
+- Composition over inheritance
+- Props interface for every component
+- `children` and `className` passthrough where appropriate
+
+### Tailwind CSS
+- Utility-first styling
+- Design tokens via Tailwind config (not hardcoded values)
+- Responsive with mobile-first breakpoints (sm, md, lg, xl, 2xl)
+- Use `cn()` utility for conditional classes (clsx + tailwind-merge)
+
+### Testing Strategy
+- **Unit tests** (Vitest): Pure functions, custom hooks, utilities
+- **Component tests** (RTL): User interactions, rendering, accessibility
+- **Visual tests** (Storybook): Component states, responsive variants
+- **E2E tests** (Playwright): Critical user flows, cross-browser
+
+### Accessibility
+- WCAG 2.1 AA minimum
+- Semantic HTML (landmarks, headings hierarchy)
+- ARIA attributes on interactive elements
+- Keyboard navigation support
+- Color contrast 4.5:1 minimum
+
+### Code Quality
+- ESLint with React, TypeScript, and jsx-a11y plugins
+- Prettier for formatting
+- 2-space indentation (JS/TS/CSS/JSON)
+
+---
+
+### Development Workflow with Claude Code
+
+**1. Feature Development**
+```bash
+# Start feature branch
+git checkout -b feature/hero-component
+
+# Develop with Claude Code
+# - frontend-developer agent for React work
+# - test-writer-fixer agent for tests
+# - ui-designer agent for design decisions
+
+# Commit with structure
+/commit
+```
+
+**2. Code Quality**
+```bash
+./scripts/lint-and-format.sh
+./scripts/check-types.sh
+./scripts/run-tests.sh
+./scripts/check-accessibility.sh
+```
+
+**3. Figma-to-React Conversion**
+```
+User: "Convert this Figma design to React components"
+      [Provide Figma URL]
+
+Claude: [Uses figma-react-converter agent]
+        → Extracts design tokens
+        → Generates Tailwind config + React components
+        → Runs visual QA verification
+```
+
+**4. Using Custom Agents**
+```
+User: "Help me optimize app performance"
+Claude: [Uses performance-benchmarker agent]
+
+User: "Build a hero component"
+Claude: [Uses frontend-developer agent]
+
+User: "Write tests for my auth hook"
+Claude: [Uses test-writer-fixer agent]
+```
 
 ---
 
 ### Quick Command Reference
-
-**WordPress Development:**
-```bash
-wp core download              # Download WordPress
-wp theme activate my-theme    # Activate theme
-wp plugin list                # List plugins
-wp db export backup.sql       # Backup database
-```
 
 **Git Workflows (via commit-commands):**
 ```bash
@@ -464,30 +293,23 @@ wp db export backup.sql       # Backup database
 /clean_gone                   # Clean merged branches
 ```
 
-**GitHub CLI Workflows:**
+**GitHub CLI:**
 ```bash
 gh pr create                  # Create pull request
 gh pr list                    # List pull requests
 gh issue create               # Create issue
-gh repo view                  # View repository info
-gh auth status                # Check authentication
 ```
 
 **Code Quality:**
 ```bash
-./scripts/wordpress/check-coding-standards.sh [path]
-./scripts/wordpress/security-scan.sh [path]
-./scripts/wordpress/check-performance.sh [path]
-```
-
-**Plugin Management:**
-```bash
-/plugin list                  # List installed plugins
-/plugin install <name>        # Install plugin
-/plugin uninstall <name>      # Uninstall plugin
+./scripts/lint-and-format.sh        # ESLint + Prettier
+./scripts/run-tests.sh              # Vitest + coverage
+./scripts/check-types.sh            # TypeScript check
+./scripts/check-bundle-size.sh      # Bundle analysis
+./scripts/check-accessibility.sh    # a11y linting
 ```
 
 ---
 
-**Last Updated:** 2026-03-09
-**Architecture Status:** ✅ Lean, WordPress-optimized configuration (5 plugins + gh CLI)
+**Last Updated:** 2026-03-11
+**Architecture:** 44 agents, 6 skills, 4 plugins + gh CLI, Figma + Playwright MCP
