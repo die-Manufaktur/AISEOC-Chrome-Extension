@@ -1,8 +1,15 @@
 import OpenAI from "openai";
 import { getLanguageByCode } from "./languages";
 
+const isDevMode =
+  typeof window !== "undefined" && window.location?.hostname === "localhost";
+
 function createClient(apiKey: string): OpenAI {
-  return new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+  return new OpenAI({
+    apiKey,
+    dangerouslyAllowBrowser: true,
+    ...(isDevMode ? { baseURL: "/api/openai" } : {}),
+  });
 }
 
 async function chatWithRetry(

@@ -19,8 +19,13 @@ function fetchPageProxy(): Plugin {
           res.end("Missing ?url= parameter");
           return;
         }
+        // Normalize URL — prepend https:// if no protocol
+        let targetUrl = url;
+        if (!/^https?:\/\//i.test(targetUrl)) {
+          targetUrl = `https://${targetUrl}`;
+        }
         try {
-          const response = await fetch(url, {
+          const response = await fetch(targetUrl, {
             headers: {
               "User-Agent":
                 "Mozilla/5.0 (compatible; SEOCopilot/1.0; +https://example.com)",
@@ -43,9 +48,64 @@ function fetchPageProxy(): Plugin {
   };
 }
 
+/**
+ * Vite plugin that proxies /api/openai/* requests to api.openai.com,
+ * avoiding CORS issues when calling OpenAI from the browser in dev mode.
+ */
+function openaiProxy(): Plugin {
+  return {
+    name: "openai-proxy",
+    configureServer(server) {
+      server.middlewares.use("/api/openai", async (req, res) => {
+        // Handle CORS preflight
+        if (req.method === "OPTIONS") {
+          res.writeHead(204, {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+          });
+          res.end();
+          return;
+        }
+
+        const targetPath = (req.url ?? "").replace(/^\//, "");
+        const targetUrl = `https://api.openai.com/v1/${targetPath}`;
+
+        try {
+          // Read request body
+          const chunks: Buffer[] = [];
+          for await (const chunk of req) {
+            chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+          }
+          const body = Buffer.concat(chunks).toString();
+
+          const response = await fetch(targetUrl, {
+            method: req.method ?? "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: req.headers.authorization ?? "",
+            },
+            body,
+          });
+
+          const responseBody = await response.text();
+          res.writeHead(response.status, {
+            "Content-Type": response.headers.get("content-type") ?? "application/json",
+            "Access-Control-Allow-Origin": "*",
+          });
+          res.end(responseBody);
+        } catch (err) {
+          res.writeHead(502, { "Content-Type": "text/plain" });
+          res.end(`OpenAI proxy error: ${err}`);
+        }
+      });
+    },
+  };
+}
+
 // Dev preview config — no CRXJS, just serves the side panel UI in a browser tab
 export default defineConfig({
-  plugins: [react(), fetchPageProxy()],
+  plugins: [react(), fetchPageProxy(), openaiProxy()],
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
