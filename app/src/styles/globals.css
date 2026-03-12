@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-900: #1a1a1a;
+  --bg-700: #323232;
+  --bg-500: #444444;
+  --bg-300: #787878;
+  --text-primary: #ffffff;
+  --text-secondary: #c7c7c7;
+  --red: #ff4343;
+  --red-light: #ff8484;
+  --green: #a2ffb4;
+  --yellow: #ffdd64;
+  --yellow-light: #ffea9e;
+  --accent-blue: #1a72f5;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-900 text-text-primary font-sans antialiased;
+    margin: 0;
+    min-width: 400px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
