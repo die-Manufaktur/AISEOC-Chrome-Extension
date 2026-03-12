@@ -13,6 +13,7 @@ import {
 } from "@/lib/storage";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Onboarding } from "@/components/Onboarding";
+import { Toast } from "@/components/ui/Toast";
 import { SetupPage } from "./pages/SetupPage";
 import { LoadingPage } from "./pages/LoadingPage";
 import { ScorePage } from "./pages/ScorePage";
@@ -28,10 +29,9 @@ async function generateAIRecommendations(
   apiKey: string,
   keyword: string,
   advancedOptions?: { pageType?: string; secondaryKeywords?: string; languageCode?: string },
-): Promise<void> {
+): Promise<string | null> {
   const allChecks = analysis.categories.flatMap((c) => c.checks);
   const promises: Promise<void>[] = [];
-
   for (const check of allChecks) {
     if (check.status === "pass") continue;
 
@@ -47,7 +47,7 @@ async function generateAIRecommendations(
           check.h2Recommendations!.forEach((h, i) => {
             h.suggestion = suggestions[i] ?? "";
           });
-        }).catch(() => {}),
+        }),
       );
       continue;
     }
@@ -57,13 +57,37 @@ async function generateAIRecommendations(
       const context = getCheckContext(check, analysis);
       promises.push(
         generateRecommendation(apiKey, check.id, keyword, context, advancedOptions)
-          .then((rec) => { check.recommendation = rec; })
-          .catch(() => {}),
+          .then((rec) => { check.recommendation = rec; }),
       );
     }
   }
 
-  await Promise.all(promises);
+  if (promises.length === 0) return null;
+
+  const settled = await Promise.allSettled(promises);
+  const failures = settled.filter((r) => r.status === "rejected");
+
+  if (failures.length === 0) return null;
+
+  // Determine error type from the first failure
+  const firstError = (failures[0] as PromiseRejectedResult).reason;
+  const errorMsg = firstError?.message ?? String(firstError);
+
+  if (errorMsg.includes("401") || errorMsg.includes("Incorrect API key") || errorMsg.includes("invalid_api_key")) {
+    return "Invalid OpenAI API key — AI suggestions could not be generated.";
+  }
+  if (errorMsg.includes("429") || errorMsg.includes("rate_limit")) {
+    return "OpenAI rate limit reached — some AI suggestions were skipped.";
+  }
+  if (errorMsg.includes("insufficient_quota") || errorMsg.includes("billing")) {
+    return "OpenAI quota exceeded — check your billing at platform.openai.com.";
+  }
+
+  if (failures.length === settled.length) {
+    return `AI suggestions failed: ${errorMsg}`;
+  }
+
+  return `${failures.length} of ${settled.length} AI suggestions failed to generate.`;
 }
 
 function getCheckContext(check: SEOCheck, analysis: SEOAnalysis): string {
@@ -78,7 +102,7 @@ function getCheckContext(check: SEOCheck, analysis: SEOAnalysis): string {
 }
 
 export default function App() {
-  const { view, setView, setAnalysis, setError, settings, setSettings, loadApiKey } =
+  const { view, setView, setAnalysis, setError, settings, setSettings, loadApiKey, hideToast, toast } =
     useStore();
 
   useEffect(() => {
@@ -287,7 +311,9 @@ export default function App() {
       });
       const analysis = calculateAnalysis(checks, pageData, settings.keyword);
 
-      // Auto-generate AI recommendations for failing checks when API key is present
+      setAnalysis(analysis);
+
+      // Auto-generate AI recommendations in background (non-blocking)
       const { apiKey } = useStore.getState();
       if (apiKey) {
         const advancedOptions = settings.advancedMode
@@ -298,15 +324,20 @@ export default function App() {
             }
           : undefined;
 
-        await generateAIRecommendations(
+        generateAIRecommendations(
           analysis,
           apiKey,
           settings.keyword,
           advancedOptions,
-        );
+        ).then((aiError) => {
+          const store = useStore.getState();
+          // Re-set analysis to trigger re-render with populated recommendations
+          store.setAnalysis({ ...analysis });
+          if (aiError) store.showToast(aiError);
+        }).catch((err) => {
+          useStore.getState().showToast(`AI error: ${err?.message ?? err}`);
+        });
       }
-
-      setAnalysis(analysis);
 
       // Save keyword and settings for this URL
       try {
@@ -351,6 +382,7 @@ export default function App() {
         {view === "loading" && <LoadingPage />}
         {view === "score" && <ScorePage />}
         {view === "subscores" && <SubscoresPage />}
+        <Toast message={toast.message} visible={toast.visible} onClose={hideToast} />
       </div>
     </ErrorBoundary>
   );

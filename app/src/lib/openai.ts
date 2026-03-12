@@ -8,7 +8,7 @@ function createClient(apiKey: string): OpenAI {
   return new OpenAI({
     apiKey,
     dangerouslyAllowBrowser: true,
-    ...(isDevMode ? { baseURL: "/api/openai" } : {}),
+    ...(isDevMode ? { baseURL: `${window.location.origin}/api/openai` } : {}),
   });
 }
 
@@ -35,7 +35,10 @@ async function chatWithRetry(
       const text = response.choices[0]?.message?.content?.trim() ?? "";
       // Strip wrapping quotes if present
       return text.replace(/^["']|["']$/g, "");
-    } catch (error) {
+    } catch (error: unknown) {
+      // Don't retry auth or billing errors — they won't resolve
+      const status = (error as { status?: number }).status;
+      if (status === 401 || status === 403) throw error;
       if (retries === maxRetries) throw error;
       retries++;
       await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, retries)));
