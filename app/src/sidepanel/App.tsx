@@ -4,6 +4,7 @@ import { runSEOChecks } from "@/lib/seo-analyzer";
 import { calculateAnalysis } from "@/lib/scoring";
 import { fetchAndAnalyzePage } from "@/lib/fetch-page";
 import { detectLanguage } from "@/lib/languages";
+import { generateRecommendation, generateAllH2Suggestions } from "@/lib/openai";
 import {
   saveKeywordForUrl,
   getKeywordForUrl,
@@ -16,10 +17,65 @@ import { SetupPage } from "./pages/SetupPage";
 import { LoadingPage } from "./pages/LoadingPage";
 import { ScorePage } from "./pages/ScorePage";
 import { SubscoresPage } from "./pages/SubscoresPage";
-import type { PageSEOData } from "@/types/seo";
+import type { PageSEOData, SEOCheck, SEOAnalysis } from "@/types/seo";
 
 const isDevMode =
   typeof chrome === "undefined" || chrome.tabs === undefined;
+
+/** Auto-generate AI recommendations for failing copyable checks and H2 suggestions. */
+async function generateAIRecommendations(
+  analysis: SEOAnalysis,
+  apiKey: string,
+  keyword: string,
+  advancedOptions?: { pageType?: string; secondaryKeywords?: string; languageCode?: string },
+): Promise<void> {
+  const allChecks = analysis.categories.flatMap((c) => c.checks);
+  const promises: Promise<void>[] = [];
+
+  for (const check of allChecks) {
+    if (check.status === "pass") continue;
+
+    // Auto-generate H2 suggestions
+    if (check.id === "h2-keyword" && check.h2Recommendations?.length) {
+      promises.push(
+        generateAllH2Suggestions(
+          apiKey,
+          check.h2Recommendations.map((h) => h.text),
+          keyword,
+          advancedOptions,
+        ).then((suggestions) => {
+          check.h2Recommendations!.forEach((h, i) => {
+            h.suggestion = suggestions[i] ?? "";
+          });
+        }).catch(() => {}),
+      );
+      continue;
+    }
+
+    // Auto-generate text recommendations for copyable checks
+    if (check.copyable) {
+      const context = getCheckContext(check, analysis);
+      promises.push(
+        generateRecommendation(apiKey, check.id, keyword, context, advancedOptions)
+          .then((rec) => { check.recommendation = rec; })
+          .catch(() => {}),
+      );
+    }
+  }
+
+  await Promise.all(promises);
+}
+
+function getCheckContext(check: SEOCheck, analysis: SEOAnalysis): string {
+  switch (check.id) {
+    case "title-keyword": return analysis.pageData.title;
+    case "meta-description-keyword": return analysis.pageData.metaDescription;
+    case "keyword-url": return analysis.pageData.url;
+    case "h1-keyword": return analysis.pageData.h1[0] ?? "";
+    case "keyword-intro": return analysis.pageData.paragraphs[0] ?? "";
+    default: return check.details ?? "";
+  }
+}
 
 export default function App() {
   const { view, setView, setAnalysis, setError, settings, setSettings, loadApiKey } =
@@ -230,6 +286,26 @@ export default function App() {
         pageType: settings.pageType,
       });
       const analysis = calculateAnalysis(checks, pageData, settings.keyword);
+
+      // Auto-generate AI recommendations for failing checks when API key is present
+      const { apiKey } = useStore.getState();
+      if (apiKey) {
+        const advancedOptions = settings.advancedMode
+          ? {
+              pageType: settings.pageType,
+              secondaryKeywords: settings.secondaryKeywords,
+              languageCode: settings.language,
+            }
+          : undefined;
+
+        await generateAIRecommendations(
+          analysis,
+          apiKey,
+          settings.keyword,
+          advancedOptions,
+        );
+      }
+
       setAnalysis(analysis);
 
       // Save keyword and settings for this URL
