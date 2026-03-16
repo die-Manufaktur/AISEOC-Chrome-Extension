@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import confetti from "canvas-confetti";
 import { ScoreGauge } from "@/components/ui/ScoreGauge";
 import { SummaryCard } from "@/components/SummaryCard";
@@ -41,7 +41,7 @@ export function ScorePage() {
   const confettiFired = useRef(false);
 
   useEffect(() => {
-    if (analysis && analysis.overallScore >= 70 && !confettiFired.current) {
+    if (analysis && analysis.overallScore === 100 && !confettiFired.current) {
       confettiFired.current = true;
       confetti({
         particleCount: 100,
@@ -58,57 +58,68 @@ export function ScorePage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-bg-900 p-4">
-      {/* Score Frame Container */}
-      <div className="score-frame w-full p-6 flex flex-col gap-6">
-        {/* Back Button */}
-        <button
-          onClick={reset}
-          className="flex items-center gap-2 text-body-16 text-text-secondary hover:text-white transition-colors mb-4"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          New Analysis
-        </button>
+    <div className="flex min-h-screen flex-col bg-bg-900 p-3">
+      {/* Back Button — directly on bg-900 */}
+      <button
+        onClick={reset}
+        className="flex items-center gap-2 text-body-16 text-text-secondary hover:text-white transition-colors mb-3"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        New Analysis
+      </button>
 
-        {/* Score Circle Area */}
-        <div className="score-circle-card flex flex-col items-center gap-6">
-          <ScoreGauge score={analysis.overallScore} />
-          <div className="text-center">
-            <h2 className="text-h2 text-text-primary">{analysis.scoreLabel}</h2>
-            {/* Description: 18px, line-height 130%, text-secondary */}
-            <p
-              className="mt-1 text-text-secondary"
-              style={{ fontSize: "18px", lineHeight: "130%" }}
-            >
-              {analysis.scoreDescription}
-            </p>
+      {/* JS-rendered / fetch warning banner */}
+      {analysis.pageData.fetchWarnings &&
+        analysis.pageData.fetchWarnings.length > 0 && (
+          <div className="flex items-start gap-3 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-3 mb-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-yellow-400" />
+            <div className="text-sm text-yellow-200">
+              {analysis.pageData.fetchWarnings.map((w, i) => (
+                <p key={i}>{w}</p>
+              ))}
+            </div>
           </div>
+        )}
 
-          {/* Passed/To-Improve Summary Bar - pill container, white text */}
-          <div className="summary-pill">
-            <span className="flex items-center gap-2 text-white">
-              <TriangleUpIcon className="text-green" />
-              <span style={{ fontSize: "16px" }}>{analysis.totalPassed} passed</span>
-            </span>
-            <span className="flex items-center gap-2 text-white">
-              <TriangleDownIcon className="text-red" />
-              <span style={{ fontSize: "16px" }}>{analysis.totalFailed} to improve</span>
-            </span>
-          </div>
+      {/* Score Circle Card */}
+      <div className="score-circle-card flex flex-col items-center gap-6 mb-3">
+        <ScoreGauge score={analysis.overallScore} />
+        <div className="text-center">
+          <h2 className="text-h2 text-text-primary">{analysis.scoreLabel}</h2>
+          <p
+            className="mt-1 text-text-secondary"
+            style={{ fontSize: "18px", lineHeight: "130%" }}
+          >
+            {analysis.scoreDescription}
+          </p>
         </div>
 
-        {/* Summary Cards - No section header per Figma spec */}
-        <div className="flex flex-col gap-3">
-          {analysis.categories.map((cat) => (
-            <SummaryCard
-              key={cat.category}
-              category={cat}
-              onClick={() => handleCategoryClick(cat.category)}
-            />
-          ))}
+        {/* Passed/To-Improve Summary Bar */}
+        <div className="summary-pill">
+          <span className="flex items-center gap-2 text-white">
+            <TriangleUpIcon className="text-green" />
+            <span style={{ fontSize: "16px" }}>{analysis.totalPassed} passed</span>
+          </span>
+          <span className="flex items-center gap-2 text-white">
+            <TriangleDownIcon className="text-red" />
+            <span style={{ fontSize: "16px" }}>{analysis.totalFailed} to improve</span>
+          </span>
         </div>
+      </div>
 
-        {/* Footer inside the score frame */}
+      {/* Summary Cards */}
+      <div className="flex flex-col gap-3">
+        {analysis.categories.map((cat) => (
+          <SummaryCard
+            key={cat.category}
+            category={cat}
+            onClick={() => handleCategoryClick(cat.category)}
+          />
+        ))}
+      </div>
+
+      {/* Footer — pinned to bottom */}
+      <div className="mt-auto w-full pt-3">
         <Footer />
       </div>
     </div>

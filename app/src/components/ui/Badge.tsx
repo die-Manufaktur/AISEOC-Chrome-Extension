@@ -20,18 +20,12 @@ export function Badge({ status, priority, className }: BadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-0.5 text-body-12 font-medium",
-        status === "pass" && "bg-green/20 text-green",
-        status === "fail" &&
-          priority === "high" &&
-          "bg-red/20 text-red",
-        status === "fail" &&
-          priority === "medium" &&
-          "bg-yellow/20 text-yellow",
-        status === "fail" &&
-          priority === "low" &&
-          "bg-yellow/20 text-yellow",
-        status === "warning" && "bg-yellow/20 text-yellow",
+        "inline-flex items-center rounded-[27px] border border-white/40 px-2 py-1 text-[12px] leading-[1.3] text-black whitespace-nowrap",
+        status === "pass" && "bg-green",
+        status === "fail" && priority === "high" && "bg-[#ff8484]",
+        status === "fail" && priority === "medium" && "bg-[#ffea9e]",
+        status === "fail" && priority === "low" && "bg-[#ffea9e]",
+        status === "warning" && "bg-[#ffea9e]",
         className,
       )}
     >

@@ -17,15 +17,30 @@ import {
 import { getSchemaRecommendations } from "@/lib/schema-recommendations";
 import type { SEOCheck } from "@/types/seo";
 
+// Triangle icons for summary pill
+function TriangleUpIcon({ className }: { className?: string }) {
+  return (
+    <svg width="14" height="12" viewBox="0 0 14 12" fill="none" className={className}>
+      <path d="M7 0L13.9282 12H0.0717969L7 0Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function TriangleDownIcon({ className }: { className?: string }) {
+  return (
+    <svg width="14" height="12" viewBox="0 0 14 12" fill="none" className={className}>
+      <path d="M7 12L0.0717969 0H13.9282L7 12Z" fill="currentColor" />
+    </svg>
+  );
+}
+
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
 function sortByPriority(checks: SEOCheck[]): SEOCheck[] {
   return [...checks].sort((a, b) => {
-    // Failed checks first, passed checks last
     const aPass = a.status === "pass" ? 1 : 0;
     const bPass = b.status === "pass" ? 1 : 0;
     if (aPass !== bPass) return aPass - bPass;
-    // Within same pass/fail group, sort by priority: high → medium → low
     return (priorityOrder[a.priority] ?? 3) - (priorityOrder[b.priority] ?? 3);
   });
 }
@@ -58,7 +73,6 @@ export function SubscoresPage() {
   const renderCheckRecommendation = (check: SEOCheck) => {
     if (check.status === "pass" || !apiKey) return null;
 
-    // H2 keyword check — show H2 selection list
     if (check.id === "h2-keyword" && check.h2Recommendations) {
       return (
         <div className="mt-3">
@@ -81,7 +95,6 @@ export function SubscoresPage() {
       );
     }
 
-    // Image alt check — show image list
     if (check.id === "images-alt" && check.imageData && check.imageData.length > 0) {
       return (
         <div className="mt-3">
@@ -94,7 +107,6 @@ export function SubscoresPage() {
       );
     }
 
-    // Schema markup check — show schema recommendations
     if (check.id === "schema-markup") {
       const schemas = getSchemaRecommendations(settings.pageType);
       if (schemas.length > 0) {
@@ -106,7 +118,6 @@ export function SubscoresPage() {
       }
     }
 
-    // Copyable checks get editable recommendation
     if (check.copyable) {
       const context =
         check.id === "title-keyword"
@@ -152,31 +163,38 @@ export function SubscoresPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="flex-1 p-6">
-        <button
-          onClick={() => setActiveCategory(null)}
-          className="mb-4 flex items-center gap-2 text-body-16 text-text-secondary hover:text-white transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Overview
-        </button>
-
-        <h2 className="text-h2 text-text-primary">{category.label}</h2>
-        <div className="mt-2 flex items-center gap-4">
-          <span className="flex items-center gap-1.5 text-body-12 text-green">
-            <span className="inline-block w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-b-[6px] border-b-current" />
-            {category.passed} passed
-          </span>
-          {failed > 0 && (
-            <span className="flex items-center gap-1.5 text-body-12 text-red">
-              <span className="inline-block w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-current" />
-              {failed} to improve
-            </span>
-          )}
+    <div className="flex min-h-screen flex-col bg-bg-900 p-3">
+      {/* Main card */}
+      <div className="flex flex-col gap-10 rounded-[20px] border-2 border-[#5b5959] bg-bg-700 px-5 py-8">
+        {/* Header: back arrow + centered title */}
+        <div className="relative flex items-center justify-center">
+          <button
+            onClick={() => setActiveCategory(null)}
+            className="absolute left-0 text-text-secondary hover:text-white transition-colors"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </button>
+          <h1 className="text-center text-[28px] font-medium leading-[1.1] text-text-primary">
+            {category.label}
+          </h1>
         </div>
 
-        <div className="mt-4 flex flex-col gap-3">
+        {/* Summary pill */}
+        <div className="flex justify-center">
+          <div className="summary-pill">
+            <span className="flex items-center gap-1.5 text-white">
+              <TriangleUpIcon className="text-green" />
+              <span className="text-[18px] leading-[1.3]">{category.passed} passed</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-white">
+              <TriangleDownIcon className="text-red" />
+              <span className="text-[18px] leading-[1.3]">{failed} to improve</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Check items — flat list with dividers */}
+        <div className="flex flex-col">
           {sortedChecks.map((check) => (
             <CheckItem key={check.id} check={check}>
               {renderCheckRecommendation(check)}
@@ -185,7 +203,11 @@ export function SubscoresPage() {
         </div>
       </div>
 
-      <Footer />
+      {/* Footer */}
+      <div className="mt-auto w-full pt-3">
+        <Footer />
+      </div>
+
       <Toast
         message={toast.message}
         visible={toast.visible}

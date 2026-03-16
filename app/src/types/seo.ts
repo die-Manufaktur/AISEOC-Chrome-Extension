@@ -22,6 +22,7 @@ export interface PageSEOData {
   schemaMarkup: { types: string[]; count: number };
   ogImage: string;
   imageFileSizes: { src: string; sizeBytes: number | null }[];
+  fetchWarnings?: string[];
 }
 
 export interface ImageData {

@@ -1,8 +1,23 @@
-import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "./ui/Badge";
 import type { SEOCheck } from "@/types/seo";
+
+// Triangle icons matching the score page
+function TriangleUpIcon({ className }: { className?: string }) {
+  return (
+    <svg width="14" height="12" viewBox="0 0 14 12" fill="none" className={className}>
+      <path d="M7 0L13.9282 12H0.0717969L7 0Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function TriangleDownIcon({ className }: { className?: string }) {
+  return (
+    <svg width="14" height="12" viewBox="0 0 14 12" fill="none" className={className}>
+      <path d="M7 12L0.0717969 0H13.9282L7 12Z" fill="currentColor" />
+    </svg>
+  );
+}
 
 interface CheckItemProps {
   check: SEOCheck;
@@ -11,45 +26,48 @@ interface CheckItemProps {
 }
 
 export function CheckItem({ check, className, children }: CheckItemProps) {
-  const [expanded, setExpanded] = useState(false);
-
   return (
-    <div className={cn("rounded-card bg-bg-700 overflow-hidden", className)}>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between p-4 text-left"
-      >
-        <div className="flex items-center gap-3">
-          <Badge status={check.status} priority={check.priority} />
-          <span className="text-body-16 text-text-primary">{check.title}</span>
-        </div>
-        {expanded ? (
-          <ChevronUp className="h-4 w-4 text-text-secondary" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-text-secondary" />
-        )}
-      </button>
-      {expanded && (
-        <div className="border-t border-bg-500 px-4 pb-4 pt-3">
-          <p className="text-body-12 text-text-secondary">{check.description}</p>
-          {check.details && (
-            <p className="mt-2 text-body-12 text-text-secondary italic">
-              {check.details}
-            </p>
-          )}
-          {check.learnMoreUrl && (
-            <a
-              href={check.learnMoreUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1 text-body-12 text-accent-blue hover:underline"
-            >
-              Learn More <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
-          {children}
-        </div>
+    <div
+      className={cn(
+        "flex flex-col gap-3 border-b border-bg-500 py-6",
+        className,
       )}
+    >
+      {/* Header row: icon + title + badge */}
+      <div className="flex items-center gap-3">
+        {check.status === "pass" ? (
+          <TriangleUpIcon className="h-[14px] w-[14px] flex-shrink-0 text-green" />
+        ) : (
+          <TriangleDownIcon className="h-[14px] w-[14px] flex-shrink-0 text-red" />
+        )}
+        <span className="text-[20px] font-semibold leading-[1.2] text-text-primary">
+          {check.title}
+        </span>
+        <Badge status={check.status} priority={check.priority} />
+      </div>
+
+      {/* Details text + Learn More */}
+      {check.details && (
+        <p className="text-[18px] leading-[1.3] text-text-secondary">
+          {check.details}
+          {check.learnMoreUrl && (
+            <>
+              {"  "}
+              <a
+                href={check.learnMoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-text-primary hover:underline"
+              >
+                Learn More &#8599;
+              </a>
+            </>
+          )}
+        </p>
+      )}
+
+      {/* Recommendation content (AI suggestions, schema, etc.) */}
+      {children}
     </div>
   );
 }

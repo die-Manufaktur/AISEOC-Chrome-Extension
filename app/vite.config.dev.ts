@@ -15,8 +15,8 @@ function fetchPageProxy(): Plugin {
           "url",
         );
         if (!url) {
-          res.writeHead(400, { "Content-Type": "text/plain" });
-          res.end("Missing ?url= parameter");
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "Missing ?url= parameter" }));
           return;
         }
         // Normalize URL — prepend https:// if no protocol
@@ -25,23 +25,72 @@ function fetchPageProxy(): Plugin {
           targetUrl = `https://${targetUrl}`;
         }
         try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 15000);
           const response = await fetch(targetUrl, {
             headers: {
               "User-Agent":
-                "Mozilla/5.0 (compatible; SEOCopilot/1.0; +https://example.com)",
-              Accept: "text/html",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+              Accept:
+                "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+              "Accept-Language": "en-US,en;q=0.9",
             },
             redirect: "follow",
+            signal: controller.signal,
           });
+          clearTimeout(timeout);
+
+          if (!response.ok) {
+            console.warn(
+              `[fetch-page-proxy] Upstream returned ${response.status} for ${targetUrl}`,
+            );
+            res.writeHead(200, {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            });
+            res.end(
+              JSON.stringify({
+                error: `Target page returned HTTP ${response.status} (${response.statusText})`,
+                status: response.status,
+              }),
+            );
+            return;
+          }
+
+          const contentType = response.headers.get("content-type") ?? "";
+          if (
+            !contentType.includes("text/html") &&
+            !contentType.includes("application/xhtml")
+          ) {
+            res.writeHead(200, {
+              "Content-Type": "application/json",
+              "Access-Control-Allow-Origin": "*",
+            });
+            res.end(
+              JSON.stringify({
+                error: `Target URL returned non-HTML content (${contentType})`,
+              }),
+            );
+            return;
+          }
+
           const html = await response.text();
           res.writeHead(200, {
             "Content-Type": "text/html; charset=utf-8",
             "Access-Control-Allow-Origin": "*",
           });
           res.end(html);
-        } catch (err) {
-          res.writeHead(502, { "Content-Type": "text/plain" });
-          res.end(`Failed to fetch: ${err}`);
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error && err.name === "AbortError"
+              ? "Request timed out after 15 seconds"
+              : `Failed to fetch: ${err}`;
+          console.error(`[fetch-page-proxy] ${message} — ${targetUrl}`);
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          });
+          res.end(JSON.stringify({ error: message }));
         }
       });
     },
@@ -120,7 +169,5 @@ export default defineConfig({
     },
   },
   root: ".",
-  server: {
-    open: "/dev.html",
-  },
+  server: {},
 });

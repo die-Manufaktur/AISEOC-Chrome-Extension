@@ -10,7 +10,7 @@ interface ToggleProps {
 export function Toggle({ checked, onChange, label, id }: ToggleProps) {
   const toggleId = id || label?.toLowerCase().replace(/\s+/g, "-");
   return (
-    <label htmlFor={toggleId} className="flex items-center gap-3 cursor-pointer">
+    <label htmlFor={toggleId} className="inline-flex items-center gap-3 cursor-pointer">
       <div className="relative">
         <input
           id={toggleId}
@@ -21,8 +21,8 @@ export function Toggle({ checked, onChange, label, id }: ToggleProps) {
         />
         <div
           className={cn(
-            "h-6 w-11 rounded-full transition-colors",
-            checked ? "bg-green" : "bg-bg-500",
+            "h-6 w-11 rounded-[27px] border border-white/40 transition-colors shadow-[0px_2px_6.6px_0px_rgba(72,201,175,0.3)]",
+            checked ? "bg-green" : "bg-bg-300",
           )}
         />
         <div
@@ -32,7 +32,7 @@ export function Toggle({ checked, onChange, label, id }: ToggleProps) {
           )}
         />
       </div>
-      {label && <span className="text-body-16 text-text-primary">{label}</span>}
+      {label && <span className="text-[16px] text-text-primary">{label}</span>}
     </label>
   );
 }

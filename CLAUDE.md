@@ -18,7 +18,7 @@ The framework is designed for:
 project-root/
 ├── .claude/              # Claude Code configuration
 │   ├── agents/           # 44 specialized agents
-│   ├── skills/           # 6 React-specific skills
+│   ├── skills/           # 9 React-specific skills
 │   ├── commands/         # Custom slash commands
 │   └── hooks/            # Git and tool hooks
 ├── scripts/              # Development automation scripts
@@ -46,6 +46,9 @@ project-root/
 
 # Accessibility linting
 ./scripts/check-accessibility.sh
+
+# Verify design token usage (no hardcoded values)
+./scripts/verify-tokens.sh
 
 # Initialize a new React project
 ./scripts/setup-project.sh my-app --next  # or --vite
@@ -141,11 +144,14 @@ Agents are invoked automatically based on task context.
 
 ---
 
-### React Skills (6 Total)
+### React Skills (9 Total)
 
 | Skill | Purpose | Triggers |
 |-------|---------|----------|
-| figma-to-react-workflow | Figma-to-React conversion pipeline | "convert Figma", "Figma to React" |
+| figma-to-react-workflow | Figma-to-React conversion pipeline (v2 with lockfile + TDD) | "convert Figma", "Figma to React" |
+| figma-intake | Structured interview → build-spec.json | Phase 1 of /build-from-figma |
+| design-token-lock | Extract + lock Figma values → lockfile | Phase 2 of /build-from-figma |
+| tdd-from-figma | Write tests FIRST from Figma + lockfile | Phase 3 of /build-from-figma |
 | react-component-development | Component patterns and best practices | "create component", "custom hook" |
 | react-testing-workflows | Vitest, RTL, Playwright, Storybook | "write tests", "test coverage" |
 | react-performance-optimization | Profiling, bundle analysis, Web Vitals | "performance", "bundle size" |
@@ -158,28 +164,33 @@ Agents are invoked automatically based on task context.
 
 ### Figma-to-React Pipeline
 
-Convert Figma designs to React components automatically:
+**Single command:** `/build-from-figma <Figma URL>`
+
+Autonomous 7-phase pipeline that converts a Figma design into a working, tested React app:
 
 ```
-User: "Convert this Figma design to React"
-      [Provide Figma URL]
+/build-from-figma https://figma.com/file/abc123
 
-Claude: [Autonomous workflow]
-        → Extract design tokens from Figma
-        → Generate Tailwind config
-        → Create TypeScript React components
-        → Framework-specific output (Next.js, Vite, Remix)
-
-Result: Production-ready components with Tailwind CSS
+  [1] INTAKE      → figma-intake skill → build-spec.json
+  [2] TOKEN LOCK  → design-token-lock skill → design-tokens.lock.json
+  [3] TDD         → tdd-from-figma skill → failing tests (Red)
+  [4] BUILD       → figma-to-react-workflow → components pass tests (Green)
+  [5] VISUAL QA   → Chrome DevTools + Figma screenshots → max 3 fix iterations
+  [6] QUALITY     → vitest + tsc + build + verify-tokens + Lighthouse
+  [7] REPORT      → .claude/visual-qa/build-report.md
 ```
+
+**Key artifacts:**
+- `design-tokens.lock.json` — Single source of truth for all design values
+- `build-spec.json` — Machine-readable build plan (no re-asking questions)
+- `verify-tokens.sh` — Catches hardcoded values and token drift
 
 **Features:**
-- Design token extraction (colors, typography, spacing, shadows)
-- Tailwind CSS config generation from Figma tokens
-- TypeScript React components with proper interfaces
-- Framework detection (Next.js, Vite, Remix)
-- Responsive implementation with Tailwind breakpoints
-- Accessibility attributes included
+- Design token extraction with lockfile enforcement
+- TDD: tests written before components, using exact Figma values
+- Automated visual comparison loop (3 iterations max)
+- Quality gate: 80%+ coverage, TypeScript, Lighthouse audit
+- Resumable: TodoWrite tracks progress across interrupted sessions
 
 **Documentation:** `docs/figma-to-react/README.md`
 
@@ -286,6 +297,11 @@ Claude: [Uses test-writer-fixer agent]
 
 ### Quick Command Reference
 
+**Figma Pipeline:**
+```bash
+/build-from-figma <URL>       # Full autonomous pipeline
+```
+
 **Git Workflows (via commit-commands):**
 ```bash
 /commit                       # Structured commit
@@ -307,9 +323,10 @@ gh issue create               # Create issue
 ./scripts/check-types.sh            # TypeScript check
 ./scripts/check-bundle-size.sh      # Bundle analysis
 ./scripts/check-accessibility.sh    # a11y linting
+./scripts/verify-tokens.sh          # Design token enforcement
 ```
 
 ---
 
-**Last Updated:** 2026-03-11
-**Architecture:** 44 agents, 6 skills, 4 plugins + gh CLI, Figma + Playwright MCP
+**Last Updated:** 2026-03-16
+**Architecture:** 44 agents, 9 skills, 4 plugins + gh CLI, Figma + Playwright MCP

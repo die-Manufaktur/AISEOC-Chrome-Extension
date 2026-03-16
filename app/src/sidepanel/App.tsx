@@ -101,62 +101,164 @@ function getCheckContext(check: SEOCheck, analysis: SEOAnalysis): string {
   }
 }
 
+/** Extract SEO data from the active tab.
+ *  Tries the content script first; if unavailable, fetches the page HTML
+ *  directly and parses it (works even when content script isn't injected). */
+async function extractPageData(tabId: number): Promise<PageSEOData> {
+  // Try content script message first (fastest, reads live DOM)
+  const response = await new Promise<{ data?: PageSEOData; error?: string }>((resolve) => {
+    const timer = setTimeout(() => resolve({ error: "timeout" }), 3000);
+    chrome.tabs.sendMessage(tabId, { type: "EXTRACT_SEO_DATA" }, (resp) => {
+      clearTimeout(timer);
+      if (chrome.runtime.lastError) {
+        resolve({ error: chrome.runtime.lastError.message });
+      } else {
+        resolve(resp ?? { error: "No response" });
+      }
+    });
+  });
+
+  if (response.data) return response.data;
+
+  // Fallback: ask the service worker to extract the data. It will try the
+  // content script first, then fall back to executeScript (which works
+  // reliably from the service worker context, unlike from the side panel).
+  console.warn("[AI SEO Copilot] Content script not available, using service worker extraction");
+  const swResponse = await new Promise<{ data?: PageSEOData; error?: string }>((resolve) => {
+    const timer = setTimeout(() => resolve({ error: "Page extraction timed out. Please refresh the page and try again." }), 15000);
+    chrome.runtime.sendMessage(
+      { type: "EXTRACT_PAGE_DATA", tabId },
+      (resp) => {
+        clearTimeout(timer);
+        if (chrome.runtime.lastError) {
+          resolve({ error: chrome.runtime.lastError.message });
+        } else if (resp?.error) {
+          resolve({ error: resp.error });
+        } else if (resp?.data) {
+          resolve({ data: resp.data as PageSEOData });
+        } else {
+          resolve({ error: "No data returned" });
+        }
+      },
+    );
+  });
+
+  if (swResponse.data) return swResponse.data;
+
+  throw new Error(swResponse.error ?? "Failed to extract page data");
+}
+
 export default function App() {
-  const { view, setView, setAnalysis, setError, settings, setSettings, loadApiKey, hideToast, toast } =
+  const { view, setView, setAnalysis, setError, settings, setSettings, loadApiKey, hideToast, toast, reset } =
     useStore();
 
   useEffect(() => {
     loadApiKey();
   }, [loadApiKey]);
 
-  // Auto-detect URL and load saved keyword/settings
+  // Register this tab with the service worker for per-tab panel scoping
+  useEffect(() => {
+    if (isDevMode) return;
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id) {
+        chrome.runtime.sendMessage({ type: "PANEL_OPENED", tabId: tabs[0].id });
+      }
+    });
+  }, []);
+
+  // Load saved keyword/settings for a given URL
+  const loadSettingsForUrl = useCallback(
+    async (url: string) => {
+      try {
+        const savedKeyword = await getKeywordForUrl(url);
+        const host = new URL(url).hostname;
+        const savedOptions = await getAdvancedOptions(host);
+        if (savedKeyword) setSettings({ keyword: savedKeyword });
+        if (savedOptions) {
+          setSettings({
+            pageType: savedOptions.pageType,
+            secondaryKeywords: savedOptions.secondaryKeywords,
+            language: savedOptions.language,
+            advancedMode: true,
+          });
+        }
+      } catch {
+        // Invalid URL
+      }
+    },
+    [setSettings],
+  );
+
+  // Auto-detect URL and load saved keyword/settings on mount
   useEffect(() => {
     async function loadSavedSettings() {
       if (!isDevMode) {
         try {
           const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
           if (tab?.url) {
-            const host = new URL(tab.url).hostname;
-            const savedKeyword = await getKeywordForUrl(tab.url);
-            const savedOptions = await getAdvancedOptions(host);
-            if (savedKeyword) setSettings({ keyword: savedKeyword });
-            if (savedOptions) {
-              setSettings({
-                pageType: savedOptions.pageType,
-                secondaryKeywords: savedOptions.secondaryKeywords,
-                language: savedOptions.language,
-                advancedMode: true,
-              });
-            }
+            await loadSettingsForUrl(tab.url);
           }
         } catch {
           // Not in extension context
         }
       } else {
-        // Dev mode: load saved keyword if URL is already set
         const { settings } = useStore.getState();
         if (settings.targetUrl.trim()) {
-          try {
-            const savedKeyword = await getKeywordForUrl(settings.targetUrl);
-            if (savedKeyword) setSettings({ keyword: savedKeyword });
-            const host = new URL(settings.targetUrl).hostname;
-            const savedOptions = await getAdvancedOptions(host);
-            if (savedOptions) {
-              setSettings({
-                pageType: savedOptions.pageType,
-                secondaryKeywords: savedOptions.secondaryKeywords,
-                language: savedOptions.language,
-                advancedMode: true,
-              });
-            }
-          } catch {
-            // Invalid URL
-          }
+          await loadSettingsForUrl(settings.targetUrl);
         }
       }
     }
     loadSavedSettings();
-  }, [setSettings]);
+  }, [setSettings, loadSettingsForUrl]);
+
+  // Listen for same-tab navigation — reset to setup page when URL changes
+  useEffect(() => {
+    if (isDevMode) return;
+
+    let currentUrl = "";
+
+    // Get the initial URL
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.url) currentUrl = tabs[0].url;
+    });
+
+    // When the active tab navigates to a new URL
+    const handleTabUpdated = (
+      tabId: number,
+      changeInfo: chrome.tabs.TabChangeInfo,
+    ) => {
+      // Only care about completed navigations with a URL change
+      if (changeInfo.status !== "complete") return;
+
+      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        if (tabs[0]?.id === tabId && tabs[0].url && tabs[0].url !== currentUrl) {
+          currentUrl = tabs[0].url;
+          reset();
+          await loadSettingsForUrl(currentUrl);
+        }
+      });
+    };
+
+    // When the user switches to a different tab
+    const handleTabActivated = (activeInfo: chrome.tabs.TabActiveInfo) => {
+      chrome.tabs.get(activeInfo.tabId, async (tab) => {
+        if (chrome.runtime.lastError) return;
+        if (tab.url && tab.url !== currentUrl) {
+          currentUrl = tab.url;
+          reset();
+          await loadSettingsForUrl(currentUrl);
+        }
+      });
+    };
+
+    chrome.tabs.onUpdated.addListener(handleTabUpdated);
+    chrome.tabs.onActivated.addListener(handleTabActivated);
+
+    return () => {
+      chrome.tabs.onUpdated.removeListener(handleTabUpdated);
+      chrome.tabs.onActivated.removeListener(handleTabActivated);
+    };
+  }, [reset, loadSettingsForUrl]);
 
   const handleAnalyze = useCallback(async () => {
     setView("loading");
@@ -172,123 +274,7 @@ export default function App() {
         });
         if (!tab?.id) throw new Error("No active tab found");
 
-        const results = await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          func: () => {
-            const getMetaContent = (name: string): string => {
-              const el =
-                document.querySelector<HTMLMetaElement>(
-                  `meta[name="${name}"]`,
-                ) ||
-                document.querySelector<HTMLMetaElement>(
-                  `meta[property="${name}"]`,
-                );
-              return el?.content ?? "";
-            };
-
-            const getHeadings = (tag: string): string[] =>
-              Array.from(document.querySelectorAll(tag)).map(
-                (el) => el.textContent?.trim() ?? "",
-              );
-
-            const images = Array.from(
-              document.querySelectorAll<HTMLImageElement>("img"),
-            ).map((img) => ({
-              src: img.src,
-              alt: img.alt ?? "",
-              width: img.naturalWidth || null,
-              height: img.naturalHeight || null,
-            }));
-
-            const links = Array.from(
-              document.querySelectorAll<HTMLAnchorElement>("a[href]"),
-            );
-            const currentHost = window.location.hostname;
-            let internalLinks = 0;
-            let externalLinks = 0;
-            for (const link of links) {
-              try {
-                const url = new URL(link.href);
-                if (url.hostname === currentHost) internalLinks++;
-                else externalLinks++;
-              } catch {
-                internalLinks++;
-              }
-            }
-
-            const bodyText = document.body?.innerText ?? "";
-            const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
-
-            const ogTags: Record<string, string> = {};
-            document
-              .querySelectorAll<HTMLMetaElement>('meta[property^="og:"]')
-              .forEach((el) => {
-                ogTags[el.getAttribute("property")!] = el.content;
-              });
-
-            const twitterTags: Record<string, string> = {};
-            document
-              .querySelectorAll<HTMLMetaElement>('meta[name^="twitter:"]')
-              .forEach((el) => {
-                twitterTags[el.getAttribute("name")!] = el.content;
-              });
-
-            const paragraphs = Array.from(document.querySelectorAll("p"))
-              .map((el) => el.textContent?.trim() ?? "")
-              .filter(Boolean);
-
-            const jsResources = Array.from(
-              document.querySelectorAll<HTMLScriptElement>("script[src]"),
-            ).map((el) => el.src).filter(Boolean);
-            const cssResources = Array.from(
-              document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
-            ).map((el) => el.href).filter(Boolean);
-
-            const schemaScripts = Array.from(
-              document.querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]'),
-            );
-            const schemaTypes: string[] = [];
-            for (const script of schemaScripts) {
-              try {
-                const data = JSON.parse(script.textContent ?? "");
-                if (data["@type"]) schemaTypes.push(data["@type"]);
-              } catch {
-                // skip
-              }
-            }
-
-            return {
-              url: window.location.href,
-              title: document.title ?? "",
-              metaDescription: getMetaContent("description"),
-              metaKeywords: getMetaContent("keywords"),
-              canonical:
-                document.querySelector<HTMLLinkElement>(
-                  'link[rel="canonical"]',
-                )?.href ?? "",
-              h1: getHeadings("h1"),
-              h2: getHeadings("h2"),
-              h3: getHeadings("h3"),
-              h4: getHeadings("h4"),
-              h5: getHeadings("h5"),
-              h6: getHeadings("h6"),
-              images,
-              ogTags,
-              twitterTags,
-              wordCount,
-              internalLinks,
-              externalLinks,
-              lang: document.documentElement.lang ?? "",
-              paragraphs,
-              resources: { js: jsResources, css: cssResources },
-              schemaMarkup: { types: schemaTypes, count: schemaScripts.length },
-              ogImage: getMetaContent("og:image"),
-              imageFileSizes: [],
-            };
-          },
-        });
-
-        pageData = results[0].result as PageSEOData;
+        pageData = await extractPageData(tab.id);
       } else {
         if (!settings.targetUrl.trim()) {
           throw new Error("Please enter a URL to analyze");
@@ -367,6 +353,7 @@ export default function App() {
 
       setView("score");
     } catch (error) {
+      console.error("[AI SEO Copilot] Analysis failed:", error);
       setError(
         error instanceof Error ? error.message : "Analysis failed",
       );

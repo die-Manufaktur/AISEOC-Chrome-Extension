@@ -1,4 +1,5 @@
 import type { PageSEOData, SEOCheck, CheckCategory } from "@/types/seo";
+import { getLearnMoreUrl } from "@/lib/docs-links";
 
 interface AnalyzerOptions {
   keyword: string;
@@ -111,11 +112,17 @@ export function runSEOChecks(
     id: "keyword-url",
     title: "URL contains target keyword",
     description: `The URL slug should contain your keyword "${keyword}".`,
-    status: containsAnyKeyword(data.url, keyword, secondaryKws) ? "pass" : "fail",
+    status:
+      pageType === "homepage"
+        ? "pass"
+        : containsAnyKeyword(data.url, keyword, secondaryKws) ? "pass" : "fail",
     priority: "medium",
     category: "meta",
-    details: `URL: ${data.url}`,
-    copyable: true,
+    details:
+      pageType === "homepage"
+        ? "Homepage URLs don't need the keyword in the URL."
+        : `URL: ${data.url}`,
+    copyable: pageType !== "homepage",
   });
 
   // --- CONTENT ---
@@ -446,7 +453,10 @@ export function runSEOChecks(
         : `${minifiedCount}/${allResources.length} resources (${minPct.toFixed(0)}%) appear minified.`,
   });
 
-  return checks;
+  return checks.map((check) => ({
+    ...check,
+    learnMoreUrl: getLearnMoreUrl(check.title),
+  }));
 }
 
 export function groupChecksByCategory(

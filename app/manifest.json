@@ -9,7 +9,7 @@
     "48": "icons/icon-48.svg",
     "128": "icons/icon-128.svg"
   },
-  "permissions": ["activeTab", "sidePanel", "storage", "scripting"],
+  "permissions": ["activeTab", "tabs", "sidePanel", "storage", "scripting"],
   "host_permissions": ["<all_urls>"],
   "side_panel": {
     "default_path": "src/sidepanel/index.html"
@@ -24,6 +24,10 @@
       "js": ["src/content/index.ts"]
     }
   ],
+  "options_ui": {
+    "page": "src/options/index.html",
+    "open_in_tab": false
+  },
   "action": {
     "default_title": "Open AI SEO Copilot"
   }

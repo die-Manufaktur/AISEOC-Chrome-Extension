@@ -15,7 +15,16 @@ export default defineConfig({
     rollupOptions: {
       input: {
         sidepanel: resolve(__dirname, "src/sidepanel/index.html"),
+        options: resolve(__dirname, "src/options/index.html"),
       },
     },
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      port: 5173,
+    },
+    cors: true,
   },
 });

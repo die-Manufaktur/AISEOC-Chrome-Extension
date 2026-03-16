@@ -5,9 +5,25 @@ export async function fetchAndAnalyzePage(url: string): Promise<PageSEOData> {
     `/api/fetch-page?url=${encodeURIComponent(url)}`,
   );
   if (!res.ok) throw new Error(`Failed to fetch page: ${res.statusText}`);
-  const html = await res.text();
 
-  const doc = new DOMParser().parseFromString(html, "text/html");
+  const contentType = res.headers.get("content-type") ?? "";
+  const rawText = await res.text();
+
+  // The proxy now returns JSON errors instead of raw error strings
+  if (contentType.includes("application/json")) {
+    let errorData: { error?: string };
+    try {
+      errorData = JSON.parse(rawText);
+    } catch {
+      throw new Error("Unexpected response from proxy");
+    }
+    if (errorData.error) {
+      throw new Error(errorData.error);
+    }
+  }
+
+  const doc = new DOMParser().parseFromString(rawText, "text/html");
+  const warnings: string[] = [];
 
   const getMetaContent = (name: string): string => {
     const el =
@@ -57,6 +73,37 @@ export async function fetchAndAnalyzePage(url: string): Promise<PageSEOData> {
 
   const bodyText = doc.body?.textContent ?? "";
   const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
+
+  // Detect JS-rendered sites: has <head> content but empty/minimal <body>
+  const hasTitle = !!doc.title;
+  const hasMetaTags =
+    doc.querySelectorAll("meta[name], meta[property]").length > 0;
+  const h1s = getHeadings("h1");
+  const hasScripts = doc.querySelectorAll("script[src]").length > 0;
+
+  if (
+    (hasTitle || hasMetaTags) &&
+    h1s.length === 0 &&
+    wordCount < 50 &&
+    hasScripts
+  ) {
+    warnings.push(
+      "This page appears to be JavaScript-rendered. Content analysis may be incomplete because the dev mode proxy can only read the initial HTML — not content injected by JavaScript. For full results, use the Chrome extension on the live page.",
+    );
+    console.warn(
+      `[fetch-page] JS-rendered site detected for ${url}: ` +
+        `title="${doc.title}", meta tags=${hasMetaTags}, h1 count=${h1s.length}, ` +
+        `word count=${wordCount}, script tags=${doc.querySelectorAll("script[src]").length}`,
+    );
+  } else if (h1s.length === 0 && wordCount < 20) {
+    warnings.push(
+      "Very little body content was found in the fetched HTML. The page may use JavaScript rendering, or the server may have returned an incomplete response.",
+    );
+    console.warn(
+      `[fetch-page] Sparse body content for ${url}: ` +
+        `h1 count=${h1s.length}, word count=${wordCount}`,
+    );
+  }
 
   const ogTags: Record<string, string> = {};
   doc
@@ -115,7 +162,7 @@ export async function fetchAndAnalyzePage(url: string): Promise<PageSEOData> {
     metaDescription: getMetaContent("description"),
     metaKeywords: getMetaContent("keywords"),
     canonical,
-    h1: getHeadings("h1"),
+    h1: h1s,
     h2: getHeadings("h2"),
     h3: getHeadings("h3"),
     h4: getHeadings("h4"),
@@ -133,5 +180,6 @@ export async function fetchAndAnalyzePage(url: string): Promise<PageSEOData> {
     schemaMarkup: { types: schemaTypes, count: schemaScripts.length },
     ogImage,
     imageFileSizes: [],
+    fetchWarnings: warnings.length > 0 ? warnings : undefined,
   };
 }

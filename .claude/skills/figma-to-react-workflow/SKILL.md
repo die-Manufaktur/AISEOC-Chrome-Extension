@@ -39,6 +39,22 @@ Use this skill when:
 
 This phase requires user input. Do not proceed autonomously until the user confirms the plan.
 
+### Pipeline Integration Check
+
+**Before asking any questions**, check if upstream artifacts exist:
+
+```
+1. Check: .claude/plans/build-spec.json
+   → If exists: SKIP all discovery questions. Load spec directly.
+   → Log: "Found build-spec.json from figma-intake — skipping discovery"
+
+2. Check: src/styles/design-tokens.lock.json
+   → If exists: SKIP token extraction in Phase 2. Use lockfile values.
+   → Log: "Found design-tokens.lock.json — using locked token values"
+```
+
+If `build-spec.json` exists, jump directly to Phase 2 with the spec's framework, components, and options pre-loaded.
+
 ### Step 1.1: Gather Figma Context
 
 Use the Figma MCP to inspect the design file.
@@ -105,6 +121,32 @@ Present the component inventory and token summary for user approval before proce
 ## Phase 2: Execution (Autonomous)
 
 Once the user approves the discovery plan, proceed autonomously through all steps.
+
+### Token Lockfile Constraint
+
+**If `src/styles/design-tokens.lock.json` exists**, ALL generated code MUST reference lockfile values:
+- Colors: Use Tailwind classes mapped in the lockfile, never approximate hex values
+- Typography: Use exact font families, sizes, and weights from the lockfile
+- Spacing: Use lockfile spacing scale values
+- Text content: Use exact strings from `lockfile.textContent`
+
+**Never approximate or guess values when a lockfile exists.** If a value isn't in the lockfile, add it to the lockfile first, then reference it.
+
+### Test-First Constraint
+
+**Check for existing test files** before writing component implementations:
+
+```
+For each component to generate:
+  1. Check: src/components/**/{ComponentName}.test.tsx
+  2. If test exists:
+     → Read test file to understand expected behavior
+     → Implementation MUST make all tests pass
+     → Run: pnpm vitest run {test-file} after writing component
+  3. If no test exists:
+     → Generate component normally
+     → Consider invoking tdd-from-figma skill to write tests
+```
 
 ### Step 2.1: Generate Tailwind Configuration
 
@@ -306,6 +348,18 @@ src/lib/
 └── fonts.ts          # Font loading (Next.js: next/font, Vite: @fontsource)
 ```
 
+### Step 2.6: Run Tests (if test files exist)
+
+After generating all components, if test files were written by `tdd-from-figma`:
+
+```bash
+pnpm vitest run --reporter=verbose
+```
+
+**If tests fail:** Fix the component implementation to match test expectations. The tests are authoritative — they encode exact values from the lockfile. Do not modify tests to match implementation.
+
+Iterate until all tests pass (Green phase of TDD).
+
 ## Phase 3: Verification
 
 After generation completes, invoke verification checks.
@@ -323,29 +377,110 @@ pnpm tsc --noEmit
 pnpm lint
 ```
 
-### Step 3.2: Visual QA
+### Step 3.2: Visual QA (Automated Loop)
 
-Invoke the **visual-qa-verification** skill to:
-1. Start the dev server (`pnpm dev`)
-2. Take screenshots at standard breakpoints
-3. Compare against Figma source screenshots
-4. Validate responsive behavior
-5. Run Lighthouse audit
-6. Check accessibility
+Perform automated visual comparison between generated app and Figma source:
+
+```
+For each page in build-spec:
+  1. Start dev server: pnpm dev (background)
+  2. Wait for server ready
+
+  3. FOR iteration IN 1..3:
+     a. Chrome DevTools MCP: take_screenshot at 1440px width
+     b. Chrome DevTools MCP: take_screenshot at 768px width
+     c. Chrome DevTools MCP: take_screenshot at 375px width
+     d. Figma MCP: get_screenshot for the same page/frame
+
+     e. Compare screenshots (Claude vision):
+        - Layout alignment (grid, spacing, positioning)
+        - Color accuracy (reference lockfile values)
+        - Typography (size, weight, family match)
+        - Component completeness (nothing missing)
+        - Responsive behavior across breakpoints
+
+     f. IF differences found AND iteration < 3:
+        → Fix identified issues in component code
+        → Re-run: pnpm vitest run (ensure tests still pass)
+        → Continue to next iteration
+     g. ELSE IF no significant differences:
+        → Mark page as verified
+        → Break loop
+     h. ELSE (iteration 3, still differences):
+        → Log remaining differences in build report
+        → Mark page as "needs manual review"
+        → Continue to next page
+
+  4. Stop dev server
+```
 
 ### Step 3.3: Token Integrity Check
 
-Verify no hardcoded values escaped the token system:
+Run the token verification script:
 
 ```bash
-# Check for hardcoded hex colors in components (should be zero)
-grep -r '#[0-9a-fA-F]\{3,8\}' src/components/ --include="*.tsx" | grep -v "// token:" | grep -v ".css"
+./scripts/verify-tokens.sh
+```
 
-# Check for hardcoded pixel values in Tailwind classes (should use scale)
-grep -rE '\b(w|h|p|m|gap)-\[' src/components/ --include="*.tsx"
+This checks for:
+- Hardcoded hex colors in `.tsx` files
+- Arbitrary pixel values not in the lockfile
+- Inline `style={{}}` attributes
+- Text content diverging from lockfile entries
 
-# Check for inline styles (should be rare)
-grep -r 'style={{' src/components/ --include="*.tsx"
+### Step 3.4: Quality Gate
+
+Run the full quality gate:
+
+```bash
+# Test coverage (80%+ threshold)
+pnpm vitest run --coverage
+
+# TypeScript
+pnpm tsc --noEmit
+
+# Production build
+pnpm build
+
+# Token verification
+./scripts/verify-tokens.sh
+
+# Lighthouse audit (via Chrome DevTools MCP)
+# → lighthouse_audit for each page URL
+# → Performance, accessibility, best practices, SEO scores
+```
+
+### Step 3.5: Generate Build Report
+
+Write a build report to `.claude/visual-qa/build-report.md`:
+
+```markdown
+# Build Report — [Project Name]
+Generated: [timestamp]
+Figma Source: [URL]
+
+## Summary
+- Pages: [N] built, [N] verified
+- Components: [N] generated, [N] reused
+- Test coverage: [X]%
+- Build status: PASS/FAIL
+
+## Visual QA Results
+| Page | Desktop (1440) | Tablet (768) | Mobile (375) | Status |
+|------|---------------|--------------|--------------|--------|
+| Home | ✓ Match | ✓ Match | ⚠ Minor diff | Verified |
+
+## Quality Gate
+| Check | Status | Details |
+|-------|--------|---------|
+| vitest | ✓ | 45/45 tests pass, 87% coverage |
+| tsc | ✓ | No type errors |
+| build | ✓ | Bundle: 142kb gzipped |
+| tokens | ✓ | No violations |
+| Lighthouse | ✓ | Perf: 95, A11y: 100, BP: 100, SEO: 100 |
+
+## Remaining Issues
+- [List any items that need manual review]
 ```
 
 ## Output Summary
@@ -357,7 +492,8 @@ project/
 ├── tailwind.config.ts          # Extended with Figma design tokens
 ├── src/
 │   ├── styles/
-│   │   └── tokens.css          # CSS custom properties from Figma
+│   │   ├── tokens.css          # CSS custom properties from Figma
+│   │   └── design-tokens.lock.json  # Lockfile (if generated)
 │   ├── lib/
 │   │   ├── utils.ts            # Utility functions (cn, etc.)
 │   │   └── fonts.ts            # Font loading configuration
@@ -366,6 +502,11 @@ project/
 │   │   ├── layout/             # Layout components (header, footer)
 │   │   └── sections/           # Page sections
 │   └── app/ or pages/          # Page compositions
+├── .claude/
+│   ├── plans/
+│   │   └── build-spec.json     # Build specification (if generated)
+│   └── visual-qa/
+│       └── build-report.md     # Visual QA and quality report
 └── public/
     └── images/                 # Exported Figma assets
 ```
@@ -378,7 +519,7 @@ project/
 
 **Cause:** Figma uses a different color space, or variables were not resolved correctly.
 
-**Fix:** Re-extract colors using `get_variable_defs`. Ensure Figma color mode is sRGB. Cross-reference with `get_screenshot` for visual accuracy.
+**Fix:** Re-extract colors using `get_variable_defs`. If lockfile exists, verify lockfile values against Figma screenshot. Ensure Figma color mode is sRGB.
 
 ### 2. Typography Scale Is Off
 
@@ -386,7 +527,7 @@ project/
 
 **Cause:** Figma measures in logical pixels; CSS may differ depending on root font size.
 
-**Fix:** Ensure `html { font-size: 16px }` as baseline. Map Figma text styles 1:1 with rem values.
+**Fix:** Ensure `html { font-size: 16px }` as baseline. Map Figma text styles 1:1 with rem values. Cross-reference lockfile typography section.
 
 ### 3. Spacing Inconsistencies
 
@@ -404,17 +545,29 @@ project/
 
 **Fix:** Re-inspect the component in Figma using `get_design_context` to capture all variant properties.
 
+### 5. Tests Fail After Generation
+
+**Symptom:** `pnpm vitest run` fails after component generation.
+
+**Cause:** Component implementation doesn't match lockfile values encoded in tests.
+
+**Fix:** Read the failing test assertions. They contain exact expected values from the lockfile. Fix the component to match — do NOT modify the test.
+
 ## Integration
 
 This skill works with:
-- **figma-react-converter agent** -- Generates React components during Phase 2
-- **visual-qa-agent** -- Performs screenshot comparison in Phase 3
-- **accessibility-auditor agent** -- Validates ARIA and keyboard navigation
-- **Figma MCP** -- Source design extraction (`get_metadata`, `get_variable_defs`, `get_design_context`, `get_screenshot`)
-- **Chrome DevTools MCP** -- Browser-based visual verification
-- **Playwright MCP** -- Cross-browser screenshot comparison
+- **figma-intake skill** — Produces `build-spec.json` consumed by Phase 1
+- **design-token-lock skill** — Produces `design-tokens.lock.json` consumed by Phase 2
+- **tdd-from-figma skill** — Produces test files that Phase 2 must satisfy
+- **figma-react-converter agent** — Generates React components during Phase 2
+- **visual-qa-agent** — Performs screenshot comparison in Phase 3
+- **accessibility-auditor agent** — Validates ARIA and keyboard navigation
+- **Figma MCP** — Source design extraction (`get_metadata`, `get_variable_defs`, `get_design_context`, `get_screenshot`)
+- **Chrome DevTools MCP** — Browser-based visual verification and Lighthouse audits
+- **Playwright MCP** — Cross-browser screenshot comparison
+- **verify-tokens.sh** — Token integrity enforcement in quality gate
 
 ---
 
-**Skill Version:** 1.0.0
-**Last Updated:** 2026-03-11
+**Skill Version:** 2.0.0
+**Last Updated:** 2026-03-16

@@ -60,6 +60,8 @@ export const useStore = create<Store>((set) => ({
   loadApiKey: async () => {
     const key = await getStorageItem<string>("openai_api_key");
     if (key) set({ apiKey: key });
+    const lang = await getStorageItem<string>("default_language");
+    if (lang) set((state) => ({ settings: { ...state.settings, language: lang } }));
   },
   reset: () =>
     set((state) => ({
