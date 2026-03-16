@@ -79,16 +79,24 @@ function openaiProxy(): Plugin {
           }
           const body = Buffer.concat(chunks).toString();
 
+          const authHeader = req.headers.authorization ?? "";
+          console.log("[OpenAI Proxy] Request to:", targetUrl);
+          console.log("[OpenAI Proxy] Auth header present:", !!authHeader && authHeader.length > 10);
+
           const response = await fetch(targetUrl, {
             method: req.method ?? "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: req.headers.authorization ?? "",
+              Authorization: authHeader,
             },
             body,
           });
 
           const responseBody = await response.text();
+          console.log("[OpenAI Proxy] Response status:", response.status);
+          if (response.status !== 200) {
+            console.log("[OpenAI Proxy] Error response:", responseBody.slice(0, 500));
+          }
           res.writeHead(response.status, {
             "Content-Type": response.headers.get("content-type") ?? "application/json",
             "Access-Control-Allow-Origin": "*",

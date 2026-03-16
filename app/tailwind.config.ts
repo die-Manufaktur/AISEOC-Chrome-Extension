@@ -41,7 +41,9 @@ export default {
       },
       borderRadius: {
         card: "12px",
+        "card-lg": "14px",
         input: "8px",
+        score: "20px",
       },
     },
   },

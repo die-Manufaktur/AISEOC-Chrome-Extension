@@ -9,7 +9,7 @@ const links = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-bg-500 px-4 py-3">
+    <footer className="rounded-card-lg bg-bg-700 border-2 border-[#3e3e3e] px-6 py-4">
       <div className="flex items-center justify-between">
         {links.map(({ label, icon: Icon, href }) => (
           <a
