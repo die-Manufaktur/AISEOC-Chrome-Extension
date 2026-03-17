@@ -109,7 +109,11 @@ describe("saveTabAnalysis / getTabAnalysis / clearTabAnalysis", () => {
 
   const sampleAnalysis: TabAnalysisState = {
     analysis: {
-      score: 75,
+      overallScore: 75,
+      scoreLabel: "Good",
+      scoreDescription: "Your page has good SEO",
+      totalPassed: 10,
+      totalFailed: 5,
       categories: [],
       pageData: {
         url: "https://example.com",
@@ -137,6 +141,7 @@ describe("saveTabAnalysis / getTabAnalysis / clearTabAnalysis", () => {
         imageFileSizes: [],
       },
       keyword: "test",
+      timestamp: Date.now(),
     },
     settings: {
       keyword: "test",
@@ -206,7 +211,11 @@ describe("tab analysis with mocked chrome.storage.session", () => {
 
   const sampleState: TabAnalysisState = {
     analysis: {
-      score: 85,
+      overallScore: 85,
+      scoreLabel: "Great",
+      scoreDescription: "Your page has great SEO",
+      totalPassed: 12,
+      totalFailed: 3,
       categories: [],
       pageData: {
         url: "https://test.com",
@@ -234,6 +243,7 @@ describe("tab analysis with mocked chrome.storage.session", () => {
         imageFileSizes: [],
       },
       keyword: "seo",
+      timestamp: Date.now(),
     },
     settings: { keyword: "seo" },
     url: "https://test.com",
