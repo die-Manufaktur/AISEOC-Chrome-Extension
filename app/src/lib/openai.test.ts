@@ -266,26 +266,18 @@ describe("openai", () => {
       vi.useRealTimers();
     });
 
-    it("throws after max retries exceeded", async () => {
-      vi.useFakeTimers();
-
-      // All calls fail
+    it("throws after max retries exceeded", { timeout: 15000 }, async () => {
+      // All calls fail - the retry has exponential backoff (1s, 2s, 4s)
+      // so we need a longer timeout
       const error = new Error("Persistent network error");
-      mockCreate.mockRejectedValueOnce(error);
-      mockCreate.mockRejectedValueOnce(error);
-      mockCreate.mockRejectedValueOnce(error);
+      mockCreate.mockRejectedValue(error);
 
-      const promise = generateRecommendation("test-api-key", "title-keyword", "SEO", "context");
-
-      // Fast-forward through retry delays
-      await vi.runAllTimersAsync();
-
-      await expect(promise).rejects.toThrow("Persistent network error");
+      await expect(
+        generateRecommendation("test-api-key", "title-keyword", "SEO", "context"),
+      ).rejects.toThrow("Persistent network error");
 
       // Initial + 2 retries = 3 total calls
       expect(mockCreate).toHaveBeenCalledTimes(3);
-
-      vi.useRealTimers();
     });
 
     it("returns empty string when API returns null content", async () => {

@@ -265,7 +265,7 @@ describe("tab analysis with mocked chrome.storage.session", () => {
     expect(sampleState).toHaveProperty("settings");
     expect(sampleState).toHaveProperty("url");
     expect(sampleState).toHaveProperty("savedAt");
-    expect(sampleState.analysis).toHaveProperty("score");
+    expect(sampleState.analysis).toHaveProperty("overallScore");
     expect(sampleState.analysis).toHaveProperty("pageData");
     expect(sampleState.analysis).toHaveProperty("keyword");
   });
