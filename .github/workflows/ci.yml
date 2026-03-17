@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+defaults:
+  run:
+    working-directory: app
+
 jobs:
   lint:
     name: Lint & Format
@@ -19,9 +23,9 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm eslint .
-      - run: pnpm prettier --check .
+      - run: pnpm lint
 
   typecheck:
     name: Type Check
@@ -35,6 +39,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm tsc --noEmit
 
@@ -50,13 +55,14 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm vitest run --coverage
+      - run: pnpm test
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report
-          path: coverage/
+          path: app/coverage/
           retention-days: 7
 
   build:
@@ -72,5 +78,6 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
