@@ -9,8 +9,9 @@ let onMessageCallback: (
   sendResponse: (response: unknown) => void,
 ) => boolean | void;
 
-const setOptionsMock = vi.fn();
+const setOptionsMock = vi.fn().mockResolvedValue(undefined);
 const setPanelBehaviorMock = vi.fn();
+const openPanelMock = vi.fn().mockResolvedValue(undefined);
 
 beforeEach(() => {
   vi.resetModules();
@@ -18,9 +19,15 @@ beforeEach(() => {
 
   // Build fresh chrome mock with listener capture
   const chromeMock = {
+    action: {
+      onClicked: {
+        addListener: vi.fn(),
+      },
+    },
     sidePanel: {
       setPanelBehavior: setPanelBehaviorMock,
       setOptions: setOptionsMock,
+      open: openPanelMock,
     },
     tabs: {
       onActivated: {
@@ -33,7 +40,7 @@ beforeEach(() => {
           onRemovedCallback = cb;
         }),
       },
-      query: vi.fn(),
+      query: vi.fn().mockResolvedValue([]),
       sendMessage: vi.fn(),
     },
     runtime: {
@@ -62,6 +69,11 @@ beforeEach(() => {
         set: vi.fn().mockResolvedValue(undefined),
         remove: vi.fn().mockResolvedValue(undefined),
       },
+      session: {
+        get: vi.fn().mockResolvedValue({}),
+        set: vi.fn().mockResolvedValue(undefined),
+        remove: vi.fn().mockResolvedValue(undefined),
+      },
     },
   };
 
@@ -76,11 +88,21 @@ async function loadServiceWorker() {
 
 describe("service-worker", () => {
   describe("initialization", () => {
-    it("sets openPanelOnActionClick to true on startup", async () => {
+    it("sets openPanelOnActionClick to false for manual handling", async () => {
       await loadServiceWorker();
       expect(setPanelBehaviorMock).toHaveBeenCalledWith({
-        openPanelOnActionClick: true,
+        openPanelOnActionClick: false,
       });
+    });
+
+    it("disables the panel globally by default", async () => {
+      await loadServiceWorker();
+      expect(setOptionsMock).toHaveBeenCalledWith({ enabled: false });
+    });
+
+    it("registers action.onClicked listener", async () => {
+      await loadServiceWorker();
+      expect(chrome.action.onClicked.addListener).toHaveBeenCalledOnce();
     });
 
     it("registers onActivated listener", async () => {
@@ -100,27 +122,26 @@ describe("service-worker", () => {
   });
 
   describe("onActivated — first click (panelTabs empty)", () => {
-    it("does NOT disable the panel when panelTabs is empty", async () => {
+    it("does NOT disable specific tabs when panelTabs is empty", async () => {
       await loadServiceWorker();
+      setOptionsMock.mockClear(); // Clear the startup global disable call
 
       // Simulate tab activation before any panel has been opened
       onActivatedCallback({ tabId: 1 });
 
-      // Should NOT call setOptions with enabled: false
+      // Should NOT call setOptions with tabId (per-tab disable)
       expect(setOptionsMock).not.toHaveBeenCalled();
     });
 
     it("allows the panel to open on first icon click after install", async () => {
       await loadServiceWorker();
+      setOptionsMock.mockClear(); // Clear the startup global disable call
 
       // Tab activates (service worker startup fires this)
       onActivatedCallback({ tabId: 1 });
 
-      // Panel should NOT be disabled — setPanelBehavior(openPanelOnActionClick)
-      // handles opening, and setOptions should not have blocked it
-      expect(setOptionsMock).not.toHaveBeenCalledWith(
-        expect.objectContaining({ enabled: false }),
-      );
+      // Panel should NOT be disabled per-tab — setOptions should not have been called
+      expect(setOptionsMock).not.toHaveBeenCalled();
     });
   });
 
@@ -155,6 +176,7 @@ describe("service-worker", () => {
 
       expect(setOptionsMock).toHaveBeenCalledWith({
         tabId: 1,
+        path: "src/sidepanel/index.html",
         enabled: true,
       });
     });
@@ -180,6 +202,7 @@ describe("service-worker", () => {
       onActivatedCallback({ tabId: 3 });
       expect(setOptionsMock).toHaveBeenCalledWith({
         tabId: 3,
+        path: "src/sidepanel/index.html",
         enabled: true,
       });
     });
@@ -191,21 +214,29 @@ describe("service-worker", () => {
 
       const sendResponse = vi.fn();
       onMessageCallback({ type: "PANEL_OPENED", tabId: 5 }, {}, sendResponse);
-      expect(sendResponse).toHaveBeenCalledWith({ ok: true });
+
+      // Wait for async persistence to complete
+      await vi.waitFor(() => {
+        expect(sendResponse).toHaveBeenCalledWith({ ok: true });
+      });
 
       // Now switching to tab 5 should enable (not disable)
+      setOptionsMock.mockClear();
       onActivatedCallback({ tabId: 5 });
       expect(setOptionsMock).toHaveBeenCalledWith({
         tabId: 5,
+        path: "src/sidepanel/index.html",
         enabled: true,
       });
     });
 
     it("ignores PANEL_OPENED without tabId", async () => {
       await loadServiceWorker();
+      setOptionsMock.mockClear(); // Clear the startup global disable call
 
       const sendResponse = vi.fn();
       onMessageCallback({ type: "PANEL_OPENED" }, {}, sendResponse);
+      // Synchronous path - no tabId means immediate response
       expect(sendResponse).toHaveBeenCalledWith({ ok: true });
 
       // panelTabs should still be empty — no disable on activate

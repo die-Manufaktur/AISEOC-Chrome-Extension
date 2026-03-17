@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Copy, RefreshCw, Check, Sparkles } from "lucide-react";
 import { Button } from "./ui/Button";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,38 @@ export function H2SelectionList({
     }
     return map;
   });
+  const textareaRefs = useRef<Map<number, HTMLTextAreaElement>>(new Map());
+
+  // Sync suggestions when items change (e.g., when AI suggestions complete)
+  useEffect(() => {
+    const newMap: Record<number, string> = {};
+    for (const item of items) {
+      if (item.suggestion) newMap[item.index] = item.suggestion;
+    }
+    setSuggestions((prev) => {
+      // Only update if there are new suggestions from props
+      const hasNewSuggestions = items.some(
+        (item) => item.suggestion && item.suggestion !== prev[item.index]
+      );
+      return hasNewSuggestions ? { ...prev, ...newMap } : prev;
+    });
+  }, [items]);
+
+  // Auto-resize a specific textarea
+  const adjustHeight = useCallback((index: number) => {
+    const textarea = textareaRefs.current.get(index);
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, []);
+
+  // Adjust all textarea heights when suggestions change
+  useEffect(() => {
+    for (const index of Object.keys(suggestions).map(Number)) {
+      adjustHeight(index);
+    }
+  }, [suggestions, adjustHeight]);
   const [loadingItems, setLoadingItems] = useState<Set<number>>(new Set());
   const [copiedItems, setCopiedItems] = useState<Set<number>>(new Set());
   const [loadingAll, setLoadingAll] = useState(false);
@@ -120,13 +152,17 @@ export function H2SelectionList({
             </div>
             <div className="flex gap-2">
               <textarea
+                ref={(el) => {
+                  if (el) textareaRefs.current.set(item.index, el);
+                }}
                 value={suggestion}
-                onChange={(e) =>
-                  setSuggestions((prev) => ({ ...prev, [item.index]: e.target.value }))
-                }
+                onChange={(e) => {
+                  setSuggestions((prev) => ({ ...prev, [item.index]: e.target.value }));
+                  adjustHeight(item.index);
+                }}
                 placeholder="Click regenerate to get a suggestion..."
                 rows={1}
-                className="flex-1 rounded-input bg-bg-700 px-3 py-2 text-body-12 text-text-primary placeholder:text-bg-300 outline-none focus:ring-1 focus:ring-accent-blue transition-shadow resize-none"
+                className="flex-1 rounded-input bg-bg-700 px-3 py-2 text-body-12 text-text-primary placeholder:text-bg-300 outline-none focus:ring-1 focus:ring-accent-blue transition-shadow resize-none overflow-hidden"
               />
               <div className="flex items-start gap-1">
                 <button

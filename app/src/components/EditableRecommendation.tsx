@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Copy, RefreshCw, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +18,25 @@ export function EditableRecommendation({
   className,
 }: EditableRecommendationProps) {
   const [text, setText] = useState(initialValue);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Sync state when initialValue changes (e.g., when AI suggestions complete)
+  useEffect(() => {
+    setText(initialValue);
+  }, [initialValue]);
+
+  // Auto-resize textarea to fit content
+  const adjustHeight = useCallback(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, []);
+
+  useEffect(() => {
+    adjustHeight();
+  }, [text, adjustHeight]);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -77,10 +96,14 @@ export function EditableRecommendation({
         </div>
       </div>
       <textarea
+        ref={textareaRef}
         value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={2}
-        className="w-full rounded-input bg-bg-700 px-3 py-2 text-body-16 text-text-primary placeholder:text-bg-300 outline-none focus:ring-1 focus:ring-accent-blue transition-shadow resize-none"
+        onChange={(e) => {
+          setText(e.target.value);
+          adjustHeight();
+        }}
+        rows={1}
+        className="w-full rounded-input bg-bg-700 px-3 py-2 text-body-16 text-text-primary placeholder:text-bg-300 outline-none focus:ring-1 focus:ring-accent-blue transition-shadow resize-none overflow-hidden"
       />
     </div>
   );

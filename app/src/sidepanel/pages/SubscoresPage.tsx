@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { CheckItem } from "@/components/CheckItem";
 import { EditableRecommendation } from "@/components/EditableRecommendation";
@@ -48,6 +48,11 @@ function sortByPriority(checks: SEOCheck[]): SEOCheck[] {
 export function SubscoresPage() {
   const { analysis, activeCategory, setActiveCategory, apiKey, settings, toast, showToast, hideToast } =
     useStore();
+
+  // Scroll to top when entering this page
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [activeCategory]);
 
   const onToast = useCallback((message: string) => showToast(message), [showToast]);
 
