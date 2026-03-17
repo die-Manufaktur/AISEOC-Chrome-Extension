@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from "vitest";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 // Create a mock for the chat.completions.create method
 const mockCreate = vi.fn();

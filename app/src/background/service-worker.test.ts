@@ -78,7 +78,7 @@ beforeEach(() => {
   };
 
   // setup.ts defines chrome as writable, so assign directly
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   (globalThis as any).chrome = chromeMock;
 });
 

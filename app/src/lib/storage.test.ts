@@ -200,7 +200,7 @@ describe("tab analysis with mocked chrome.storage.session", () => {
       },
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     (globalThis as any).chrome = chromeMock;
   });
 
