@@ -16,7 +16,7 @@ beforeEach(() => {
     settings: {
       keyword: "",
       secondaryKeywords: "",
-      pageType: "blog-post",
+      pageType: "homepage",
       language: "en",
       advancedMode: false,
       targetUrl: "",
@@ -62,7 +62,7 @@ describe("SetupPage", () => {
       settings: {
         keyword: "react testing",
         secondaryKeywords: "",
-        pageType: "blog-post",
+        pageType: "homepage",
         language: "en",
         advancedMode: false,
         targetUrl: "https://example.com",
@@ -84,9 +84,6 @@ describe("SetupPage", () => {
     render(<SetupPage onAnalyze={onAnalyze} />);
     expect(screen.queryByLabelText(/page type/i)).not.toBeInTheDocument();
     expect(
-      screen.queryByLabelText(/ai recommendations language/i),
-    ).not.toBeInTheDocument();
-    expect(
       screen.queryByPlaceholderText(/seo webflow/i),
     ).not.toBeInTheDocument();
   });
@@ -96,7 +93,7 @@ describe("SetupPage", () => {
       settings: {
         keyword: "",
         secondaryKeywords: "",
-        pageType: "blog-post",
+        pageType: "homepage",
         language: "en",
         advancedMode: true,
         targetUrl: "",
@@ -104,9 +101,6 @@ describe("SetupPage", () => {
     });
     render(<SetupPage onAnalyze={onAnalyze} />);
     expect(screen.getByLabelText(/page type/i)).toBeInTheDocument();
-    expect(
-      screen.getByLabelText(/ai recommendations language/i),
-    ).toBeInTheDocument();
     expect(
       screen.getByPlaceholderText(/seo webflow/i),
     ).toBeInTheDocument();
@@ -117,7 +111,7 @@ describe("SetupPage", () => {
       settings: {
         keyword: "",
         secondaryKeywords: "",
-        pageType: "blog-post",
+        pageType: "homepage",
         language: "en",
         advancedMode: true,
         targetUrl: "",
@@ -126,21 +120,18 @@ describe("SetupPage", () => {
     render(<SetupPage onAnalyze={onAnalyze} />);
     const pageTypeSelect = screen.getByLabelText(/page type/i);
     expect(pageTypeSelect).toBeInTheDocument();
-    expect(pageTypeSelect).toHaveValue("blog-post");
+    expect(pageTypeSelect).toHaveValue("homepage");
   });
 
-  it("shows language select in advanced mode", () => {
-    useStore.setState({
-      settings: {
-        keyword: "",
-        secondaryKeywords: "",
-        pageType: "blog-post",
-        language: "en",
-        advancedMode: true,
-        targetUrl: "",
-      },
-    });
+  it("shows language select in settings panel when gear icon is clicked", async () => {
+    const { userEvent } = await import("@testing-library/user-event");
+    const user = userEvent.setup();
     render(<SetupPage onAnalyze={onAnalyze} />);
+    // Language should not be visible initially
+    expect(screen.queryByLabelText(/ai recommendations language/i)).not.toBeInTheDocument();
+    // Click the settings gear icon
+    await user.click(screen.getByRole("button", { name: /settings/i }));
+    // Now language select should be visible
     const langSelect = screen.getByLabelText(/ai recommendations language/i);
     expect(langSelect).toBeInTheDocument();
     expect(langSelect).toHaveValue("en");
@@ -151,7 +142,7 @@ describe("SetupPage", () => {
       settings: {
         keyword: "",
         secondaryKeywords: "",
-        pageType: "blog-post",
+        pageType: "homepage",
         language: "en",
         advancedMode: true,
         targetUrl: "",
@@ -168,7 +159,7 @@ describe("SetupPage", () => {
       settings: {
         keyword: "",
         secondaryKeywords: "hello",
-        pageType: "blog-post",
+        pageType: "homepage",
         language: "en",
         advancedMode: true,
         targetUrl: "",

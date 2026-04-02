@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Toggle } from "@/components/ui/Toggle";
@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { useStore } from "@/lib/store";
 import { SUPPORTED_LANGUAGES } from "@/lib/languages";
 import { getKeywordForUrl, getAdvancedOptions } from "@/lib/storage";
+import { Settings, X } from "lucide-react";
 
 const pageTypes = [
   { value: "homepage", label: "Homepage" },
@@ -39,8 +40,89 @@ interface SetupPageProps {
 const isDevMode =
   typeof chrome === "undefined" || chrome.tabs === undefined;
 
+/**
+ * Hook that watches an input element for programmatic value changes
+ * (autofill, paste tools, browser automation) and syncs back to React state.
+ *
+ * Programmatic fill tools often set the native `value` property directly and
+ * dispatch an `input` event without clearing the field first.  Because React
+ * controlled inputs continuously write state back to the DOM, the dispatched
+ * event's `target.value` ends up being the *old* React state concatenated
+ * with the new text.
+ *
+ * This hook intercepts the native `value` setter so that any external write
+ * is immediately forwarded to the provided `onValueChange` callback, keeping
+ * React state in sync and preventing duplication.
+ */
+function useProgrammaticInputSync(
+  onValueChange: (value: string) => void,
+) {
+  const ref = useRef<HTMLInputElement>(null);
+  const onValueChangeRef = useRef(onValueChange);
+  onValueChangeRef.current = onValueChange;
+
+  useEffect(() => {
+    const input = ref.current;
+    if (!input) return;
+
+    // Get the native value setter from the HTMLInputElement prototype.
+    const nativeDescriptor = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    );
+    if (!nativeDescriptor || !nativeDescriptor.set) return;
+
+    const nativeSetter = nativeDescriptor.set;
+
+    // Replace the value setter on this specific element instance.
+    // When a programmatic tool sets `input.value = "..."`, this fires
+    // our callback so React state stays in sync before any subsequent
+    // input events are dispatched.
+    Object.defineProperty(input, "value", {
+      configurable: true,
+      get() {
+        return nativeDescriptor.get?.call(this) ?? "";
+      },
+      set(newValue: string) {
+        // Call the original native setter first to actually update the DOM.
+        nativeSetter.call(this, newValue);
+        // Sync value back to React state.
+        onValueChangeRef.current(newValue);
+      },
+    });
+
+    return () => {
+      // Restore original behaviour by removing the instance override.
+      delete (input as unknown as Record<string, unknown>).value;
+    };
+  }, []);
+
+  return ref;
+}
+
 export function SetupPage({ onAnalyze }: SetupPageProps) {
-  const { settings, setSettings, error } = useStore();
+  const { settings, setSettings, apiKey, setApiKey, error } = useStore();
+  const [showSettings, setShowSettings] = useState(false);
+  const [localApiKey, setLocalApiKey] = useState(apiKey);
+  const [settingsSaved, setSettingsSaved] = useState(false);
+
+  useEffect(() => {
+    setLocalApiKey(apiKey);
+  }, [apiKey]);
+
+  const handleSaveSettings = async () => {
+    await setApiKey(localApiKey);
+    setSettingsSaved(true);
+    setTimeout(() => setSettingsSaved(false), 2000);
+  };
+
+  const keywordRef = useProgrammaticInputSync((value) =>
+    setSettings({ keyword: value }),
+  );
+
+  const urlRef = useProgrammaticInputSync((value) =>
+    setSettings({ targetUrl: value }),
+  );
 
   const handleUrlBlur = useCallback(async () => {
     const url = settings.targetUrl.trim();
@@ -76,14 +158,75 @@ export function SetupPage({ onAnalyze }: SetupPageProps) {
       {/* Main card */}
       <div className="flex w-full flex-col gap-10 rounded-[20px] border-2 border-[#5b5959] bg-bg-700 px-5 py-8">
         <div className="flex flex-col gap-6">
-          {/* Title */}
-          <h1 className="text-center text-[28px] font-medium leading-[1.1] text-text-primary">
-            Set up your SEO analysis
-          </h1>
+          {/* Title with settings gear */}
+          <div className="relative flex items-center justify-center">
+            <h1 className="text-center text-[28px] font-medium leading-[1.1] text-text-primary">
+              Set up your SEO analysis
+            </h1>
+            <button
+              type="button"
+              onClick={() => setShowSettings(!showSettings)}
+              className="absolute right-0 rounded-full p-1.5 text-text-secondary transition-colors hover:bg-bg-500 hover:text-text-primary"
+              aria-label="Settings"
+            >
+              <Settings className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Inline settings panel */}
+          {showSettings && (
+            <div className="flex flex-col gap-4 rounded-[14px] border border-[#717171] bg-bg-500 p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[18px] font-semibold text-text-primary">Settings</span>
+                <button
+                  type="button"
+                  onClick={() => setShowSettings(false)}
+                  className="rounded-full p-1 text-text-secondary transition-colors hover:bg-bg-700 hover:text-text-primary"
+                  aria-label="Close settings"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="settings-api-key" className="text-[16px] font-medium text-text-primary">
+                  OpenAI API key
+                </label>
+                <input
+                  id="settings-api-key"
+                  type="password"
+                  placeholder="sk-..."
+                  value={localApiKey}
+                  onChange={(e) => setLocalApiKey(e.target.value)}
+                  className="w-full rounded-[10px] border border-[#717171] bg-bg-700 p-[10px] text-[16px] text-text-primary placeholder:text-text-secondary outline-none focus:ring-1 focus:ring-accent-blue transition-shadow"
+                />
+              </div>
+
+              <Select
+                label="AI recommendations language"
+                options={languages}
+                value={settings.language}
+                onChange={(e) => setSettings({ language: e.target.value })}
+              />
+
+              <button
+                type="button"
+                onClick={handleSaveSettings}
+                className="self-start rounded-full bg-accent-blue px-5 py-2 text-[14px] font-medium text-white transition-colors hover:bg-accent-blue/90"
+              >
+                Save
+              </button>
+
+              {settingsSaved && (
+                <p className="text-[14px] text-green-400">Settings saved.</p>
+              )}
+            </div>
+          )}
 
           {/* Dev mode URL field */}
           {isDevMode && (
             <Input
+              ref={urlRef}
               label="Page URL to analyze"
               type="url"
               placeholder="https://example.com"
@@ -95,6 +238,7 @@ export function SetupPage({ onAnalyze }: SetupPageProps) {
 
           {/* Main keyword */}
           <Input
+            ref={keywordRef}
             label="Main keyword"
             placeholder="Enter your main keyword"
             value={settings.keyword}
@@ -131,13 +275,6 @@ export function SetupPage({ onAnalyze }: SetupPageProps) {
                 options={pageTypes}
                 value={settings.pageType}
                 onChange={(e) => setSettings({ pageType: e.target.value })}
-              />
-
-              <Select
-                label="AI recommendations language"
-                options={languages}
-                value={settings.language}
-                onChange={(e) => setSettings({ language: e.target.value })}
               />
 
               <div className="flex flex-col gap-4">

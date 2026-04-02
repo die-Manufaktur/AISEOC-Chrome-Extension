@@ -83,4 +83,32 @@ describe("ImageAltTextList", () => {
       "Failed to generate alt text",
     );
   });
+
+  describe("when apiKeyMissing is true", () => {
+    it("disables all generate buttons", () => {
+      render(<ImageAltTextList {...defaultProps} apiKeyMissing />);
+      const generateButtons = screen.getAllByTitle("Set up API key in options");
+      for (const btn of generateButtons) {
+        expect(btn).toBeDisabled();
+      }
+    });
+
+    it("shows a message about setting up the API key", () => {
+      render(<ImageAltTextList {...defaultProps} apiKeyMissing />);
+      expect(
+        screen.getByText("Set up your OpenAI API key in options to use AI suggestions."),
+      ).toBeInTheDocument();
+    });
+
+    it("does not call onGenerate when generate button is clicked", async () => {
+      const onGenerate = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <ImageAltTextList {...defaultProps} onGenerate={onGenerate} apiKeyMissing />,
+      );
+      const generateButtons = screen.getAllByTitle("Set up API key in options");
+      await user.click(generateButtons[0]);
+      expect(onGenerate).not.toHaveBeenCalled();
+    });
+  });
 });

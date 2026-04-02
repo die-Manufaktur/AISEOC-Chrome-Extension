@@ -7,6 +7,7 @@ interface EditableRecommendationProps {
   initialValue: string;
   onRegenerate: () => Promise<string>;
   onToast: (message: string) => void;
+  apiKeyMissing?: boolean;
   className?: string;
 }
 
@@ -15,6 +16,7 @@ export function EditableRecommendation({
   initialValue,
   onRegenerate,
   onToast,
+  apiKeyMissing = false,
   className,
 }: EditableRecommendationProps) {
   const [text, setText] = useState(initialValue);
@@ -85,9 +87,9 @@ export function EditableRecommendation({
           </button>
           <button
             onClick={handleRegenerate}
-            disabled={loading}
-            className="rounded-full p-1.5 text-text-secondary hover:bg-bg-300 hover:text-white transition-colors disabled:opacity-50"
-            title="Regenerate"
+            disabled={loading || apiKeyMissing}
+            className="rounded-full p-1.5 text-text-secondary hover:bg-bg-300 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-text-secondary"
+            title={apiKeyMissing ? "Set up API key in options" : "Regenerate"}
           >
             <RefreshCw
               className={cn("h-3.5 w-3.5", loading && "animate-spin")}
@@ -105,6 +107,11 @@ export function EditableRecommendation({
         rows={1}
         className="w-full rounded-input bg-bg-700 px-3 py-2 text-body-16 text-text-primary placeholder:text-bg-300 outline-none focus:ring-1 focus:ring-accent-blue transition-shadow resize-none overflow-hidden"
       />
+      {apiKeyMissing && (
+        <p className="mt-2 text-body-12 text-text-secondary opacity-70">
+          Set up your OpenAI API key in options to use AI suggestions.
+        </p>
+      )}
     </div>
   );
 }

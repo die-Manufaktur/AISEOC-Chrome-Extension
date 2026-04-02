@@ -94,4 +94,42 @@ describe("H2SelectionList", () => {
     await user.click(regenerateButtons[0]);
     expect(defaultProps.onToast).toHaveBeenCalledWith("Failed to regenerate");
   });
+
+  describe("when apiKeyMissing is true", () => {
+    it("disables the Generate All button", () => {
+      render(<H2SelectionList {...defaultProps} apiKeyMissing />);
+      const generateAllBtn = screen.getByText("Generate All").closest("button")!;
+      expect(generateAllBtn).toBeDisabled();
+    });
+
+    it("disables all per-item regenerate buttons", () => {
+      render(<H2SelectionList {...defaultProps} apiKeyMissing />);
+      const regenerateButtons = screen.getAllByTitle("Set up API key in options");
+      for (const btn of regenerateButtons) {
+        expect(btn).toBeDisabled();
+      }
+    });
+
+    it("shows a message about setting up the API key", () => {
+      render(<H2SelectionList {...defaultProps} apiKeyMissing />);
+      expect(
+        screen.getByText("Set up your OpenAI API key in options to use AI suggestions."),
+      ).toBeInTheDocument();
+    });
+
+    it("does not call onRegenerateAll when Generate All is clicked", async () => {
+      const onRegenerateAll = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <H2SelectionList
+          {...defaultProps}
+          onRegenerateAll={onRegenerateAll}
+          apiKeyMissing
+        />,
+      );
+      const generateAllBtn = screen.getByText("Generate All").closest("button")!;
+      await user.click(generateAllBtn);
+      expect(onRegenerateAll).not.toHaveBeenCalled();
+    });
+  });
 });

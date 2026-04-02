@@ -1,15 +1,17 @@
 {
   "manifest_version": 3,
   "name": "AI SEO Copilot",
+  "short_name": "SEO Copilot",
   "description": "Analyze page SEO and get AI-powered recommendations",
   "version": "0.1.0",
+  "minimum_chrome_version": "116",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png"
   },
-  "permissions": ["activeTab", "tabs", "sidePanel", "storage", "scripting"],
+  "permissions": ["tabs", "sidePanel", "storage", "scripting"],
   "host_permissions": ["<all_urls>"],
   "background": {
     "service_worker": "src/background/service-worker.ts",
@@ -21,6 +23,9 @@
       "js": ["src/content/index.ts"]
     }
   ],
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
   "options_ui": {
     "page": "src/options/index.html",
     "open_in_tab": false

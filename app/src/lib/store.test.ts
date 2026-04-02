@@ -7,7 +7,7 @@ beforeEach(() => {
     settings: {
       keyword: "",
       secondaryKeywords: "",
-      pageType: "blog-post",
+      pageType: "homepage",
       language: "en",
       advancedMode: false,
       targetUrl: "",
@@ -32,7 +32,7 @@ describe("useStore", () => {
     expect(state.settings).toEqual({
       keyword: "",
       secondaryKeywords: "",
-      pageType: "blog-post",
+      pageType: "homepage",
       language: "en",
       advancedMode: false,
       targetUrl: "",
@@ -49,7 +49,7 @@ describe("useStore", () => {
 
     const settings = useStore.getState().settings;
     expect(settings.keyword).toBe("react hooks");
-    expect(settings.pageType).toBe("blog-post");
+    expect(settings.pageType).toBe("homepage");
     expect(settings.language).toBe("en");
     expect(settings.advancedMode).toBe(false);
     expect(settings.targetUrl).toBe("");

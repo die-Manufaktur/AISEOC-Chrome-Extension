@@ -447,6 +447,16 @@ describe("runSEOChecks", () => {
       expect(findCheck(checks, "next-gen-images").status).toBe("pass");
     });
 
+    it("image-file-size: warns when no file size data is available", () => {
+      const checks = runSEOChecks(
+        makePageData({ imageFileSizes: [] }),
+        defaultOptions,
+      );
+      const check = findCheck(checks, "image-file-size");
+      expect(check.status).toBe("warning");
+      expect(check.details).toContain("Unable to verify");
+    });
+
     it("image-file-size: passes when all under 500KB", () => {
       const checks = runSEOChecks(
         makePageData({

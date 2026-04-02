@@ -75,4 +75,30 @@ describe("EditableRecommendation", () => {
     await user.click(screen.getByTitle("Regenerate"));
     expect(defaultProps.onToast).toHaveBeenCalledWith("Failed to regenerate");
   });
+
+  describe("when apiKeyMissing is true", () => {
+    it("disables the regenerate button", () => {
+      render(<EditableRecommendation {...defaultProps} apiKeyMissing />);
+      const btn = screen.getByTitle("Set up API key in options");
+      expect(btn).toBeDisabled();
+    });
+
+    it("shows a message about setting up the API key", () => {
+      render(<EditableRecommendation {...defaultProps} apiKeyMissing />);
+      expect(
+        screen.getByText("Set up your OpenAI API key in options to use AI suggestions."),
+      ).toBeInTheDocument();
+    });
+
+    it("does not call onRegenerate when button is clicked", async () => {
+      const onRegenerate = vi.fn();
+      const user = userEvent.setup();
+      render(
+        <EditableRecommendation {...defaultProps} onRegenerate={onRegenerate} apiKeyMissing />,
+      );
+      const btn = screen.getByTitle("Set up API key in options");
+      await user.click(btn);
+      expect(onRegenerate).not.toHaveBeenCalled();
+    });
+  });
 });

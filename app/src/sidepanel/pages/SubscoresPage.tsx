@@ -66,6 +66,7 @@ export function SubscoresPage() {
   const failed = category.total - category.passed;
   const keyword = analysis.keyword;
   const sortedChecks = sortByPriority(category.checks);
+  const noApiKey = !apiKey;
 
   const advancedOptions = settings.advancedMode
     ? {
@@ -75,26 +76,37 @@ export function SubscoresPage() {
       }
     : undefined;
 
+  // Stub that rejects immediately when no API key is configured.
+  // The buttons will be disabled, but this provides a safe fallback.
+  const rejectNoKey = () => Promise.reject(new Error("No API key configured"));
+
   const renderCheckRecommendation = (check: SEOCheck) => {
-    if (check.status === "pass" || !apiKey) return null;
+    if (check.status === "pass") return null;
 
     if (check.id === "h2-keyword" && check.h2Recommendations) {
       return (
         <div className="mt-3">
           <H2SelectionList
             items={check.h2Recommendations}
-            onRegenerateOne={(_index, h2Text) =>
-              generateH2Suggestion(apiKey, h2Text, keyword, advancedOptions)
+            onRegenerateOne={
+              noApiKey
+                ? rejectNoKey
+                : (_index, h2Text) =>
+                    generateH2Suggestion(apiKey, h2Text, keyword, advancedOptions)
             }
-            onRegenerateAll={() =>
-              generateAllH2Suggestions(
-                apiKey,
-                check.h2Recommendations!.map((h) => h.text),
-                keyword,
-                advancedOptions,
-              )
+            onRegenerateAll={
+              noApiKey
+                ? () => rejectNoKey() as Promise<string[]>
+                : () =>
+                    generateAllH2Suggestions(
+                      apiKey,
+                      check.h2Recommendations!.map((h) => h.text),
+                      keyword,
+                      advancedOptions,
+                    )
             }
             onToast={onToast}
+            apiKeyMissing={noApiKey}
           />
         </div>
       );
@@ -105,8 +117,13 @@ export function SubscoresPage() {
         <div className="mt-3">
           <ImageAltTextList
             images={check.imageData}
-            onGenerate={(src) => generateAltText(apiKey, src, keyword, advancedOptions)}
+            onGenerate={
+              noApiKey
+                ? rejectNoKey
+                : (src) => generateAltText(apiKey, src, keyword, advancedOptions)
+            }
             onToast={onToast}
+            apiKeyMissing={noApiKey}
           />
         </div>
       );
@@ -155,10 +172,14 @@ export function SubscoresPage() {
           <EditableRecommendation
             label={label}
             initialValue={check.recommendation ?? "Click regenerate to generate..."}
-            onRegenerate={() =>
-              generateRecommendation(apiKey, check.id, keyword, context, advancedOptions)
+            onRegenerate={
+              noApiKey
+                ? rejectNoKey
+                : () =>
+                    generateRecommendation(apiKey, check.id, keyword, context, advancedOptions)
             }
             onToast={onToast}
+            apiKeyMissing={noApiKey}
           />
         </div>
       );

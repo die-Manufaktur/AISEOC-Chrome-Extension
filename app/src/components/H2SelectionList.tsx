@@ -14,6 +14,7 @@ interface H2SelectionListProps {
   onRegenerateOne: (index: number, h2Text: string) => Promise<string>;
   onRegenerateAll: () => Promise<string[]>;
   onToast: (message: string) => void;
+  apiKeyMissing?: boolean;
   className?: string;
 }
 
@@ -22,6 +23,7 @@ export function H2SelectionList({
   onRegenerateOne,
   onRegenerateAll,
   onToast,
+  apiKeyMissing = false,
   className,
 }: H2SelectionListProps) {
   const [suggestions, setSuggestions] = useState<Record<number, string>>(() => {
@@ -133,11 +135,19 @@ export function H2SelectionList({
           variant="secondary"
           onClick={handleRegenerateAll}
           loading={loadingAll}
+          disabled={apiKeyMissing}
+          title={apiKeyMissing ? "Set up API key in options" : undefined}
         >
           <Sparkles className="h-3 w-3" />
           Generate All
         </Button>
       </div>
+
+      {apiKeyMissing && (
+        <p className="text-body-12 text-text-secondary opacity-70">
+          Set up your OpenAI API key in options to use AI suggestions.
+        </p>
+      )}
 
       {items.map((item) => {
         const suggestion = suggestions[item.index] ?? "";
@@ -184,9 +194,9 @@ export function H2SelectionList({
                 </button>
                 <button
                   onClick={() => handleRegenerateOne(item.index, item.text)}
-                  disabled={isLoading}
-                  className="rounded-full p-1.5 text-text-secondary hover:bg-bg-300 hover:text-white transition-colors disabled:opacity-50"
-                  title="Regenerate"
+                  disabled={isLoading || apiKeyMissing}
+                  className="rounded-full p-1.5 text-text-secondary hover:bg-bg-300 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-text-secondary"
+                  title={apiKeyMissing ? "Set up API key in options" : "Regenerate"}
                 >
                   <RefreshCw
                     className={cn("h-3.5 w-3.5", isLoading && "animate-spin")}

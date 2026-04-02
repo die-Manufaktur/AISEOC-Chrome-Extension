@@ -22,7 +22,7 @@ function injectStyles() {
       padding: 2px 6px;
       border-radius: 4px;
       white-space: nowrap;
-      z-index: 99999;
+      z-index: 10000;
       font-family: system-ui, sans-serif;
     }
   `;

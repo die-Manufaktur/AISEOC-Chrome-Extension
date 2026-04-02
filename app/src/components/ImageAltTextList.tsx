@@ -7,6 +7,7 @@ interface ImageAltTextListProps {
   images: ImageData[];
   onGenerate: (imageSrc: string) => Promise<string>;
   onToast: (message: string) => void;
+  apiKeyMissing?: boolean;
   className?: string;
 }
 
@@ -14,6 +15,7 @@ export function ImageAltTextList({
   images,
   onGenerate,
   onToast,
+  apiKeyMissing = false,
   className,
 }: ImageAltTextListProps) {
   const [altTexts, setAltTexts] = useState<Record<number, string>>({});
@@ -66,6 +68,12 @@ export function ImageAltTextList({
         Images Missing Alt Text
       </span>
 
+      {apiKeyMissing && (
+        <p className="text-body-12 text-text-secondary opacity-70">
+          Set up your OpenAI API key in options to use AI suggestions.
+        </p>
+      )}
+
       {images.map((img, index) => {
         const altText = altTexts[index] ?? "";
         const isLoading = loadingItems.has(index);
@@ -114,9 +122,9 @@ export function ImageAltTextList({
                   </button>
                   <button
                     onClick={() => handleGenerate(index, img.src)}
-                    disabled={isLoading}
-                    className="rounded-full p-1.5 text-text-secondary hover:bg-bg-300 hover:text-white transition-colors disabled:opacity-50"
-                    title="Generate alt text"
+                    disabled={isLoading || apiKeyMissing}
+                    className="rounded-full p-1.5 text-text-secondary hover:bg-bg-300 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-text-secondary"
+                    title={apiKeyMissing ? "Set up API key in options" : "Generate alt text"}
                   >
                     {isLoading ? (
                       <RefreshCw className="h-3.5 w-3.5 animate-spin" />

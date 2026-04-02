@@ -29,7 +29,7 @@ interface Store extends AppState {
 const defaultSettings: AnalysisSettings = {
   keyword: "",
   secondaryKeywords: "",
-  pageType: "blog-post",
+  pageType: "homepage",
   language: "en",
   advancedMode: false,
   targetUrl: "",

@@ -195,7 +195,7 @@ For AI-powered suggestions, you need an OpenAI API key:
 4. Create a new secret key
 5. Copy the key and paste it in the extension's Settings
 
-**Note:** OpenAI API usage has associated costs. The extension uses GPT-3.5-turbo which is inexpensive (typically fractions of a cent per request).
+**Note:** OpenAI API usage has associated costs. The extension uses GPT-4o-mini which is inexpensive (typically fractions of a cent per request).
 
 ---
 

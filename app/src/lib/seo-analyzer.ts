@@ -350,7 +350,7 @@ export function runSEOChecks(
     description: "Large images slow down page load. Keep images under 500KB.",
     status:
       data.imageFileSizes.length === 0
-        ? "pass"
+        ? "warning"
         : oversizedImages.length === 0
           ? "pass"
           : "warning",
@@ -358,7 +358,7 @@ export function runSEOChecks(
     category: "images",
     details:
       data.imageFileSizes.length === 0
-        ? "No image file size data available."
+        ? "No image file size data available. Unable to verify in dev mode."
         : oversizedImages.length === 0
           ? "All images are under 500KB."
           : `${oversizedImages.length} image(s) exceed 500KB.`,

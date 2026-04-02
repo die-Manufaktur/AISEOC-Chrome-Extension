@@ -1,5 +1,5 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
-import { fetchAndAnalyzePage } from "./fetch-page";
+import { fetchAndAnalyzePage, detectJavaScriptRendering } from "./fetch-page";
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -330,7 +330,7 @@ describe("fetchAndAnalyzePage", () => {
   });
 
   describe("JS-rendered site detection", () => {
-    it("adds warning for JS-rendered sites", async () => {
+    it("adds warning for JS-rendered sites with React root", async () => {
       const jsRenderedHtml = `
         <!DOCTYPE html>
         <html>
@@ -348,6 +348,76 @@ describe("fetchAndAnalyzePage", () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(jsRenderedHtml));
 
       const result = await fetchAndAnalyzePage("https://example.com/spa");
+
+      expect(result.fetchWarnings).toBeDefined();
+      expect(result.fetchWarnings?.[0]).toContain("JavaScript-rendered");
+    });
+
+    it("adds warning for Next.js sites with __NEXT_DATA__", async () => {
+      const nextJsHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Next.js App</title>
+          <meta name="description" content="A Next.js site">
+        </head>
+        <body>
+          <div id="__next"></div>
+          <script id="__NEXT_DATA__" type="application/json">{"props":{}}</script>
+          <script src="/_next/static/chunks/main.js"></script>
+        </body>
+        </html>
+      `;
+      mockFetch.mockResolvedValueOnce(createMockResponse(nextJsHtml));
+
+      const result = await fetchAndAnalyzePage("https://example.com/nextjs");
+
+      expect(result.fetchWarnings).toBeDefined();
+      expect(result.fetchWarnings?.[0]).toContain("JavaScript-rendered");
+    });
+
+    it("adds warning for Vue/Nuxt sites", async () => {
+      const nuxtHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Nuxt App</title>
+        </head>
+        <body>
+          <div id="__nuxt"></div>
+          <script src="/js/app.js"></script>
+          <script src="/js/vendor.js"></script>
+        </body>
+        </html>
+      `;
+      mockFetch.mockResolvedValueOnce(createMockResponse(nuxtHtml));
+
+      const result = await fetchAndAnalyzePage("https://example.com/nuxt");
+
+      expect(result.fetchWarnings).toBeDefined();
+      expect(result.fetchWarnings?.[0]).toContain("JavaScript-rendered");
+    });
+
+    it("adds warning when body has only scripts and empty divs", async () => {
+      const emptyBodyHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>SPA Shell</title>
+          <meta name="description" content="An SPA">
+        </head>
+        <body>
+          <div id="root"></div>
+          <noscript>You need JavaScript to run this app.</noscript>
+          <script src="/bundle.js"></script>
+          <script src="/vendor.js"></script>
+          <script src="/runtime.js"></script>
+        </body>
+        </html>
+      `;
+      mockFetch.mockResolvedValueOnce(createMockResponse(emptyBodyHtml));
+
+      const result = await fetchAndAnalyzePage("https://example.com/shell");
 
       expect(result.fetchWarnings).toBeDefined();
       expect(result.fetchWarnings?.[0]).toContain("JavaScript-rendered");
@@ -377,6 +447,33 @@ describe("fetchAndAnalyzePage", () => {
       const result = await fetchAndAnalyzePage("https://example.com/test");
 
       expect(result.fetchWarnings).toBeUndefined();
+    });
+
+    it("detects SPA with moderate word count (50-100) from nav/footer but no real content", async () => {
+      const spaWithNavHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>My SPA</title>
+          <meta name="description" content="A single page application">
+        </head>
+        <body>
+          <div id="root">
+            <nav>Home About Contact Blog Products Services Portfolio Careers Press FAQ Support Terms Privacy</nav>
+            <footer>Copyright 2026 My Company. All rights reserved. Built with React. Follow us on Twitter.</footer>
+          </div>
+          <script src="/static/js/main.abc123.js"></script>
+          <script src="/static/js/vendor.def456.js"></script>
+        </body>
+        </html>
+      `;
+      mockFetch.mockResolvedValueOnce(createMockResponse(spaWithNavHtml));
+
+      const result = await fetchAndAnalyzePage("https://example.com/spa-nav");
+
+      // Should detect because: SPA root + low word count + multiple scripts + no h1
+      expect(result.fetchWarnings).toBeDefined();
+      expect(result.fetchWarnings?.[0]).toContain("JavaScript-rendered");
     });
   });
 
@@ -449,5 +546,160 @@ describe("fetchAndAnalyzePage", () => {
       // Invalid URLs should be counted as internal
       expect(result.internalLinks).toBeGreaterThanOrEqual(1);
     });
+  });
+});
+
+describe("detectJavaScriptRendering", () => {
+  function parseDoc(html: string): Document {
+    return new DOMParser().parseFromString(html, "text/html");
+  }
+
+  function getWordCount(doc: Document): number {
+    const bodyText = doc.body?.textContent ?? "";
+    return bodyText.split(/\s+/).filter(Boolean).length;
+  }
+
+  function getH1Count(doc: Document): number {
+    return doc.querySelectorAll("h1").length;
+  }
+
+  it("returns false for a normal content-rich page", () => {
+    const html = `
+      <html>
+      <head><title>Blog Post</title></head>
+      <body>
+        <h1>My Great Blog Post</h1>
+        <p>This is a detailed article about web development best practices.
+        It covers many topics including performance, accessibility, and SEO.
+        The article goes into depth about each topic with practical examples
+        and code snippets that developers can use in their own projects.
+        We also discuss common pitfalls and how to avoid them effectively.</p>
+        <script src="/analytics.js"></script>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(false);
+  });
+
+  it("returns true for a typical Create React App shell", () => {
+    const html = `
+      <html>
+      <head><title>React App</title></head>
+      <body>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root"></div>
+        <script src="/static/js/bundle.js"></script>
+        <script src="/static/js/main.chunk.js"></script>
+        <script src="/static/js/vendors~main.chunk.js"></script>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(true);
+  });
+
+  it("returns true for a Next.js page with __NEXT_DATA__ and empty __next div", () => {
+    const html = `
+      <html>
+      <head><title>Next App</title><meta name="description" content="desc"></head>
+      <body>
+        <div id="__next"></div>
+        <script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{}}}</script>
+        <script src="/_next/static/chunks/webpack.js"></script>
+        <script src="/_next/static/chunks/main.js"></script>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(true);
+  });
+
+  it("returns true for a Vue app with #app root", () => {
+    const html = `
+      <html>
+      <head><title>Vue App</title></head>
+      <body>
+        <div id="app"></div>
+        <script src="/js/chunk-vendors.js"></script>
+        <script src="/js/app.js"></script>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(true);
+  });
+
+  it("returns true for a Gatsby site with #__gatsby root", () => {
+    const html = `
+      <html>
+      <head><title>Gatsby Site</title><meta name="description" content="desc"></head>
+      <body>
+        <div id="__gatsby"></div>
+        <script id="gatsby-script-loader">/* loader */</script>
+        <script src="/app.js"></script>
+        <script src="/framework.js"></script>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(true);
+  });
+
+  it("returns false for a page with enough real content even if it has SPA-like root", () => {
+    // SSR'd Next.js page with actual content in the HTML
+    const words = Array(150).fill("word").join(" ");
+    const html = `
+      <html>
+      <head><title>SSR Page</title></head>
+      <body>
+        <div id="__next">
+          <h1>Server Rendered Page</h1>
+          <p>${words}</p>
+        </div>
+        <script src="/_next/static/chunks/main.js"></script>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    // SPA root gives +2, but only 1 script (not >=2) so Signal 2 doesn't fire,
+    // body has meaningful content so Signal 3 doesn't fire.
+    // H1 present so Signal 6 doesn't fire. Score = 2, under threshold.
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(false);
+  });
+
+  it("returns true for body with only script and noscript tags", () => {
+    const html = `
+      <html>
+      <head><title>App</title><meta name="viewport" content="width=device-width"></head>
+      <body>
+        <script src="/a.js"></script>
+        <script src="/b.js"></script>
+        <noscript>Enable JS</noscript>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(true);
+  });
+
+  it("returns false for a static page with scripts but rich content", () => {
+    const paragraphs = Array(10)
+      .fill(null)
+      .map((_, i) => `<p>Paragraph ${i + 1} with enough text to be meaningful content on the page.</p>`)
+      .join("\n");
+    const html = `
+      <html>
+      <head><title>Static Page</title></head>
+      <body>
+        <h1>Main Title</h1>
+        ${paragraphs}
+        <script src="/analytics.js"></script>
+        <script src="/tracking.js"></script>
+      </body>
+      </html>
+    `;
+    const doc = parseDoc(html);
+    expect(detectJavaScriptRendering(doc, getWordCount(doc), getH1Count(doc))).toBe(false);
   });
 });
